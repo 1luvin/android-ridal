@@ -1,0 +1,114 @@
+package tv.ridal
+
+
+import android.os.Bundle
+import android.view.View
+import androidx.activity.addCallback
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.tunjid.androidx.navigation.MultiStackNavigator
+import com.tunjid.androidx.navigation.Navigator
+import com.tunjid.androidx.navigation.multiStackNavigationController
+import tv.ridal.Application.Theme
+import tv.ridal.Utils.Utils
+
+class ApplicationActivity : BaseActivity()
+{
+
+    companion object {
+        val tabs = intArrayOf(R.id.settings, R.id.navigation, R.id.search)
+    }
+
+    val multiStackNavigator: MultiStackNavigator by multiStackNavigationController(
+        tabs.size,
+        R.id.content_container
+    ) { index ->
+        when(index)
+        {
+            0 -> SettingsFragment.newInstance() to SettingsFragment.TAG
+            1 -> CatalogFragment.newInstance() to CatalogFragment.TAG
+            2 -> SearchFragment.newInstance() to SearchFragment.TAG
+            else -> Fragment() to "Fragment"
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_application)
+
+        Utils.checkDisplaySize(this)
+
+        findViewById<BottomNavigationView>(R.id.bottom_navigation).apply {
+            multiStackNavigator.stackSelectedListener = { menu.findItem(tabs[it])?.isChecked = true}
+            multiStackNavigator.transactionModifier = { incomingFragment ->
+                val current = multiStackNavigator.current
+                if (current is Navigator.TransactionModifier) current.augmentTransaction(this, incomingFragment)
+                else { zoom() }
+            }
+            multiStackNavigator.stackTransactionModifier = { fade() }
+
+            setOnApplyWindowInsetsListener { v, insets -> insets }
+            setOnNavigationItemSelectedListener { multiStackNavigator.show(tabs.indexOf(it.itemId)).let { true } }
+            setOnNavigationItemReselectedListener { multiStackNavigator.activeNavigator.clear() }
+        }
+
+        onBackPressedDispatcher.addCallback(this) { if( ! multiStackNavigator.pop()) finish() }
+    }
+
+    fun FragmentTransaction.zoom()
+    {
+        this.setCustomAnimations(
+            R.anim.zoom_in,
+            R.anim.zoom_out,
+            R.anim.zoom_pop_in,
+            R.anim.zoom_pop_out
+        )
+    }
+
+    fun FragmentTransaction.fade()
+    {
+        this.setCustomAnimations(
+            R.anim.fade_in,
+            R.anim.fade_out,
+            R.anim.fade_out,
+            R.anim.fade_in
+        )
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
