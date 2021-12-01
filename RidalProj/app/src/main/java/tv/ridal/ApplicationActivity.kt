@@ -57,7 +57,7 @@ class ApplicationActivity : BaseActivity()
         onBackPressedDispatcher.addCallback(this) { if( ! multiStackNavigator.pop()) finish() }
     }
 
-    fun FragmentTransaction.zoom()
+    private fun FragmentTransaction.zoom()
     {
         this.setCustomAnimations(
             R.anim.zoom_in,
@@ -67,7 +67,7 @@ class ApplicationActivity : BaseActivity()
         )
     }
 
-    fun FragmentTransaction.fade()
+    private fun FragmentTransaction.fade()
     {
         this.setCustomAnimations(
             R.anim.fade_in,

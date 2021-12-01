@@ -72,12 +72,12 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
             orientation = LinearLayout.VERTICAL
         }
 
-        for (i in 0 until 30)
+        for (i in 0 until 11)
         {
             resultsLayout.addView(
                 SearchResultCell(requireContext()).apply {
                     resultText = "Result ${i + 1}"
-                    resultValue = Random.nextFloat() * 10
+                    resultValue = i + 0F
                 }
             )
         }

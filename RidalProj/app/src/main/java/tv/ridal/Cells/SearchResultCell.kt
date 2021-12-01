@@ -25,8 +25,7 @@ class SearchResultCell(context: Context) : FrameLayout(context)
         set(value) {
             field = value
 
-            textView2.text = ((resultValue * 100) / 100F).toString()
-            val value: Float = Math.round(resultValue / 10F * 100) / 100F
+            textView2.text = value.toString()
             textView2.setTextColor(colorForValue(value))
         }
 
@@ -42,8 +41,7 @@ class SearchResultCell(context: Context) : FrameLayout(context)
             ellipsize = TextUtils.TruncateAt.END
         }
         addView(textView2, LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT,
-            LayoutHelper.WRAP_CONTENT,
+            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.END or Gravity.CENTER_VERTICAL,
             20, 0, 25, 0
         ))
@@ -58,13 +56,9 @@ class SearchResultCell(context: Context) : FrameLayout(context)
             ellipsize = TextUtils.TruncateAt.END
         }
         addView(textView, LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT,
-            LayoutHelper.WRAP_CONTENT,
+            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.CENTER_VERTICAL,
-            25,
-            0,
-            20 + textView2.width + 25,
-            0)
+            25, 0, 20 + textView2.width + 25, 0)
         )
 
     }
@@ -76,20 +70,21 @@ class SearchResultCell(context: Context) : FrameLayout(context)
         )
     }
 
+    // value: от 0 до 10
     private fun colorForValue(value: Float) : Int
     {
-        if (value >= 0.5F)
+        if (value >= 5F)
         {
-            return ColorUtils.blendARGB(
-                Theme.color(Theme.color_searchResult_best),
+            return Theme.mixColors(
                 Theme.color(Theme.color_searchResult_middle),
-                (1 - value) * 2
+                Theme.color(Theme.color_searchResult_best),
+                (value - 5F) / 5F
             )
         }
-        return ColorUtils.blendARGB(
+        return Theme.mixColors(
             Theme.color(Theme.color_searchResult_worst),
             Theme.color(Theme.color_searchResult_middle),
-            value * 2
+            (value / 5F)
         )
     }
 

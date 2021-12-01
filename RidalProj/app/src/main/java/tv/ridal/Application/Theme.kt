@@ -12,6 +12,7 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
 import android.graphics.drawable.shapes.RoundRectShape
 import android.util.StateSet
+import androidx.annotation.FloatRange
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import tv.ridal.Utils.Utils
@@ -117,16 +118,22 @@ class Theme
             return ContextCompat.getDrawable(ApplicationLoader.instance().applicationContext, drawableId)!!
         }
 
-
+        // alpha: от 0 до 1
         fun alphaColor(color: Int, alpha: Float) : Int
         {
             return ColorUtils.setAlphaComponent(color, (255 * alpha).toInt())
         }
-
         fun alphaColor(colorKey: String, alpha: Float) : Int
         {
             return alphaColor(color(colorKey), alpha)
         }
+
+        // ratio: от 0 до 1 (для 0.2 будет использовано 20% color2 и 80% color1)
+        fun mixColors(color1: Int, color2: Int, ratio: Float) : Int
+        {
+            return ColorUtils.blendARGB(color1, color2, ratio)
+        }
+
 
 
         fun createCircleSelector(color: Int, radius: Int = Utils.dp(20)) : Drawable
@@ -140,7 +147,6 @@ class Theme
             }
             return rippleDrawable
         }
-
 
         fun createRect(color: Int, radii: FloatArray? = null) : Drawable
         {

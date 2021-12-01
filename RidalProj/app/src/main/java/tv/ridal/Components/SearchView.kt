@@ -1,6 +1,7 @@
 package tv.ridal.Components
 
 import android.content.Context
+import android.graphics.drawable.ColorDrawable
 import android.text.*
 import android.text.style.UnderlineSpan
 import android.view.Gravity
@@ -58,12 +59,9 @@ class SearchView(context: Context) : FrameLayout(context)
             25, 0, 25, 5
         )
 
-        background = Theme.createOutlinedRect(Theme.alphaColor(Theme.color_main, 0.1F), floatArrayOf(
-            Utils.dp(10F),
-            Utils.dp(10F),
-            Utils.dp(10F),
-            Utils.dp(10F)
-        ))
+        background = Theme.createOutlinedRect(Theme.alphaColor(Theme.color_main, 0.1F), FloatArray(4).apply {
+            fill(10F)
+        })
 
         editText = EditText(context).apply {
             background = null
@@ -97,8 +95,7 @@ class SearchView(context: Context) : FrameLayout(context)
             })
         }
         addView(editText, LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT,
-            LayoutHelper.WRAP_CONTENT,
+            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.CENTER_VERTICAL,
             15, 0, 15 + 24 + 15, 0
         ))
@@ -123,7 +120,8 @@ class SearchView(context: Context) : FrameLayout(context)
 
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
+    {
         super.onMeasure(
             MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(Utils.dp(56), MeasureSpec.EXACTLY)
