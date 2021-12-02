@@ -48,13 +48,9 @@ class CatalogSectionCell(context: Context) : FrameLayout(context)
             ellipsize = TextUtils.TruncateAt.END
         }
         addView(sectionNameView,LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT,
-            LayoutHelper.WRAP_CONTENT,
+            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.TOP,
-            25,
-            7,
-            62,
-            0)
+            25, 7, 62, 0)
         )
 
         sectionSubtextView = TextView(context).apply {
@@ -65,7 +61,10 @@ class CatalogSectionCell(context: Context) : FrameLayout(context)
             isSingleLine = true
             ellipsize = TextUtils.TruncateAt.END
         }
-        addView(sectionSubtextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.START or Gravity.TOP, 25, 29, 62, 0))
+        addView(sectionSubtextView, LayoutHelper.createFrame(
+            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+            Gravity.START or Gravity.TOP,
+            25, 29, 62, 0))
 
         val pointerDrawable = Theme.drawable(R.drawable.pointer_forward).apply {
             setTint(Theme.color(Theme.color_main))
@@ -73,12 +72,17 @@ class CatalogSectionCell(context: Context) : FrameLayout(context)
         pointerImage = ImageView(context).apply {
             setImageDrawable(pointerDrawable)
         }
-        addView(pointerImage, LayoutHelper.createFrame(12, 12, Gravity.END or Gravity.CENTER_VERTICAL, 20, 0, 30, 0))
+        addView(pointerImage, LayoutHelper.createFrame(
+            12, 12,
+            Gravity.END or Gravity.CENTER_VERTICAL,
+            20, 0, 30, 0))
 
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(Utils.dp(56), MeasureSpec.EXACTLY))
+        super.onMeasure(
+            MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(Utils.dp(56), MeasureSpec.EXACTLY))
     }
 
 

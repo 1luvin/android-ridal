@@ -25,6 +25,11 @@ class LayoutHelper
             }
         }
 
+        fun createFrame(width: Int, height: Int, gravity: Int) : FrameLayout.LayoutParams
+        {
+            return FrameLayout.LayoutParams(size(width), size(height), gravity)
+        }
+
         fun createFrame(width: Int, height: Int) : FrameLayout.LayoutParams
         {
             return FrameLayout.LayoutParams(size(width), size(height))

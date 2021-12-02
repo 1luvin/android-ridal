@@ -5,7 +5,9 @@ import android.graphics.drawable.ColorDrawable
 import android.text.*
 import android.text.style.UnderlineSpan
 import android.view.Gravity
-import android.widget.EditText
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import tv.ridal.Application.Locale
@@ -37,6 +39,10 @@ class SearchView(context: Context) : FrameLayout(context)
         }
 
     private lateinit var editText: EditText
+
+    val text: String
+        get() = editText.text.toString()
+
     private lateinit var clearButton: ImageButton
 
     abstract inner class SearchListener
@@ -44,9 +50,19 @@ class SearchView(context: Context) : FrameLayout(context)
         open fun onClear()
         {
             editText.text.clear()
+            // если клавиатура опущена, поднимаем ее
+            if ( ! editText.isFocused)
+            {
+                editText.requestFocus()
+
+                val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+            }
         }
 
         open fun onTextChanged(text: CharSequence) {}
+
+        open fun onSearch(text: CharSequence) {}
     }
 
     var searchListener: SearchListener? = null
@@ -75,8 +91,36 @@ class SearchView(context: Context) : FrameLayout(context)
 
             inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD // чтобы текст не подчеркивался при наборе
 
+            imeOptions = EditorInfo.IME_ACTION_SEARCH // чтобы вместо иконки "Enter" была иконка поиска
+
             hint = Locale.text(Locale.hint_search)
             setHintTextColor(Theme.color(Theme.color_text2))
+
+            setOnEditorActionListener { v, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+
+                    editText.clearFocus()
+
+                    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+
+                    searchListener?.onSearch(editText.text)
+                    return@setOnEditorActionListener true
+                }
+                return@setOnEditorActionListener false
+            }
+
+            keyImeChangeListener = object : EditText.KeyImeChange {
+                override fun onKeyIme(keyCode: Int, event: KeyEvent) {
+                    when (keyCode)
+                    {
+                        KeyEvent.KEYCODE_BACK ->
+                        {
+                            editText.clearFocus()
+                        }
+                    }
+                }
+            }
 
             addTextChangedListener(object : TextWatcher
             {

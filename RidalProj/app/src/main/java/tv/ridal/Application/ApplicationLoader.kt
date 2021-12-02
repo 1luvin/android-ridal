@@ -2,6 +2,8 @@ package tv.ridal.Application
 
 import android.app.Application
 import android.content.Context
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.Volley
 
 class ApplicationLoader : Application()
 {
@@ -13,14 +15,18 @@ class ApplicationLoader : Application()
 
         @Volatile
         private var INSTANCE: ApplicationLoader? = null
-
         fun instance() =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: ApplicationLoader().also {
                     INSTANCE = it
                 }
             }
+    }
 
+    // volley
+
+    val requestQueue: RequestQueue by lazy {
+        Volley.newRequestQueue(applicationContext)
     }
 
     override fun onCreate()

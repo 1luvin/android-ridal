@@ -5,14 +5,17 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 
-class Parser {
-    companion object {
+class Parser
+{
+    companion object
+    {
 
         /*
             Фильмы
          */
 
-        fun parseMovies(doc: Document): ArrayList<Movie>? {
+        fun parseMovies(doc: Document): ArrayList<Movie>?
+        {
             val movieCardsBox = doc.getElementsByClass("b-content__inline_items")
             if (movieCardsBox.size == 0) return null
             val movieCards = movieCardsBox[0].getElementsByClass("b-content__inline_item")
@@ -57,7 +60,8 @@ class Parser {
             return movies
         }
 
-        fun parseMovies(html: String): ArrayList<Movie>? {
+        fun parseMovies(html: String): ArrayList<Movie>?
+        {
             return parseMovies(Jsoup.parse(html))
         }
 
@@ -118,7 +122,8 @@ class Parser {
             Информаци о фильме
          */
 
-        fun parseMovieInfo(doc: Document): Movie.Info {
+        fun parseMovieInfo(doc: Document): Movie.Info
+        {
             val mi = Movie.Info()
 
             mi.hdPosterUrl = doc.select(".b-sidecover > a > img").attr("src")
@@ -258,6 +263,78 @@ class Parser {
             }
 
             return mi
+        }
+
+        /*
+            Результаты поиска
+         */
+        fun parseSearchResults(doc: Document): ArrayList<SearchResult>?
+        {
+            val results = ArrayList<SearchResult>().apply {
+                ensureCapacity(5)
+            }
+
+            val lis = doc.getElementsByTag("li")
+            if (lis.size == 0) return null
+
+            for (li in lis)
+            {
+                val a = li.select("a")
+                val movieName = a.select(".enty").text()
+
+                var movieData: String = ""
+                val d = a.textNodes()[0].text()
+
+                val typesList = listOf(
+                    HDRezka.CARTOON, HDRezka.FILM, HDRezka.SERIAL, HDRezka.ANIME
+                )
+
+                for (i in typesList.indices)
+                {
+                    if (d.contains(typesList[i], ignoreCase = true)) {
+                        movieData += typesList[i]
+                        movieData += ", "
+                        break
+                    }
+                    else {
+                        if (i == typesList.size - 1)
+                        {
+                            movieData += HDRezka.FILM
+                            movieData += ", "
+                        }
+                    }
+                }
+
+                val years = Regex("[0-9]+").findAll(d)
+                    .map(MatchResult::value)
+                    .toList()
+
+                for (i in years.indices)
+                {
+                    if (years[i].length < 4) continue
+                    movieData += years[i]
+                    if (years.size > 1 && i != years.size - 1)
+                    {
+                        movieData += "-"
+                    }
+                }
+
+                if (d.contains(" - ...")) movieData += " - ..."
+
+
+                val movieRating = a.select(".rating").text()
+                val movieUrl = a.attr("href")
+
+                val result = SearchResult(movieName, movieData, movieRating, movieUrl)
+                results.add(result)
+            }
+
+            return results
+        }
+
+        fun parseSearchResults(html: String) : ArrayList<SearchResult>?
+        {
+            return parseSearchResults(Jsoup.parse(html))
         }
 
 //        fun parsePersonPhotoUrl(doc: Document): String {

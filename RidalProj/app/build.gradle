@@ -46,9 +46,10 @@ dependencies {
 
     // jsoup
     implementation 'org.jsoup:jsoup:1.13.1'
-
     // multi back stack navigation
     implementation 'com.tunjid.androidx:navigation:1.0.0-rc03'
+    // volley
+    implementation 'com.android.volley:volley:1.2.1'
 }
 
 
