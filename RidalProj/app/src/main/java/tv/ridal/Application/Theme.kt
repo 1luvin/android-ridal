@@ -22,6 +22,8 @@ class Theme
 {
     companion object
     {
+        const val COLOR_TRANSPARENT = 0x00000000
+
         const val LIGHT: Int = 0
         const val DARK: Int = 1
 
@@ -162,6 +164,34 @@ class Theme
             return ShapeDrawable(RoundRectShape(radiiArray, null, null)).apply {
                 paint.color = color
             }
+        }
+
+        fun createRectSelector(color: Int, radii: FloatArray? = null, fillAfter: Boolean = false) : Drawable
+        {
+            val colorStateList = ColorStateList(
+                arrayOf(StateSet.WILD_CARD),
+                intArrayOf(alphaColor(color, 0.33F))
+            )
+
+            val radiiArray = FloatArray(8)
+            if (radii != null) {
+                for (i in 0 until radii.size)
+                {
+                    radiiArray[i*2] = radii[i]
+                    radiiArray[i*2 + 1] = radii[i]
+                }
+            }
+
+            val defDrawable = ShapeDrawable(RoundRectShape(radiiArray, null, null))
+            if (fillAfter) {
+                defDrawable.paint.color = color
+            } else {
+                defDrawable.paint.color = COLOR_TRANSPARENT
+            }
+
+            val rippleDrawable = ShapeDrawable(RoundRectShape(radiiArray, null, null))
+
+            return RippleDrawable(colorStateList, defDrawable, rippleDrawable)
         }
 
         fun createOutlinedRect(color: Int, radii: FloatArray? = null) : Drawable

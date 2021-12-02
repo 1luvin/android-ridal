@@ -17,6 +17,7 @@ import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.Cells.CatalogSectionCell
 import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Components.MovieView
 import tv.ridal.Utils.Utils
 
 class CatalogFragment : BaseFragment(), Navigator.TagProvider
@@ -70,6 +71,12 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
         rootLayout.addView(scroll)
 
         containerLayout.addView(createScreenTitleView())
+
+        val movieView = MovieView(requireContext()).apply {
+            movieName = "Joi the fuck boi"
+            posterUrl = "https://static.hdrezka.ac/i/2021/11/29/i438f1e8659f7pz51m93t.jpg"
+        }
+        containerLayout.addView(movieView)
 
         for (i in 0 until 30)
         {

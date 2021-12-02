@@ -33,5 +33,51 @@ class Utils
             }
             return ceil(density * value)
         }
+
+        fun px(value: Int) : Int
+        {
+            if (value == 0) {
+                return 0
+            }
+            return ceil(value / density).toInt()
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
