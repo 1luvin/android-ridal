@@ -1,9 +1,11 @@
 package tv.ridal
 
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -33,6 +35,8 @@ class ApplicationActivity : BaseActivity()
         }
     }
 
+    lateinit var bottomNavigationView: BottomNavigationView
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -40,7 +44,11 @@ class ApplicationActivity : BaseActivity()
 
         Utils.checkDisplaySize(this)
 
-        findViewById<BottomNavigationView>(R.id.bottom_navigation).apply {
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
+
+        bottomNavigationView = findViewById(R.id.bottom_navigation)
+
+        bottomNavigationView.apply {
             multiStackNavigator.stackSelectedListener = { menu.findItem(tabs[it])?.isChecked = true}
             multiStackNavigator.transactionModifier = { incomingFragment ->
                 val current = multiStackNavigator.current
@@ -52,6 +60,23 @@ class ApplicationActivity : BaseActivity()
             setOnApplyWindowInsetsListener { v, insets -> insets }
             setOnNavigationItemSelectedListener { multiStackNavigator.show(tabs.indexOf(it.itemId)).let { true } }
             setOnNavigationItemReselectedListener { multiStackNavigator.activeNavigator.clear() }
+        }
+
+        bottomNavigationView.apply {
+            setBackgroundColor(Theme.color(Theme.color_bg))
+
+            itemIconTintList = ColorStateList(
+                arrayOf(
+                    intArrayOf( -android.R.attr.state_checked ),
+                    intArrayOf( android.R.attr.state_checked )
+                ),
+                intArrayOf(
+                    Theme.color(Theme.color_bottomNavIcon_inactive),
+                    Theme.color(Theme.color_bottomNavIcon_active),
+                )
+            )
+
+            itemRippleColor = ColorStateList.valueOf(Theme.alphaColor(Theme.color(Theme.color_bottomNavIcon_active), 0.05F))
         }
 
         onBackPressedDispatcher.addCallback(this) { if( ! multiStackNavigator.pop()) finish() }

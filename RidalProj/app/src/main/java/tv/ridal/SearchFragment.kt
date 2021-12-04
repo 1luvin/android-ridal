@@ -20,6 +20,7 @@ import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.Cells.SearchResultCell
 import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Components.ScreenTitleBar
 import tv.ridal.Components.SearchView
 import tv.ridal.HDRezka.Parser
 import tv.ridal.HDRezka.SearchResult
@@ -127,20 +128,22 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
         return rootFrame
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+    }
+
     private fun createScreenTitleView() : View
     {
-        return TextView(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LayoutHelper.MATCH_PARENT,
-                LayoutHelper.WRAP_CONTENT
-            )
-            setPadding(Utils.dp(30), Utils.dp(25), 0, Utils.dp(25))
-
-            text = Locale.text(Locale.text_search)
-
-            typeface = Theme.typeface(Theme.tf_bold)
-            textSize = 30F
-            setTextColor(Theme.color(Theme.color_text))
+        return ScreenTitleBar(requireContext()).apply {
+            title = Locale.text(Locale.text_search)
         }
     }
 

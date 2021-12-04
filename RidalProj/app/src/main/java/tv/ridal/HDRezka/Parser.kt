@@ -14,7 +14,7 @@ class Parser
             Фильмы
          */
 
-        fun parseMovies(doc: Document): ArrayList<Movie>?
+        fun parseMovies(doc: Document, size: Int = HDRezka.PAGE_CAPACITY): ArrayList<Movie>?
         {
             val movieCardsBox = doc.getElementsByClass("b-content__inline_items")
             if (movieCardsBox.size == 0) return null
@@ -22,9 +22,12 @@ class Parser
             if (movieCards.size == 0) return null
 
             val movies = ArrayList<Movie>()
-            movies.ensureCapacity(HDRezka.PAGE_CAPACITY)
+            movies.ensureCapacity(size)
 
-            for (movieCard in movieCards) {
+            for (i in 0 until Math.min(movieCards.size, size))
+            {
+                val movieCard = movieCards[i]
+
                 val cardCover = movieCard.getElementsByClass("b-content__inline_item-cover")[0]
                 val cardLink = movieCard.getElementsByClass("b-content__inline_item-link")[0]
                 // название
@@ -60,9 +63,9 @@ class Parser
             return movies
         }
 
-        fun parseMovies(html: String): ArrayList<Movie>?
+        fun parseMovies(html: String, size: Int = HDRezka.PAGE_CAPACITY): ArrayList<Movie>?
         {
-            return parseMovies(Jsoup.parse(html))
+            return parseMovies(Jsoup.parse(html), size)
         }
 
 

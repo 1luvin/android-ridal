@@ -47,6 +47,9 @@ class Theme
         const val color_searchResult_middle = "color_searchResult_middle"
         const val color_searchResult_worst = "color_searchResult_worst"
 
+        const val color_bottomNavIcon_inactive = "color_bottomNavIcon_inactive"
+        const val color_bottomNavIcon_active = "color_bottomNavIcon_active"
+
         /*
             Темы
          */
@@ -61,6 +64,9 @@ class Theme
             this[color_searchResult_best] = 0xFF00FF00.toInt()
             this[color_searchResult_middle] = 0xFF666666.toInt()
             this[color_searchResult_worst] = 0xFFFF0000.toInt()
+
+            this[color_bottomNavIcon_inactive] = 0xFFAAAAAA.toInt()
+            this[color_bottomNavIcon_active] = 0xFF00B2FF.toInt()
         }
         // черная тема
         private val darkColors = HashMap<String, Int>().apply {
@@ -130,6 +136,28 @@ class Theme
             return alphaColor(color(colorKey), alpha)
         }
 
+        fun ripplizeColor(color: Int) : Int
+        {
+            val hsv = FloatArray(3)
+            val outHsv = FloatArray(3)
+            Color.colorToHSV(color, hsv)
+            outHsv[0] = hsv[0]
+            outHsv[1] = hsv[1]
+            if (hsv[2] >= 0.5F) {
+                outHsv[2] = hsv[2] - 0.24F
+                return Color.HSVToColor(outHsv)
+            }
+            else {
+                outHsv[2] = hsv[2] + 0.12F
+                return Color.HSVToColor(outHsv)
+            }
+        }
+
+        fun ripplizeColor(colorKey: String) : Int
+        {
+            return ripplizeColor(color(colorKey))
+        }
+
         // ratio: от 0 до 1 (для 0.2 будет использовано 20% color2 и 80% color1)
         fun mixColors(color1: Int, color2: Int, ratio: Float) : Int
         {
@@ -170,7 +198,7 @@ class Theme
         {
             val colorStateList = ColorStateList(
                 arrayOf(StateSet.WILD_CARD),
-                intArrayOf(alphaColor(color, 0.33F))
+                intArrayOf(ripplizeColor(color))
             )
 
             val radiiArray = FloatArray(8)

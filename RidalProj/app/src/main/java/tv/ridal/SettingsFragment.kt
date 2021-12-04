@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -15,6 +16,7 @@ import com.tunjid.androidx.navigation.Navigator
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Components.ScreenTitleBar
 import tv.ridal.Utils.Utils
 
 class SettingsFragment : BaseFragment(), Navigator.TagProvider
@@ -100,20 +102,22 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
         return rootLayout
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+    }
+
     private fun createScreenTitleView() : View
     {
-        return TextView(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LayoutHelper.MATCH_PARENT,
-                LayoutHelper.WRAP_CONTENT
-            )
-            setPadding(Utils.dp(30), Utils.dp(25), 0, Utils.dp(25))
-
-            text = Locale.text(Locale.text_sett)
-
-            typeface = Theme.typeface(Theme.tf_bold)
-            textSize = 30F
-            setTextColor(Theme.color(Theme.color_text))
+        return ScreenTitleBar(requireContext()).apply {
+            title = Locale.text(Locale.text_sett)
         }
     }
 

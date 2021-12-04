@@ -23,5 +23,57 @@ class HDRezka
         const val FROM_SERIES = "Из серии"
         const val ACTORS = "В ролях актеры"
 
+        var url_base = "https://rezka.ag/"
+
+        val URL_FILMS
+            get() = url_base + "films/"
+        val URL_SERIES
+            get() = url_base + "series/"
+        val URL_CARTOONS
+            get() = url_base + "cartoons/"
+        val URL_ANIME
+            get() = url_base + "animation/"
+
+        val SECTION_URLS
+            get() = listOf(URL_FILMS, URL_SERIES, URL_CARTOONS, URL_ANIME)
+
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//

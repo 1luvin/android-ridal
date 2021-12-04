@@ -10,6 +10,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import tv.ridal.Application.Theme
+import tv.ridal.Components.InstantPressListener
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.R
 import tv.ridal.Utils.Utils
@@ -31,12 +32,14 @@ class CatalogSectionCell(context: Context) : FrameLayout(context)
             sectionSubtextView.text = sectionSubtext
         }
 
-    private lateinit var pointerImage: ImageView
+    private var pointerImage: ImageView
 
     init
     {
         isClickable = true
-        //background = ColorDrawable(Theme.color(Theme.color_main))
+        setOnTouchListener(InstantPressListener())
+
+        background = Theme.createRectSelector(Theme.color(Theme.color_bg))
 
         sectionNameView = TextView(context).apply {
             setTextColor(Theme.color(Theme.color_text))

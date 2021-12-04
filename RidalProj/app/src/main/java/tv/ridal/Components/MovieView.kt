@@ -3,6 +3,7 @@ package tv.ridal.Components
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.view.Gravity
 import android.widget.FrameLayout
@@ -12,6 +13,7 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import tv.ridal.Application.Theme
 import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.HDRezka.Loader
 import tv.ridal.Utils.Utils
 
 class MovieView(context: Context) : FrameLayout(context)
@@ -21,32 +23,25 @@ class MovieView(context: Context) : FrameLayout(context)
         set(value) {
             field = value
 
-            val request = ImageRequest.Builder(context)
-                .data(posterUrl)
-                .target {result ->
-                    posterDrawable = result as BitmapDrawable
-                    resizePoster()
-                }
-                .build()
-
-            context.imageLoader.enqueue(request)
+            Loader.loadImage(posterUrl, this::onPosterLoaded)
         }
-    var posterDrawable: BitmapDrawable? = null
-    private var posterWidthPx = Utils.dp(113)
-    private var posterHeightPx = Utils.dp(170)
 
-    private fun resizePoster()
+    private fun onPosterLoaded(poster: Drawable?)
     {
-        if (posterDrawable == null) return
+        // ошибка загрузки постера
+        if (poster == null) return
 
-        val rawBitmap = posterDrawable!!.bitmap
+        val rawBitmap = (poster as BitmapDrawable).bitmap
 
         val resizedBitmap = Bitmap.createScaledBitmap(rawBitmap, posterWidthPx, posterHeightPx, false)
 
         posterDrawable = BitmapDrawable(resources, resizedBitmap)
-
         posterView.setImageDrawable(posterDrawable)
     }
+
+    var posterDrawable: BitmapDrawable? = null
+    private var posterWidthPx = Utils.dp(113)
+    private var posterHeightPx = Utils.dp(170)
 
     private var gradientPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var gradient: LinearGradient
@@ -62,6 +57,7 @@ class MovieView(context: Context) : FrameLayout(context)
     init
     {
         isClickable = true
+        setOnTouchListener(InstantPressListener())
 
         background = Theme.createRect(Theme.color(Theme.color_bg))
         foreground = Theme.createRectSelector(Theme.color(Theme.color_main))
@@ -96,6 +92,7 @@ class MovieView(context: Context) : FrameLayout(context)
             Gravity.START or Gravity.BOTTOM,
             7, 0, 7, 5
         ))
+
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
