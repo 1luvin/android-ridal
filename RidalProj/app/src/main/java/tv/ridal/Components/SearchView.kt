@@ -1,11 +1,13 @@
 package tv.ridal.Components
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.text.*
 import android.text.style.UnderlineSpan
 import android.view.Gravity
 import android.view.KeyEvent
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
@@ -43,22 +45,14 @@ class SearchView(context: Context) : FrameLayout(context)
     val text: String
         get() = editText.text.toString()
 
-    private lateinit var clearButton: ImageButton
+    private var clearButton: ImageButton
+    private var clearButtonAnimator = ObjectAnimator().apply {
+        duration = 150
+    }
 
     abstract inner class SearchListener
     {
-        open fun onClear()
-        {
-            editText.text.clear()
-            // если клавиатура опущена, поднимаем ее
-            if ( ! editText.isFocused)
-            {
-                editText.requestFocus()
-
-                val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-            }
-        }
+        open fun onClear() {}
 
         open fun onTextChanged(text: CharSequence) {}
 
@@ -71,11 +65,6 @@ class SearchView(context: Context) : FrameLayout(context)
 
     init
     {
-        layoutParams = LayoutHelper.createFrame(
-            LayoutHelper.MATCH_PARENT, 50,
-            Gravity.CENTER,
-            25, 0, 25, 5
-        )
 
         background = Theme.createOutlinedRect(Theme.alphaColor(Theme.color_main, 0.1F), FloatArray(4).apply {
             fill(10F)
@@ -138,6 +127,9 @@ class SearchView(context: Context) : FrameLayout(context)
                 }
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int)
                 {
+                    if (s.isEmpty()) hideClearButton()
+                    else showClearButton()
+
                     searchListener?.onTextChanged(s)
                 }
                 override fun afterTextChanged(s: Editable)
@@ -161,8 +153,25 @@ class SearchView(context: Context) : FrameLayout(context)
             background = Theme.createCircleSelector(Theme.color(Theme.color_text2))
 
             setOnClickListener {
+                editText.text.clear()
+
+                hideClearButton()
+
+                // если клавиатура опущена, поднимаем ее
+                if ( ! editText.isFocused)
+                {
+                    editText.requestFocus()
+
+                    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+                }
+
                 searchListener?.onClear()
             }
+
+            // сразу кнопка спрятана
+            scaleX = 0F
+            scaleY = 0F
         }
         addView(clearButton, LayoutHelper.createFrame(
             24, 24,
@@ -170,6 +179,7 @@ class SearchView(context: Context) : FrameLayout(context)
             15, 0, 15, 0
         ))
 
+        clearButtonAnimator.target = clearButton
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
@@ -178,6 +188,46 @@ class SearchView(context: Context) : FrameLayout(context)
             MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(Utils.dp(50), MeasureSpec.EXACTLY)
         )
+    }
+
+    private fun showClearButton()
+    {
+        val currScale = clearButton.scaleX
+
+        clearButtonAnimator.cancel()
+        clearButtonAnimator.apply {
+            setFloatValues(currScale, 1F)
+
+            addUpdateListener {
+                val animatedScale = it.animatedValue as Float
+                (target as View).apply {
+                    scaleX = animatedScale
+                    scaleY = animatedScale
+                }
+            }
+
+            start()
+        }
+    }
+
+    private fun hideClearButton()
+    {
+        val currScale = clearButton.scaleX
+
+        clearButtonAnimator.cancel()
+        clearButtonAnimator.apply {
+            setFloatValues(currScale, 0F)
+
+            addUpdateListener {
+                val animatedScale = it.animatedValue as Float
+                (target as View).apply {
+                    scaleX = animatedScale
+                    scaleY = animatedScale
+                }
+            }
+
+            start()
+        }
     }
 
 }

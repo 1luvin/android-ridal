@@ -12,6 +12,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.tunjid.androidx.navigation.MultiStackNavigator
 import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.multiStackNavigationController
+import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Theme
 import tv.ridal.Utils.Utils
 
@@ -20,6 +21,20 @@ class ApplicationActivity : BaseActivity()
 
     companion object {
         val tabs = intArrayOf(R.id.settings, R.id.navigation, R.id.search)
+
+        @Volatile
+        private var INSTANCE: ApplicationActivity? = null
+        fun instance() =
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: ApplicationActivity().also {
+                    INSTANCE = it
+                }
+            }
+
+        fun currentFragment() : Fragment
+        {
+            return instance().multiStackNavigator.current!!
+        }
     }
 
     val multiStackNavigator: MultiStackNavigator by multiStackNavigationController(
@@ -41,6 +56,8 @@ class ApplicationActivity : BaseActivity()
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_application)
+
+        INSTANCE = this
 
         Utils.checkDisplaySize(this)
 

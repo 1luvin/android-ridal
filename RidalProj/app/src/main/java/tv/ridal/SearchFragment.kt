@@ -120,7 +120,11 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
 
         rootLayout.apply {
             addView(screenTitleBar)
-            addView(searchView)
+            addView(searchView, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, 50,
+                Gravity.CENTER,
+                25, 0, 25, 10
+            ))
             addView(resultsFrame)
         }
 
@@ -139,6 +143,7 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
 
         requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }
+
     override fun onStop() {
         super.onStop()
 

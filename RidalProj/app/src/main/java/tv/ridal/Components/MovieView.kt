@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.view.Gravity
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -15,6 +16,7 @@ import tv.ridal.Application.Theme
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.HDRezka.Loader
 import tv.ridal.Utils.Utils
+import kotlin.math.ceil
 
 class MovieView(context: Context) : FrameLayout(context)
 {
@@ -39,8 +41,27 @@ class MovieView(context: Context) : FrameLayout(context)
         posterView.setImageDrawable(posterDrawable)
     }
 
-    var posterDrawable: BitmapDrawable? = null
-    private var posterWidthPx = Utils.dp(113)
+    private var posterDrawable: BitmapDrawable? = null
+    var posterWidthPx = Utils.dp(113)
+        set(value) {
+            field = value
+
+            posterHeightPx = ceil(posterWidthPx * 1.5F).toInt()
+
+            posterView.layoutParams = LayoutHelper.createFrame(
+                Utils.px(posterWidthPx), Utils.px(posterHeightPx),
+                Gravity.START or Gravity.TOP
+            )
+
+            gradient = LinearGradient(
+                0F, posterHeightPx + 0F, 0F, posterHeightPx / 2F,
+                Theme.color(Theme.color_bg),
+                Theme.COLOR_TRANSPARENT,
+                Shader.TileMode.CLAMP
+            )
+            gradientPaint.shader = gradient
+        }
+
     private var posterHeightPx = Utils.dp(170)
 
     private var movieTypeView: TextView
@@ -123,7 +144,21 @@ class MovieView(context: Context) : FrameLayout(context)
 
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
+    {
+        val width = MeasureSpec.getSize(widthMeasureSpec)
+        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+
+        if (widthMode == MeasureSpec.UNSPECIFIED)
+        {
+            posterWidthPx = Utils.dp(113)
+        }
+        else if (widthMode == MeasureSpec.EXACTLY)
+        {
+            posterWidthPx = width
+        }
+
+
         super.onMeasure(
             MeasureSpec.makeMeasureSpec(posterWidthPx, MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(Utils.dp(Utils.px(posterHeightPx) + 5 + 15 + 5), MeasureSpec.EXACTLY)
