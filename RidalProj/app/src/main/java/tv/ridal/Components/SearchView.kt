@@ -63,6 +63,8 @@ class SearchView(context: Context) : FrameLayout(context)
         open fun onTextChanged(text: CharSequence) {}
 
         open fun onSearch(text: CharSequence) {}
+
+        open fun onFocusChange(focus: Boolean) {}
     }
 
     var searchListener: SearchListener? = null
@@ -70,7 +72,7 @@ class SearchView(context: Context) : FrameLayout(context)
     init
     {
         layoutParams = LayoutHelper.createFrame(
-            LayoutHelper.MATCH_PARENT, 56,
+            LayoutHelper.MATCH_PARENT, 50,
             Gravity.CENTER,
             25, 0, 25, 5
         )
@@ -96,10 +98,15 @@ class SearchView(context: Context) : FrameLayout(context)
             hint = Locale.text(Locale.hint_search)
             setHintTextColor(Theme.color(Theme.color_text2))
 
+            setOnFocusChangeListener { v, hasFocus ->
+                searchListener?.onFocusChange(hasFocus)
+            }
+
             setOnEditorActionListener { v, actionId, event ->
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
 
                     editText.clearFocus()
+                    searchListener?.onFocusChange(false)
 
                     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(v.windowToken, 0)
@@ -117,6 +124,7 @@ class SearchView(context: Context) : FrameLayout(context)
                         KeyEvent.KEYCODE_BACK ->
                         {
                             editText.clearFocus()
+                            searchListener?.onFocusChange(false)
                         }
                     }
                 }
@@ -168,7 +176,7 @@ class SearchView(context: Context) : FrameLayout(context)
     {
         super.onMeasure(
             MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(Utils.dp(56), MeasureSpec.EXACTLY)
+            MeasureSpec.makeMeasureSpec(Utils.dp(50), MeasureSpec.EXACTLY)
         )
     }
 

@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
@@ -14,14 +16,18 @@ import com.tunjid.androidx.navigation.Navigator
 import org.json.JSONException
 import org.json.JSONObject
 import org.jsoup.Jsoup
+import tv.ridal.Adapters.MoviesAdapter
 import tv.ridal.Adapters.SearchAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.Cells.SearchResultCell
+import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Components.PopupFrame
 import tv.ridal.Components.ScreenTitleBar
 import tv.ridal.Components.SearchView
+import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Parser
 import tv.ridal.HDRezka.SearchResult
 import tv.ridal.Utils.Utils
@@ -47,20 +53,28 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
     }
 
     private lateinit var rootFrame: FrameLayout
+
+
     private lateinit var rootLayout: LinearLayout
+    // children
+    private lateinit var screenTitleBar: ScreenTitleBar
+
 
     private lateinit var searchView: SearchView
 
     private lateinit var resultsFrame: FrameLayout
-    //
+
+    // подсказки
+    private lateinit var movieSuggestionsView: RecyclerView
+
     // список результатов поиска
     private lateinit var resultsListView: ListView
     // результаты поиска
     private var searchResults: ArrayList<SearchResult> = ArrayList()
-    // индикатор загрузки
-    private lateinit var loadingProgress: ProgressBar
 
     private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
+
+    private lateinit var resultsPopupFrame: PopupFrame
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -76,51 +90,43 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
             layoutParams = LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT)
             orientation = LinearLayout.VERTICAL
         }
-
-        rootLayout.addView(createScreenTitleView())
-
+        // rootLayout's children creation
+        createScreenTitleView()
         createSearchView()
-        rootLayout.addView(searchView)
-
         resultsFrame = FrameLayout(requireContext()).apply {
             layoutParams = LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT)
         }
-
-        loadingProgress = ProgressBar(requireContext()).apply {
-            isIndeterminate = true
-            visibility = View.GONE
-        }
-
-        resultsFrame.addView(loadingProgress, LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-            Gravity.CENTER
-        ))
-
-//        resultsScroll = ScrollView(requireContext()).apply {
-//            layoutParams = LayoutHelper.createScroll(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT)
-//        }
-
-//        resultsLayout = LinearLayout(requireContext()).apply {
-//            layoutParams = LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT)
-//            orientation = LinearLayout.VERTICAL
-//        }
-
-        // создание ListView
+        // resultsFrame's children creation
+        createMovieSuggestionsView()
+        resultsPopupFrame = PopupFrame(requireContext())
+        // resultsPopupFrame's ListView child
         resultsListView = ListView(requireContext()).apply {
+            setPadding(0, 0, 0, Utils.dp(10))
+
+            background = Theme.createRect(Theme.color_bg)
+
             adapter = SearchAdapter(searchResults)
         }
+        resultsPopupFrame.apply {
+            addView(resultsListView, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
+            ))
+        }
 
-        resultsFrame.addView(resultsListView, LayoutHelper.createFrame(
-            LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
-        ))
 
-//        resultsScroll.addView(resultsLayout)
-//
-//        resultsFrame.addView(resultsScroll)
+        resultsFrame.apply {
+            addView(movieSuggestionsView)
+        }
 
-        rootLayout.addView(resultsFrame)
+        rootLayout.apply {
+            addView(screenTitleBar)
+            addView(searchView)
+            addView(resultsFrame)
+        }
 
         rootFrame.addView(rootLayout)
+
+        loadMovieSuggestions()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -133,21 +139,41 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
 
         requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }
-
     override fun onStop() {
         super.onStop()
 
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }
 
-    private fun createScreenTitleView() : View
+
+    private val movies: ArrayList<Movie> = ArrayList()
+
+    private fun createMovieSuggestionsView()
     {
-        return ScreenTitleBar(requireContext()).apply {
+        movieSuggestionsView = RecyclerView(requireContext()).apply {
+            edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
+                override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
+                    return EdgeEffect(view.context).apply { color = Theme.color(Theme.color_main) }
+                }
+            }
+            clipToPadding = false
+
+            layoutManager = GridLayoutManager(requireContext(), 3)
+            addItemDecoration(GridSpacingItemDecoration(3, Utils.dp(15)))
+
+            adapter = MoviesAdapter(movies)
+        }
+    }
+
+    private fun createScreenTitleView()
+    {
+        screenTitleBar = ScreenTitleBar(requireContext()).apply {
             title = Locale.text(Locale.text_search)
         }
     }
 
     var updateResultsTimer: Timer? = null
+
 
     private fun createSearchView()
     {
@@ -190,6 +216,19 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
                     super.onSearch(text)
 
                     println("SEARCH IS CLICKED")
+                }
+
+                override fun onFocusChange(focus: Boolean) {
+                    super.onFocusChange(focus)
+
+                    if (focus)
+                    {
+                        resultsPopupFrame.show(resultsFrame)
+                    }
+                    else
+                    {
+                        resultsPopupFrame.dismiss()
+                    }
                 }
             }
         }
@@ -248,11 +287,35 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
 
     private fun showLoading() {
         resultsListView.visibility = View.GONE
-        loadingProgress.visibility = View.VISIBLE
     }
     private fun hideLoading() {
-        loadingProgress.visibility = View.GONE
         resultsListView.visibility = View.VISIBLE
+    }
+
+
+    private fun loadMovieSuggestions()
+    {
+        val urls = listOf(
+            "https://rezka.ag/films/?filter=watching",
+            "https://rezka.ag/series/?filter=watching",
+            "https://rezka.ag/cartoons/?filter=watching",
+            "https://rezka.ag/animation/?filter=watching"
+        )
+
+        for (i in urls.indices)
+        {
+            val stringRequest = StringRequest(Request.Method.GET, urls[i],
+                { response ->
+                    movies.addAll(Parser.parseMovies(response, 5)!!)
+
+                    (movieSuggestionsView.adapter as MoviesAdapter).notifyDataSetChanged()
+                },
+                {
+                    println("ERROR!")
+                }
+            )
+            requestQueue.add(stringRequest)
+        }
     }
 
 }

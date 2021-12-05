@@ -11,7 +11,7 @@ class ApplicationLoader : Application()
     {
         const val APP_NAME = "Ridal"
 
-        const val WEBSITE_URL = "https://ridal.tv"
+        const val WEBSITE = "https://ridal.tv"
 
         @Volatile
         private var INSTANCE: ApplicationLoader? = null

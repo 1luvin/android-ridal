@@ -24,6 +24,7 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
             movieView.apply {
                 posterUrl = current.posterUrl
                 movieName = current.name
+                movieType = current.type.ruType
             }
         }
     }

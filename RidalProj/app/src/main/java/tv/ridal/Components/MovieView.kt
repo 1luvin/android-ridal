@@ -43,6 +43,14 @@ class MovieView(context: Context) : FrameLayout(context)
     private var posterWidthPx = Utils.dp(113)
     private var posterHeightPx = Utils.dp(170)
 
+    private var movieTypeView: TextView
+    var movieType: String = ""
+        set(value) {
+            field = value
+
+            movieTypeView.text = movieType
+        }
+
     private var gradientPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var gradient: LinearGradient
 
@@ -69,6 +77,26 @@ class MovieView(context: Context) : FrameLayout(context)
             Utils.px(posterWidthPx), Utils.px(posterHeightPx),
             Gravity.START or Gravity.TOP
         ))
+
+        movieTypeView = TextView(context).apply {
+            setPadding(Utils.dp(5), Utils.dp(2), Utils.dp(5), Utils.dp(2))
+
+            background = Theme.createRect(Theme.alphaColor(Theme.COLOR_LIGHT_CHERRY, 0.7F), floatArrayOf(
+                0F, 0F, 0F, Utils.dp(7F)
+            ))
+
+            setTextColor(Theme.COLOR_WHITE)
+            textSize = 13.3F
+            typeface = Theme.typeface(Theme.tf_bold)
+            setLines(1)
+            maxLines = 1
+            isSingleLine = true
+        }
+        addView(movieTypeView, LayoutHelper.createFrame(
+            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+            Gravity.END or Gravity.TOP
+        ))
+
 
         gradient = LinearGradient(
             0F, posterHeightPx + 0F, 0F, posterHeightPx / 2F,

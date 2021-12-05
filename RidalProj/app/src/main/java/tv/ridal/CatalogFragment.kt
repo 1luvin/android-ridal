@@ -1,5 +1,6 @@
 package tv.ridal
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,8 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tunjid.androidx.navigation.Navigator
 import tv.ridal.Adapters.MoviesAdapter
 import tv.ridal.Application.ApplicationLoader
@@ -99,11 +102,7 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
         loadSections()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         return rootLayout
     }
@@ -125,6 +124,18 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
     {
         return ScreenTitleBar(requireContext()).apply {
             title = ApplicationLoader.APP_NAME
+            image = Theme.drawable(R.drawable.invite).apply {
+                setTint(Theme.color(Theme.color_text))
+            }
+            imageClickListener = View.OnClickListener {
+                val sendIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, Locale.text(Locale.share_application))
+                    type = "text/plain"
+                }
+                val shareIntent = Intent.createChooser(sendIntent, "")
+                startActivity(shareIntent)
+            }
         }
     }
 

@@ -1,20 +1,16 @@
 package tv.ridal.Application
 
 import android.content.res.ColorStateList
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Typeface
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.RippleDrawable
-import android.graphics.drawable.ShapeDrawable
+import android.graphics.*
+import android.graphics.drawable.*
 import android.graphics.drawable.shapes.RectShape
 import android.graphics.drawable.shapes.RoundRectShape
 import android.util.StateSet
 import androidx.annotation.FloatRange
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.drawable.toBitmap
+import tv.ridal.ApplicationActivity
 import tv.ridal.Utils.Utils
 import kotlin.math.ceil
 
@@ -23,6 +19,10 @@ class Theme
     companion object
     {
         const val COLOR_TRANSPARENT = 0x00000000
+        const val COLOR_WHITE = 0xFFFFFFFF.toInt()
+        const val COLOR_BLACK = 0xFF000000.toInt()
+
+        const val COLOR_LIGHT_CHERRY = 0xFFFF005F.toInt()
 
         const val LIGHT: Int = 0
         const val DARK: Int = 1
@@ -118,13 +118,8 @@ class Theme
         }
 
         /*
-            Drawable
+            Color
          */
-
-        fun drawable(drawableId: Int): Drawable
-        {
-            return ContextCompat.getDrawable(ApplicationLoader.instance().applicationContext, drawableId)!!
-        }
 
         // alpha: от 0 до 1
         fun alphaColor(color: Int, alpha: Float) : Int
@@ -152,7 +147,6 @@ class Theme
                 return Color.HSVToColor(outHsv)
             }
         }
-
         fun ripplizeColor(colorKey: String) : Int
         {
             return ripplizeColor(color(colorKey))
@@ -164,18 +158,29 @@ class Theme
             return ColorUtils.blendARGB(color1, color2, ratio)
         }
 
+        /*
+            Drawable
+         */
 
+        fun drawable(drawableId: Int): Drawable
+        {
+            return ContextCompat.getDrawable(ApplicationLoader.instance().applicationContext, drawableId)!!
+        }
 
         fun createCircleSelector(color: Int, radius: Int = Utils.dp(20)) : Drawable
         {
             val colorStateList = ColorStateList(
                 arrayOf(StateSet.WILD_CARD),
-                intArrayOf(alphaColor(color, 0.1F))
+                intArrayOf(ripplizeColor(color))
             )
             val rippleDrawable = RippleDrawable(colorStateList, null, null).apply {
                 this.radius = radius
             }
             return rippleDrawable
+        }
+        fun createCircleSelector(colorKey: String, radius: Int = Utils.dp(20)) : Drawable
+        {
+            return createCircleSelector(color(colorKey), radius)
         }
 
         fun createRect(color: Int, radii: FloatArray? = null) : Drawable
@@ -192,6 +197,10 @@ class Theme
             return ShapeDrawable(RoundRectShape(radiiArray, null, null)).apply {
                 paint.color = color
             }
+        }
+        fun createRect(colorKey: String, radii: FloatArray? = null) : Drawable
+        {
+            return createRect(color(colorKey), radii)
         }
 
         fun createRectSelector(color: Int, radii: FloatArray? = null, fillAfter: Boolean = false) : Drawable

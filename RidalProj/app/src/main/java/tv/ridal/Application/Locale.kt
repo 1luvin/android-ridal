@@ -21,6 +21,9 @@ class Locale
                     texts[text_search] = "Поиск"
 
                     texts[hint_search] = "Фильм, сериал, мультфильм, аниме"
+
+                    texts[share_application] = "Привет, я использую ${ApplicationLoader.APP_NAME} для просмотра кино. " +
+                            "Присоеденяйся! Скачать его можно здесь: ${ApplicationLoader.WEBSITE}"
                 }
             }
         }
@@ -38,6 +41,8 @@ class Locale
         const val text_search = "text_search"
 
         const val hint_search = "hint_search"
+
+        const val share_application = "share_application"
 
         private var texts = HashMap<String, String>()
 
