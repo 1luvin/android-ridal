@@ -1,4 +1,4 @@
-package tv.ridal.Components
+package tv.ridal.Components.View
 
 import android.content.Context
 import android.graphics.*
@@ -6,13 +6,11 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.view.Gravity
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import coil.imageLoader
-import coil.request.ImageRequest
 import tv.ridal.Application.Theme
+import tv.ridal.Components.InstantPressListener
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.HDRezka.Loader
 import tv.ridal.Utils.Utils

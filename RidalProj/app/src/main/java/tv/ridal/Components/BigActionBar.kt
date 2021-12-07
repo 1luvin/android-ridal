@@ -1,26 +1,45 @@
 package tv.ridal.Components
 
 import android.content.Context
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.children
 import tv.ridal.Application.Theme
 import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Components.View.LoadingTextView
 import tv.ridal.Utils.Utils
 
-class ScreenTitleBar(context: Context) : FrameLayout(context)
+class BigActionBar(context: Context) : FrameLayout(context)
 {
-    private var titleView: TextView
+    var titleView: TextView? = null
+        set(value) {
+            value ?: return
+            field = value
+
+            if (titleView!!.parent != null) return
+
+            addView(titleView, LayoutHelper.createFrame(
+                LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+                Gravity.START or Gravity.CENTER_VERTICAL,
+                30, 0, 15 + 40 + 25, 0
+            ))
+        }
 
     var title: String = ""
         set(value) {
             field = value
 
-            titleView.text = title
+            titleView?.text = title
+
+            titleView?.measure(0, 0)
         }
 
     private var imageView: ImageView
@@ -42,21 +61,6 @@ class ScreenTitleBar(context: Context) : FrameLayout(context)
     init
     {
         setPadding(0, Utils.dp(25), 0, 0)
-
-        titleView = TextView(context).apply {
-            setTextColor(Theme.color(Theme.color_text))
-            textSize = 36F
-            typeface = Theme.typeface(Theme.tf_bold)
-            setLines(1)
-            maxLines = 1
-            isSingleLine = true
-            ellipsize = TextUtils.TruncateAt.END
-        }
-        addView(titleView, LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-            Gravity.START or Gravity.CENTER_VERTICAL,
-            30, 0, 15 + 40 + 25, 0
-        ))
 
         imageView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.FIT_XY

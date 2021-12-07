@@ -1,10 +1,9 @@
-package tv.ridal.Components
+package tv.ridal.Components.View
 
 import android.content.Context
 import android.graphics.Rect
 import android.view.View
 import android.widget.EdgeEffect
-import androidx.core.view.size
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import tv.ridal.Application.Theme

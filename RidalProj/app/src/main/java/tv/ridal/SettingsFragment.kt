@@ -9,14 +9,11 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.graphics.drawable.DrawableCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import com.tunjid.androidx.navigation.Navigator
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.Components.Layout.LayoutHelper
-import tv.ridal.Components.ScreenTitleBar
+import tv.ridal.Components.BigActionBar
 import tv.ridal.Utils.Utils
 
 class SettingsFragment : BaseFragment(), Navigator.TagProvider
@@ -116,7 +113,7 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
 
     private fun createScreenTitleView() : View
     {
-        return ScreenTitleBar(requireContext()).apply {
+        return BigActionBar(requireContext()).apply {
             title = Locale.text(Locale.text_sett)
         }
     }

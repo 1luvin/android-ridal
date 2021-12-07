@@ -3,14 +3,12 @@ package tv.ridal.Adapters
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import tv.ridal.Application.ApplicationLoader
 import tv.ridal.ApplicationActivity
 import tv.ridal.CatalogFragment
 import tv.ridal.Components.Layout.LayoutHelper
-import tv.ridal.Components.MovieView
+import tv.ridal.Components.View.MovieView
 import tv.ridal.HDRezka.Movie
 import tv.ridal.SearchFragment
-import tv.ridal.Utils.Utils
 
 class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter<MoviesAdapter.ViewHolder>()
 {

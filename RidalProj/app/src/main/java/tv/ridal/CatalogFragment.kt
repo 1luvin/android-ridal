@@ -9,30 +9,19 @@ import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.ScrollView
-import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
-import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.TransitionInflater
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tunjid.androidx.navigation.Navigator
 import tv.ridal.Adapters.MoviesAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
-import tv.ridal.Cells.CatalogSectionCell
 import tv.ridal.Components.Layout.LayoutHelper
-import tv.ridal.Components.MovieView
-import tv.ridal.Components.ScreenTitleBar
-import tv.ridal.Components.SectionView
+import tv.ridal.Components.BigActionBar
+import tv.ridal.Components.View.SectionView
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Parser
-import tv.ridal.Utils.Utils
 
 class CatalogFragment : BaseFragment(), Navigator.TagProvider
 {
@@ -122,7 +111,7 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
 
     private fun createScreenTitleView() : View
     {
-        return ScreenTitleBar(requireContext()).apply {
+        return BigActionBar(requireContext()).apply {
             title = ApplicationLoader.APP_NAME
             image = Theme.drawable(R.drawable.invite).apply {
                 setTint(Theme.color(Theme.color_text))

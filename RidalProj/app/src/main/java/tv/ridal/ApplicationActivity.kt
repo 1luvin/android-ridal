@@ -3,7 +3,6 @@ package tv.ridal
 
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.view.View
 import androidx.activity.addCallback
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
@@ -12,7 +11,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.tunjid.androidx.navigation.MultiStackNavigator
 import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.multiStackNavigationController
-import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Theme
 import tv.ridal.Utils.Utils
 
@@ -45,7 +43,10 @@ class ApplicationActivity : BaseActivity()
         {
             0 -> SettingsFragment.newInstance() to SettingsFragment.TAG
             1 -> CatalogFragment.newInstance() to CatalogFragment.TAG
-            2 -> SearchFragment.newInstance() to SearchFragment.TAG
+            2 -> {
+                val f = SearchFragment.instance()
+                Pair(f, f.stableTag)
+            }
             else -> Fragment() to "Fragment"
         }
     }

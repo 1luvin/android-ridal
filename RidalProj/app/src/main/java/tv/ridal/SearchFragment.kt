@@ -1,32 +1,27 @@
 package tv.ridal
 
-import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.*
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.tunjid.androidx.navigation.Navigator
-import org.json.JSONException
-import org.json.JSONObject
-import org.jsoup.Jsoup
 import tv.ridal.Adapters.MoviesAdapter
 import tv.ridal.Adapters.SearchAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
-import tv.ridal.Cells.SearchResultCell
 import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.Components.PopupFrame
-import tv.ridal.Components.ScreenTitleBar
-import tv.ridal.Components.SearchView
+import tv.ridal.Components.BigActionBar
+import tv.ridal.Components.View.LoadingTextView
+import tv.ridal.Components.View.SearchView
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Parser
 import tv.ridal.HDRezka.SearchResult
@@ -44,11 +39,8 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
 
     companion object
     {
-        const val TAG = "CatalogFragment"
-
-        fun newInstance(): SearchFragment {
-            val fragment = SearchFragment()
-            return fragment
+        fun instance(): SearchFragment {
+            return SearchFragment()
         }
     }
 
@@ -57,7 +49,7 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
 
     private lateinit var rootLayout: LinearLayout
     // children
-    private lateinit var screenTitleBar: ScreenTitleBar
+    private lateinit var bigActionBar: BigActionBar
 
 
     private lateinit var searchView: SearchView
@@ -91,7 +83,10 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
             orientation = LinearLayout.VERTICAL
         }
         // rootLayout's children creation
-        createScreenTitleView()
+        createBigActionBar()
+
+        (bigActionBar.titleView as LoadingTextView).startLoading()
+
         createSearchView()
         resultsFrame = FrameLayout(requireContext()).apply {
             layoutParams = LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT)
@@ -101,8 +96,6 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
         resultsPopupFrame = PopupFrame(requireContext())
         // resultsPopupFrame's ListView child
         resultsListView = ListView(requireContext()).apply {
-            setPadding(0, 0, 0, Utils.dp(10))
-
             background = Theme.createRect(Theme.color_bg)
 
             adapter = SearchAdapter(searchResults)
@@ -113,13 +106,12 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
             ))
         }
 
-
         resultsFrame.apply {
             addView(movieSuggestionsView)
         }
 
         rootLayout.apply {
-            addView(screenTitleBar)
+            addView(bigActionBar)
             addView(searchView, LayoutHelper.createFrame(
                 LayoutHelper.MATCH_PARENT, 50,
                 Gravity.CENTER,
@@ -170,9 +162,21 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
         }
     }
 
-    private fun createScreenTitleView()
+    private fun createBigActionBar()
     {
-        screenTitleBar = ScreenTitleBar(requireContext()).apply {
+        bigActionBar = BigActionBar(requireContext()).apply {
+            titleView = LoadingTextView(requireContext()).apply {
+                color = Theme.color(Theme.color_text)
+                loadColor = Theme.color(Theme.color_main)
+
+                textSize = 36F
+                typeface = Theme.typeface(Theme.tf_bold)
+                setLines(1)
+                maxLines = 1
+                isSingleLine = true
+                ellipsize = TextUtils.TruncateAt.END
+            }
+
             title = Locale.text(Locale.text_search)
         }
     }
@@ -257,14 +261,6 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
                 searchResults.clear()
                 searchResults.addAll(Parser.parseSearchResults(response)!!)
                 (resultsListView.adapter as SearchAdapter).notifyDataSetChanged()
-
-//                val resList = doc.getElementsByTag("ul")
-//                val lis = resList[0].getElementsByTag("li")
-//                for (li in lis)
-//                {
-//                    val s = li.getElementsByTag("a").attr("href")
-//                    println(s)
-//                }
 
                 hideLoading()
             }

@@ -1,8 +1,7 @@
-package tv.ridal.Components
+package tv.ridal.Components.View
 
 import android.content.Context
 import android.widget.LinearLayout
-import androidx.recyclerview.widget.RecyclerView
 import tv.ridal.Adapters.MoviesAdapter
 import tv.ridal.Cells.CatalogSectionCell
 

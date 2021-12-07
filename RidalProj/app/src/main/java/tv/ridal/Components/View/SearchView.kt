@@ -1,10 +1,8 @@
-package tv.ridal.Components
+package tv.ridal.Components.View
 
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
 import android.text.*
-import android.text.style.UnderlineSpan
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
@@ -14,6 +12,7 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
+import tv.ridal.Components.EditText
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.R
 import tv.ridal.Utils.Utils
