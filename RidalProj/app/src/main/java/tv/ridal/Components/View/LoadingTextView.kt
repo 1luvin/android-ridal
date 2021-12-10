@@ -42,9 +42,7 @@ class LoadingTextView(context: Context) : TextView(context)
             }
         }
 
-        kotlin.run {
-            animator.start()
-        }
+        animator.start()
 
     }
 }

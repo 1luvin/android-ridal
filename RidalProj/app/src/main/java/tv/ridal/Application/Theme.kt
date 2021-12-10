@@ -50,6 +50,8 @@ class Theme
         const val color_bottomNavIcon_inactive = "color_bottomNavIcon_inactive"
         const val color_bottomNavIcon_active = "color_bottomNavIcon_active"
 
+        const val color_actionBar_back = "color_actionBar_back"
+
         /*
             Темы
          */
@@ -67,6 +69,8 @@ class Theme
 
             this[color_bottomNavIcon_inactive] = 0xFFAAAAAA.toInt()
             this[color_bottomNavIcon_active] = 0xFF00B2FF.toInt()
+
+            this[color_actionBar_back] = 0xFF666666.toInt()
         }
         // черная тема
         private val darkColors = HashMap<String, Int>().apply {

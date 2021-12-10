@@ -46,19 +46,13 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
 
     private lateinit var rootFrame: FrameLayout
 
-
     private lateinit var rootLayout: LinearLayout
     // children
     private lateinit var bigActionBar: BigActionBar
-
-
     private lateinit var searchView: SearchView
-
     private lateinit var resultsFrame: FrameLayout
-
     // подсказки
     private lateinit var movieSuggestionsView: RecyclerView
-
     // список результатов поиска
     private lateinit var resultsListView: ListView
     // результаты поиска
@@ -67,6 +61,7 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
     private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
 
     private lateinit var resultsPopupFrame: PopupFrame
+
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -84,8 +79,6 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
         }
         // rootLayout's children creation
         createBigActionBar()
-
-        (bigActionBar.titleView as LoadingTextView).startLoading()
 
         createSearchView()
         resultsFrame = FrameLayout(requireContext()).apply {
@@ -165,18 +158,6 @@ class SearchFragment : BaseFragment(), Navigator.TagProvider
     private fun createBigActionBar()
     {
         bigActionBar = BigActionBar(requireContext()).apply {
-            titleView = LoadingTextView(requireContext()).apply {
-                color = Theme.color(Theme.color_text)
-                loadColor = Theme.color(Theme.color_main)
-
-                textSize = 36F
-                typeface = Theme.typeface(Theme.tf_bold)
-                setLines(1)
-                maxLines = 1
-                isSingleLine = true
-                ellipsize = TextUtils.TruncateAt.END
-            }
-
             title = Locale.text(Locale.text_search)
         }
     }

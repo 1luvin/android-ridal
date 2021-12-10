@@ -24,6 +24,11 @@ class Locale
 
                     texts[share_application] = "Привет, я использую ${ApplicationLoader.APP_NAME} для просмотра кино. " +
                             "Присоеденяйся! Скачать его можно здесь: ${ApplicationLoader.WEBSITE}"
+
+                    texts[text_films] = "Фильмы"
+                    texts[text_series] = "Сериалы"
+                    texts[text_cartoons] = "Мультфильмы"
+                    texts[text_anime] = "Аниме"
                 }
             }
         }
@@ -43,6 +48,11 @@ class Locale
         const val hint_search = "hint_search"
 
         const val share_application = "share_application"
+
+        const val text_films = "text_films"
+        const val text_series = "text_series"
+        const val text_cartoons = "text_cartoons"
+        const val text_anime = "text_anime"
 
         private var texts = HashMap<String, String>()
 

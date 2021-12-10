@@ -4,9 +4,16 @@ import android.content.Context
 import android.widget.LinearLayout
 import tv.ridal.Adapters.MoviesAdapter
 import tv.ridal.Cells.CatalogSectionCell
+import kotlin.concurrent.fixedRateTimer
 
 class SectionView(context: Context) : LinearLayout(context)
 {
+
+    interface OpenListener
+    {
+        fun onOpen()
+    }
+    var openListener: OpenListener? = null
 
     private var nameCell: CatalogSectionCell
 
@@ -18,7 +25,8 @@ class SectionView(context: Context) : LinearLayout(context)
         }
     var sectionSubtext: String = ""
         set(value) {
-            field = value
+
+            field = "$value+"
 
             nameCell.sectionSubtext = sectionSubtext
         }
@@ -36,7 +44,11 @@ class SectionView(context: Context) : LinearLayout(context)
     {
         orientation = LinearLayout.VERTICAL
 
-        nameCell = CatalogSectionCell(context)
+        nameCell = CatalogSectionCell(context).apply {
+            setOnClickListener {
+                openListener?.onOpen()
+            }
+        }
         addView(nameCell)
 
         recyclerView = MoviesRecyclerView(context)

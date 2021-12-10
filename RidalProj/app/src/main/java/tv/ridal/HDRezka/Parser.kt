@@ -340,6 +340,25 @@ class Parser
             return parseSearchResults(Jsoup.parse(html))
         }
 
+
+        fun parseSectionMoviesSize(doc: Document) : String
+        {
+            val navigation = doc.getElementsByClass("b-navigation")
+            if (navigation.size > 0)
+            {
+                val nav = navigation[0]
+                val aTags = nav.getElementsByTag("a")
+                val size = aTags[aTags.size - 2].text().toInt() - 1
+                return (HDRezka.PAGE_CAPACITY * size).toString()
+            }
+            return ""
+        }
+
+        fun parseSectionMoviesSize(html: String) : String
+        {
+            return parseSectionMoviesSize(Jsoup.parse(html))
+        }
+
 //        fun parsePersonPhotoUrl(doc: Document): String {
 //            val sideCover = doc.getElementsByClass("b-sidecover")
 //            if (sideCover.isNotEmpty()) {

@@ -19,19 +19,7 @@ import tv.ridal.Utils.Utils
 
 class BigActionBar(context: Context) : FrameLayout(context)
 {
-    var titleView: TextView? = null
-        set(value) {
-            value ?: return
-            field = value
-
-            if (titleView!!.parent != null) return
-
-            addView(titleView, LayoutHelper.createFrame(
-                LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-                Gravity.START or Gravity.CENTER_VERTICAL,
-                30, 0, 15 + 40 + 25, 0
-            ))
-        }
+    private var titleView: TextView
 
     var title: String = ""
         set(value) {
@@ -61,6 +49,21 @@ class BigActionBar(context: Context) : FrameLayout(context)
     init
     {
         setPadding(0, Utils.dp(25), 0, 0)
+
+        titleView = TextView(context).apply {
+            setTextColor(Theme.color(Theme.color_text))
+            textSize = 36F
+            typeface = Theme.typeface(Theme.tf_bold)
+            setLines(1)
+            maxLines = 1
+            isSingleLine = true
+            ellipsize = TextUtils.TruncateAt.END
+        }
+        addView(titleView, LayoutHelper.createFrame(
+            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+            Gravity.START or Gravity.CENTER_VERTICAL,
+            30, 0, 15 + 40 + 25, 0
+        ))
 
         imageView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.FIT_XY

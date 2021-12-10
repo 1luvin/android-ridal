@@ -132,6 +132,13 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
     {
         val urls = HDRezka.SECTION_URLS
 
+        val sectionNames = listOf(
+            Locale.text(Locale.text_films),
+            Locale.text(Locale.text_series),
+            Locale.text(Locale.text_cartoons),
+            Locale.text(Locale.text_anime),
+        )
+
         println(urls)
 
         for (i in urls.indices)
@@ -142,10 +149,18 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
 
                     val movies = Parser.parseMovies(response, 10)!!
 
-                    sectionView.sectionName = "Хеллов"
-                    sectionView.sectionSubtext = "Сабтекст"
+                    sectionView.sectionName = sectionNames[i]
+                    sectionView.sectionSubtext = Parser.parseSectionMoviesSize(response)
 
                     sectionView.adapter = MoviesAdapter(movies)
+
+                    sectionView.openListener = object : SectionView.OpenListener {
+                        override fun onOpen() {
+                            ApplicationActivity.instance().multiStackNavigator.push(
+                                MoviesFragment.newInstance()
+                            )
+                        }
+                    }
                 },
                 {
                     println("ERROR!")
