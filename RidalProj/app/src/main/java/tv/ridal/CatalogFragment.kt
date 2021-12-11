@@ -18,7 +18,7 @@ import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.Components.Layout.LayoutHelper
-import tv.ridal.Components.BigActionBar
+import tv.ridal.Components.ActionBar.BigActionBar
 import tv.ridal.Components.View.SectionView
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Parser
@@ -139,8 +139,6 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
             Locale.text(Locale.text_anime),
         )
 
-        println(urls)
-
         for (i in urls.indices)
         {
             val stringRequest = StringRequest(Request.Method.GET, urls[i],
@@ -156,8 +154,13 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
 
                     sectionView.openListener = object : SectionView.OpenListener {
                         override fun onOpen() {
-                            ApplicationActivity.instance().multiStackNavigator.push(
-                                MoviesFragment.newInstance()
+                            val args = MoviesFragment.Arguments().apply {
+                                title = sectionView.sectionName
+                                url = urls[i]
+                            }
+
+                            startFragment(
+                                MoviesFragment.newInstance(args)
                             )
                         }
                     }
@@ -168,11 +171,6 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
             )
             requestQueue.add(stringRequest)
         }
-    }
-
-    private fun createMoviesView()
-    {
-
     }
 
 

@@ -1,5 +1,7 @@
 package tv.ridal.Components.View
 
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
@@ -9,15 +11,95 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.children
 import tv.ridal.Application.Theme
 import tv.ridal.Components.InstantPressListener
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.HDRezka.Loader
+import tv.ridal.R
 import tv.ridal.Utils.Utils
 import kotlin.math.ceil
 
 class MovieView(context: Context) : FrameLayout(context)
 {
+    var isMovieSelected: Boolean = false
+
+    var isSelectable: Boolean = false
+        set(value) {
+            field = value
+
+            if (isSelectable) {
+                if (selectionView == null) createSelectionView()
+            } else {
+                if (selectionView != null) selectionView = null
+            }
+        }
+
+    private var selectionView: FrameLayout? = null
+    private fun createSelectionView()
+    {
+        val doneView = ImageView(context).apply {
+            scaleType = ImageView.ScaleType.FIT_XY
+
+            setImageDrawable( Theme.drawable(R.drawable.done).apply {
+                setTint(Theme.COLOR_WHITE)
+            } )
+        }
+
+        selectionView = FrameLayout(context).apply {
+            setBackgroundColor( Theme.alphaColor(Theme.color_main, 0.85F) )
+
+            addView(doneView, LayoutHelper.createFrame(
+                50, 50,
+                Gravity.CENTER
+            ))
+        }
+    }
+
+    fun select(select: Boolean)
+    {
+        if ( ! isSelectable) return
+
+        if (select)
+        {
+            isMovieSelected = true
+
+            this.addView(selectionView!!, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
+            ))
+
+            ValueAnimator.ofFloat(0F, 1F).apply {
+                duration = 300
+                addUpdateListener {
+                    val currAlpha = it.animatedValue as Float
+                    selectionView!!.alpha = currAlpha
+                }
+            }
+        }
+        else
+        {
+            ValueAnimator.ofFloat(1F, 0F).apply {
+                duration = 200
+                addUpdateListener {
+                    val currAlpha = it.animatedValue as Float
+                    selectionView!!.alpha = currAlpha
+                }
+
+                addListener(object : Animator.AnimatorListener {
+                    override fun onAnimationStart(animation: Animator?) {}
+                    override fun onAnimationEnd(animation: Animator?) {
+                        this@MovieView.removeView(selectionView)
+                    }
+                    override fun onAnimationCancel(animation: Animator?) {}
+                    override fun onAnimationRepeat(animation: Animator?) {}
+                })
+            }
+
+            isMovieSelected = false
+        }
+    }
+
+
     private var posterView: ImageView
     var posterUrl: String = ""
         set(value) {

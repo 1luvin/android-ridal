@@ -12,7 +12,6 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
-import tv.ridal.Components.EditText
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.R
 import tv.ridal.Utils.Utils

@@ -1,20 +1,15 @@
-package tv.ridal.Components
+package tv.ridal.Components.ActionBar
 
 import android.content.Context
-import android.graphics.LinearGradient
-import android.graphics.Shader
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.children
 import tv.ridal.Application.Theme
 import tv.ridal.Components.Layout.LayoutHelper
-import tv.ridal.Components.View.LoadingTextView
 import tv.ridal.Utils.Utils
 
 class BigActionBar(context: Context) : FrameLayout(context)

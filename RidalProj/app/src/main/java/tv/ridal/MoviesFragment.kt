@@ -11,7 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
-import com.tunjid.androidx.navigation.Navigator
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import tv.ridal.Adapters.MoviesAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Theme
@@ -19,21 +20,34 @@ import tv.ridal.Components.ActionBar.ActionBar
 import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.HDRezka.Movie
+import tv.ridal.HDRezka.Navigator
 import tv.ridal.HDRezka.Parser
 import tv.ridal.Utils.Utils
 
-class MoviesFragment : BaseFragment(), Navigator.TagProvider
+class MoviesFragment : BaseFragment()
 {
     override val stableTag: String
         get() = "MoviesFragment${View.generateViewId()}"
 
     companion object
     {
-        fun newInstance(): MoviesFragment
+        fun newInstance(args: Arguments): MoviesFragment
         {
-            return MoviesFragment()
+            return MoviesFragment().apply {
+                arguments = args
+            }
         }
     }
+
+    private lateinit var arguments: Arguments
+
+    class Arguments
+    {
+        var title: String? = null
+        var url: String? = null
+    }
+
+    private var document: Document? = null
 
     private lateinit var rootFrame: FrameLayout
 
@@ -41,6 +55,8 @@ class MoviesFragment : BaseFragment(), Navigator.TagProvider
 
     private lateinit var moviesView: RecyclerView
     private val movies: ArrayList<Movie> = ArrayList()
+
+    private var loading: Boolean = false
 
     private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
 
@@ -64,13 +80,16 @@ class MoviesFragment : BaseFragment(), Navigator.TagProvider
 
             actionButtonIcon = Theme.drawable(R.drawable.back)
             actionButtonColor = Theme.color(Theme.color_actionBar_back)
-            title = "Сука"
+            onActionButtonClick {
+                finish()
+            }
+
+            title = arguments.title ?: ""
         }
 
         rootFrame.addView(actionBar, LayoutHelper.createFrame(
             LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-            Gravity.START or Gravity.TOP,
-            0, -25, 0, 0
+            Gravity.START or Gravity.TOP
         ))
 
         createMoviesView()
@@ -116,48 +135,23 @@ class MoviesFragment : BaseFragment(), Navigator.TagProvider
             layoutManager = GridLayoutManager(requireContext(), 3)
             addItemDecoration(GridSpacingItemDecoration(3, Utils.dp(15)))
 
-            adapter = MoviesAdapter(movies)
+            adapter = MoviesAdapter(movies, true)
 
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
-                    // скроллим вниз
-                    if (dy > 0)
-                    {
-                        if (actionBar.y > - actionBar.height)
-                        {
-                            val curr = actionBar.y - dy + 0F
-                            if (curr >= - actionBar.height) {
-                                actionBar.y -= dy + 0F
-                            } else {
-                                actionBar.y = - actionBar.height + 0F
-                            }
-                        }
-                    }
-                    else // скроллим вверх
-                    {
-                        if (actionBar.y < 0)
-                        {
-                            val curr = actionBar.y - dy
-                            if (curr <= 0) {
-                                actionBar.y += -dy
-                            } else {
-                                actionBar.y = 0F
-                            }
-                        }
-                    }
 
-//                    actionBar.layoutParams = LayoutHelper.createFrame(
-//                        LayoutHelper.MATCH_PARENT, 56 + 25,
-//                        Gravity.NO_GRAVITY,
-//                        0, actionBar.y.toInt(), 0, 0
-//                    )
-////
-//                    moviesView.layoutParams = LayoutHelper.createFrame(
-//                        LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
-//                        Gravity.START or Gravity.TOP,
-//                        0, Utils.px(actionBar.y.toInt() + actionBar.height), 0, 0
-//                    )
+                    println(recyclerView.computeVerticalScrollOffset())
+
+                    val offset = recyclerView.computeVerticalScrollOffset()
+                    val range = recyclerView.computeVerticalScrollRange()
+                    if (offset > range / 2)
+                    {
+                        if ( ! loading)
+                        {
+                            loadMovies()
+                        }
+                    }
                 }
             })
         }
@@ -165,28 +159,40 @@ class MoviesFragment : BaseFragment(), Navigator.TagProvider
 
     private fun loadMovies()
     {
-        val urls = listOf(
-            "https://rezka.ag/films/?filter=watching",
-        )
+        loading = true
 
-        for (i in urls.indices)
-        {
-            val stringRequest = StringRequest(
-                Request.Method.GET, urls[i],
-                { response ->
-                    movies.addAll(Parser.parseMovies(response)!!)
-
-                    (moviesView.adapter as MoviesAdapter).notifyDataSetChanged()
-                },
-                {
-                    println("ERROR!")
-                }
-            )
-            requestQueue.add(stringRequest)
+        var url: String = ""
+        if (document == null) {
+            url = arguments.url!!
+        } else {
+            if (Navigator.isNextPageExist(document!!)) {
+                url = Navigator.nextPageUrl(document!!)
+            } else {
+                loading = false
+                return
+            }
         }
+
+        val stringRequest = StringRequest(
+            Request.Method.GET, url,
+            { response ->
+                loading = false
+
+                document = Jsoup.parse(response)
+
+                movies.addAll(Parser.parseMovies(document!!)!!)
+
+                (moviesView.adapter as MoviesAdapter).notifyItemRangeInserted(movies.size, movies.size + 36)
+            },
+            {
+                println("ERROR!")
+            }
+        )
+        requestQueue.add(stringRequest)
     }
 
 }
+
 
 
 

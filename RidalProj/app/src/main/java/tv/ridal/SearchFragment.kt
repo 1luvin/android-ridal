@@ -1,7 +1,6 @@
 package tv.ridal
 
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.*
 import android.widget.*
 import androidx.recyclerview.widget.GridLayoutManager
@@ -10,7 +9,6 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
-import com.tunjid.androidx.navigation.Navigator
 import tv.ridal.Adapters.MoviesAdapter
 import tv.ridal.Adapters.SearchAdapter
 import tv.ridal.Application.ApplicationLoader
@@ -19,8 +17,7 @@ import tv.ridal.Application.Theme
 import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.Components.PopupFrame
-import tv.ridal.Components.BigActionBar
-import tv.ridal.Components.View.LoadingTextView
+import tv.ridal.Components.ActionBar.BigActionBar
 import tv.ridal.Components.View.SearchView
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Parser
@@ -32,7 +29,7 @@ import kotlin.collections.HashMap
 import kotlin.concurrent.schedule
 
 
-class SearchFragment : BaseFragment(), Navigator.TagProvider
+class SearchFragment : BaseFragment()
 {
     override val stableTag: String
         get() = "SearchFragment"

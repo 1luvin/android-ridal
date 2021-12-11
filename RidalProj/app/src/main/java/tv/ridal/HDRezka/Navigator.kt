@@ -1,5 +1,6 @@
 package tv.ridal.HDRezka
 
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 class Navigator
@@ -15,6 +16,11 @@ class Navigator
                 return spans[spans.size - 2].attr("class") != "no-page"
             }
             return false
+        }
+
+        fun isNextPageExist(html: String) : Boolean
+        {
+            return isNextPageExist(Jsoup.parse(html))
         }
 
         fun nextPageUrl(document: Document) : String

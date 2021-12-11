@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.media.Image
 import android.text.TextUtils
 import android.view.Gravity
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -49,6 +50,14 @@ class ActionBar(context: Context) : FrameLayout(context)
 
             actionButtonView?.drawable?.setTint(actionButtonColor)
         }
+
+    fun onActionButtonClick(l: () -> Unit)
+    {
+        actionButtonView?.setOnClickListener {
+            l.invoke()
+        }
+    }
+
 
     // title
     private var titleFrame: FrameLayout? = null

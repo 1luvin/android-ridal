@@ -1,4 +1,4 @@
-package tv.ridal.Components
+package tv.ridal.Components.View
 
 import android.content.Context
 import android.view.KeyEvent

@@ -1,21 +1,29 @@
 package tv.ridal
 
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
+import com.tunjid.androidx.navigation.Navigator
 
-open class BaseFragment : Fragment()
+open class BaseFragment : Fragment(), Navigator.TagProvider
 {
+    override val stableTag: String
+        get() = "${View.generateViewId()}"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        parentFragmentManager.commit {
-//            setCustomAnimations(
-//                R.anim.zoom_in,
-//                R.anim.zoom_out,
-//                R.anim.zoom_pop_in,
-//                R.anim.zoom_pop_out
-//            )
-//        }
+
+    }
+
+    protected fun startFragment(fragment: BaseFragment)
+    {
+        ApplicationActivity.instance().multiStackNavigator.push(fragment)
+    }
+
+    protected fun finish()
+    {
+        ApplicationActivity.instance().multiStackNavigator.pop()
     }
 }
