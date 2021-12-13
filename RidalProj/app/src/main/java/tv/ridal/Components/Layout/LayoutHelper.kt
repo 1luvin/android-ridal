@@ -24,12 +24,10 @@ class LayoutHelper
                 setMargins(Utils.dp(leftMargin), Utils.dp(topMargin), Utils.dp(rightMargin), Utils.dp(bottomMargin))
             }
         }
-
         fun createFrame(width: Int, height: Int, gravity: Int) : FrameLayout.LayoutParams
         {
             return FrameLayout.LayoutParams(size(width), size(height), gravity)
         }
-
         fun createFrame(width: Int, height: Int) : FrameLayout.LayoutParams
         {
             return FrameLayout.LayoutParams(size(width), size(height))
@@ -39,9 +37,15 @@ class LayoutHelper
             Linear
          */
 
-        fun createLinear(width: Int, height: Int) : LinearLayout.LayoutParams
+        fun createLinear(width: Int, height: Int): LinearLayout.LayoutParams
         {
             return LinearLayout.LayoutParams(size(width), size(height))
+        }
+        fun createLinear(width: Int, height: Int, leftMargin: Int, topMargin: Int, rightMargin: Int, bottomMargin: Int): LinearLayout.LayoutParams
+        {
+            return LinearLayout.LayoutParams(size(width), size(height)).apply {
+                setMargins(leftMargin, topMargin, rightMargin, bottomMargin)
+            }
         }
 
         /*

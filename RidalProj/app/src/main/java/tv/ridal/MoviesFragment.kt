@@ -1,11 +1,9 @@
 package tv.ridal
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import android.widget.EdgeEffect
 import android.widget.FrameLayout
-import androidx.core.view.marginTop
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
@@ -16,7 +14,7 @@ import org.jsoup.nodes.Document
 import tv.ridal.Adapters.MoviesAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Theme
-import tv.ridal.Components.ActionBar.ActionBar
+import tv.ridal.ActionBar.ActionBar
 import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.HDRezka.Movie

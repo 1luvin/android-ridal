@@ -13,7 +13,7 @@ import com.tunjid.androidx.navigation.Navigator
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.Components.Layout.LayoutHelper
-import tv.ridal.Components.ActionBar.BigActionBar
+import tv.ridal.ActionBar.BigActionBar
 import tv.ridal.Utils.Utils
 
 class SettingsFragment : BaseFragment(), Navigator.TagProvider

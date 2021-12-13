@@ -52,6 +52,8 @@ class Theme
 
         const val color_actionBar_back = "color_actionBar_back"
 
+        const val color_bigActionBar_item_bg = "color_bigActionBar_item_bg"
+
         /*
             Темы
          */
@@ -71,6 +73,8 @@ class Theme
             this[color_bottomNavIcon_active] = 0xFF00B2FF.toInt()
 
             this[color_actionBar_back] = 0xFF666666.toInt()
+
+            this[color_bigActionBar_item_bg] = 0xFFEEEEEE.toInt()
         }
         // черная тема
         private val darkColors = HashMap<String, Int>().apply {
@@ -170,6 +174,16 @@ class Theme
         {
             return ContextCompat.getDrawable(ApplicationLoader.instance().applicationContext, drawableId)!!
         }
+        fun drawable(drawableId: Int, color: Int): Drawable
+        {
+            return drawable(drawableId).apply {
+                setTint(color)
+            }
+        }
+        fun drawable(drawableId: Int, colorKey: String): Drawable
+        {
+            return drawable(drawableId, color(colorKey))
+        }
 
         fun createCircleSelector(color: Int, radius: Int = Utils.dp(20)) : Drawable
         {
@@ -223,17 +237,20 @@ class Theme
                 }
             }
 
-            val defDrawable = ShapeDrawable(RoundRectShape(radiiArray, null, null))
-            if (fillAfter) {
-                defDrawable.paint.color = color
-            } else {
-                defDrawable.paint.color = COLOR_TRANSPARENT
-            }
+            val defDrawable = Theme.createRect(
+                if (fillAfter) color else COLOR_TRANSPARENT,
+                radii
+            )
 
             val rippleDrawable = ShapeDrawable(RoundRectShape(radiiArray, null, null))
 
             return RippleDrawable(colorStateList, defDrawable, rippleDrawable)
         }
+        fun createRectSelector(colorKey: String, radii: FloatArray? = null, fillAfter: Boolean = false) : Drawable
+        {
+            return createRectSelector(color(colorKey), radii, fillAfter)
+        }
+
 
         fun createOutlinedRect(color: Int, radii: FloatArray? = null) : Drawable
         {

@@ -1,14 +1,12 @@
 package tv.ridal.Cells
 
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
 import android.text.TextUtils
 import android.view.Gravity
-import android.view.MotionEvent
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+
 import tv.ridal.Application.Theme
 import tv.ridal.Components.InstantPressListener
 import tv.ridal.Components.Layout.LayoutHelper
@@ -39,7 +37,7 @@ class CatalogSectionCell(context: Context) : FrameLayout(context)
         isClickable = true
         setOnTouchListener(InstantPressListener())
 
-        background = Theme.createRectSelector(Theme.color(Theme.color_bg))
+        background = Theme.createRectSelector(Theme.color_bg)
 
         sectionNameView = TextView(context).apply {
             setTextColor(Theme.color(Theme.color_text))
@@ -53,7 +51,7 @@ class CatalogSectionCell(context: Context) : FrameLayout(context)
         addView(sectionNameView,LayoutHelper.createFrame(
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.TOP,
-            25, 7, 62, 0)
+            25, 7, 59, 0)
         )
 
         sectionSubtextView = TextView(context).apply {
@@ -67,7 +65,7 @@ class CatalogSectionCell(context: Context) : FrameLayout(context)
         addView(sectionSubtextView, LayoutHelper.createFrame(
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.TOP,
-            25, 29, 62, 0))
+            25, 29, 59, 0))
 
         val pointerDrawable = Theme.drawable(R.drawable.pointer_forward).apply {
             setTint(Theme.color(Theme.color_main))
@@ -76,16 +74,17 @@ class CatalogSectionCell(context: Context) : FrameLayout(context)
             setImageDrawable(pointerDrawable)
         }
         addView(pointerImage, LayoutHelper.createFrame(
-            12, 12,
+            24, 24,
             Gravity.END or Gravity.CENTER_VERTICAL,
-            20, 0, 30, 0))
+            15, 0, 20, 0))
 
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(
             MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(Utils.dp(56), MeasureSpec.EXACTLY))
+            MeasureSpec.makeMeasureSpec(Utils.dp(56), MeasureSpec.EXACTLY)
+        )
     }
 
 

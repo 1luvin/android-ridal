@@ -1,12 +1,10 @@
-package tv.ridal.Components.ActionBar
+package tv.ridal.ActionBar
 
 import android.content.Context
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
-import android.media.Image
 import android.text.TextUtils
 import android.view.Gravity
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView

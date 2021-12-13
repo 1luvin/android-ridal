@@ -18,7 +18,7 @@ import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.Components.Layout.LayoutHelper
-import tv.ridal.Components.ActionBar.BigActionBar
+import tv.ridal.ActionBar.BigActionBar
 import tv.ridal.Components.View.SectionView
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Parser
@@ -96,13 +96,15 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
         return rootLayout
     }
 
-    override fun onResume() {
+    override fun onResume()
+    {
         super.onResume()
 
         requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }
 
-    override fun onStop() {
+    override fun onStop()
+    {
         super.onStop()
 
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
@@ -111,12 +113,8 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
 
     private fun createScreenTitleView() : View
     {
-        return BigActionBar(requireContext()).apply {
-            title = ApplicationLoader.APP_NAME
-            image = Theme.drawable(R.drawable.invite).apply {
-                setTint(Theme.color(Theme.color_text))
-            }
-            imageClickListener = View.OnClickListener {
+        val menu = BigActionBar.Menu(requireContext()).apply {
+            addItem(Theme.drawable(R.drawable.invite, Theme.color_text)) {
                 val sendIntent = Intent().apply {
                     action = Intent.ACTION_SEND
                     putExtra(Intent.EXTRA_TEXT, Locale.text(Locale.share_application))
@@ -125,6 +123,12 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
                 val shareIntent = Intent.createChooser(sendIntent, "")
                 startActivity(shareIntent)
             }
+        }
+
+        return BigActionBar(requireContext()).apply {
+            title = ApplicationLoader.APP_NAME
+
+            this.menu = menu
         }
     }
 
