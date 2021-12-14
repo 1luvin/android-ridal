@@ -54,6 +54,8 @@ class Theme
 
         const val color_bigActionBar_item_bg = "color_bigActionBar_item_bg"
 
+        const val color_negative = "color_negative"
+
         /*
             Темы
          */
@@ -75,6 +77,8 @@ class Theme
             this[color_actionBar_back] = 0xFF666666.toInt()
 
             this[color_bigActionBar_item_bg] = 0xFFEEEEEE.toInt()
+
+            this[color_negative] = 0xFFFF6565.toInt()
         }
         // черная тема
         private val darkColors = HashMap<String, Int>().apply {

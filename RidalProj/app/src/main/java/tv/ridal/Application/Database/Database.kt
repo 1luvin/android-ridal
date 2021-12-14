@@ -13,6 +13,28 @@ object Database
         val creationDate: Date,
         val modifiedDate: Date,
     )
+    {
+        fun isEmpty(): Boolean
+        {
+            return size == 0
+        }
+    }
+
+    @Dao
+    interface FolderDao
+    {
+        @Insert(onConflict = OnConflictStrategy.IGNORE)
+        fun insert(folder: Folder)
+
+        @Query("SELECT folderName FROM folders")
+        fun allNames(): List<String>
+
+        @Query("SELECT COUNT(folderName) FROM folders")
+        fun count(): Int
+
+        @Query("SELECT * FROM folders")
+        fun allFolders(): List<Folder>
+    }
 
     @Entity(tableName = "movies")
     data class Movie(

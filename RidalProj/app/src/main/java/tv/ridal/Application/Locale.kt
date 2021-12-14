@@ -31,6 +31,7 @@ class Locale
                     texts[text_anime] = "Аниме"
 
                     texts[text_favourites] = "Избранное"
+                    texts[text_empty] = "Пусто"
                 }
             }
         }
@@ -57,6 +58,7 @@ class Locale
         const val text_anime = "text_anime"
 
         const val text_favourites = "text_favourites"
+        const val text_empty = "text_empty"
 
         private var texts = HashMap<String, String>()
 

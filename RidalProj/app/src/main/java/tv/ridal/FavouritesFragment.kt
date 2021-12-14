@@ -1,14 +1,27 @@
 package tv.ridal
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.widget.EdgeEffect
 import android.widget.FrameLayout
-import android.widget.ScrollView
+import android.widget.LinearLayout
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import tv.ridal.ActionBar.BigActionBar
+import tv.ridal.Application.Database.ApplicationDatabase
+import tv.ridal.Application.Database.Database
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
+import tv.ridal.Cells.CatalogSectionCell
+import tv.ridal.Cells.EmptyFolderCell
 import tv.ridal.Components.Layout.LayoutHelper
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class FavouritesFragment : BaseFragment()
@@ -18,10 +31,14 @@ class FavouritesFragment : BaseFragment()
 
     companion object
     {
-        fun instance(): FavouritesFragment
-        {
-            return FavouritesFragment()
-        }
+        @Volatile
+        private var INSTANCE: FavouritesFragment? = null
+        fun instance() =
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: FavouritesFragment().also {
+                    INSTANCE = it
+                }
+            }
     }
 
     private lateinit var rootFrame: FrameLayout
@@ -29,7 +46,7 @@ class FavouritesFragment : BaseFragment()
 //    private lateinit var scroll: ScrollView
 //    private lateinit var scrollFrame: FrameLayout
 //    private lateinit var sortingCell: View
-//    private lateinit var foldersView: RecyclerView
+    private lateinit var foldersView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -48,9 +65,19 @@ class FavouritesFragment : BaseFragment()
             LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.TOP
         ))
+
+        actionBar.measure(0, 0)
+
+        createFoldersView()
+        rootFrame.addView(foldersView, LayoutHelper.createFrame(
+            LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
+            Gravity.START or Gravity.TOP,
+            0, actionBar.measuredHeight, 0, 0
+        ))
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+    {
         return rootFrame
     }
 
@@ -84,7 +111,172 @@ class FavouritesFragment : BaseFragment()
         }
     }
 
-    private fun showNewFolderFragment() {}
+    private fun createFoldersView()
+    {
+        foldersView = RecyclerView(requireContext()).apply {
+            edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
+                override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
+                    return EdgeEffect(view.context).apply { color = Theme.color(Theme.color_main) }
+                }
+            }
+            clipToPadding = false
+
+            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+
+            adapter = FoldersAdapter()
+        }
+    }
+
+    private fun showNewFolderFragment()
+    {
+        lifecycleScope.launch {
+            var count = 0
+            withContext(Dispatchers.IO)
+            {
+                val folderDao = ApplicationDatabase.instance().folderDao()
+                folderDao.apply {
+                    insert(
+                        Database.Folder("Shit${System.currentTimeMillis()}", 5, Date(), Date())
+                    )
+                }
+                count = folderDao.count()
+            }
+            println(count)
+            foldersView.adapter?.notifyDataSetChanged()
+        }
+    }
+
+
+
+    class FolderView(context: Context) : LinearLayout(context)
+    {
+        var type: Type = Type.EMPTY
+            set(value) {
+                if (value == type) return
+                field = value
+
+                this.removeView(folderHeaderCell)
+
+                if (type == Type.NOT_EMPTY)
+                {
+                    folderHeaderCell = CatalogSectionCell(context).apply {
+                        sectionName = folderName
+                        sectionSubtext = folderSize.toString()
+                    }
+                }
+                else if (type == Type.EMPTY)
+                {
+                    folderHeaderCell = EmptyFolderCell(context).apply {
+                        this.folderName = folderName
+                    }
+                }
+
+                this.addView(folderHeaderCell, 0)
+            }
+
+        private var folderHeaderCell: View? = null
+
+        var folderName: String = ""
+            set(value) {
+                field = value
+
+                if (folderHeaderCell == null) return
+
+                if (type == Type.NOT_EMPTY) {
+                    (folderHeaderCell as CatalogSectionCell).sectionName = folderName
+                } else if (type == Type.EMPTY) {
+                    (folderHeaderCell as EmptyFolderCell).folderName = folderName
+                }
+            }
+
+        var folderSize: Int = 0
+            set(value) {
+                field = value
+
+                if (folderHeaderCell == null) return
+
+                if (type == Type.NOT_EMPTY) {
+                    (folderHeaderCell as CatalogSectionCell).sectionSubtext = folderSize.toString()
+                }
+            }
+
+        init
+        {
+            orientation = LinearLayout.VERTICAL
+        }
+
+        enum class Type
+        {
+            NOT_EMPTY, EMPTY
+        }
+    }
+
+    class FoldersAdapter : RecyclerView.Adapter<FoldersAdapter.ViewHolder>()
+    {
+        private lateinit var folderDao: Database.FolderDao
+        private lateinit var folders: List<Database.Folder>
+
+        private suspend fun initFolders() = withContext(Dispatchers.IO) {
+            folderDao = ApplicationDatabase.instance().folderDao()
+            folders = folderDao.allFolders()
+            println(folderDao.count())
+        }
+
+        init
+        {
+            FavouritesFragment.instance().lifecycleScope.launch {
+                initFolders()
+                println("SHIT")
+                notifyDataSetChanged()
+            }
+        }
+
+        inner class ViewHolder(folderView: FolderView) : RecyclerView.ViewHolder(folderView)
+        {
+
+            init
+            {
+
+            }
+
+            fun bind(current: Database.Folder)
+            {
+                val folder = itemView as FolderView
+                folder.apply {
+                    type = if (current.isEmpty()) {
+                        FolderView.Type.EMPTY
+                    } else FolderView.Type.NOT_EMPTY
+
+                    folderName = current.folderName
+                    folderSize = current.size
+                }
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
+        {
+            val folder = FolderView(parent.context)
+
+            return ViewHolder(folder)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int)
+        {
+            if ( ! this::folders.isInitialized) return
+
+            holder.bind(folders[position])
+        }
+
+        override fun getItemCount(): Int
+        {
+            return if ( ! this::folders.isInitialized) {
+                0
+            } else {
+                folders.size
+            }
+        }
+
+    }
 
 }
 

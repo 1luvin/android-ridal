@@ -6,8 +6,12 @@ import tv.ridal.Application.ApplicationLoader
 
 
 @Database(entities = [tv.ridal.Application.Database.Database.Folder::class, ], version = 1, exportSchema = false)
+@TypeConverters(DateConverter::class)
 abstract class ApplicationDatabase : RoomDatabase()
 {
+
+    abstract fun folderDao(): tv.ridal.Application.Database.Database.FolderDao
+
     companion object
     {
         @Volatile
