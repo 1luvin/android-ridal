@@ -1,8 +1,7 @@
-package tv.ridal.Components
+package tv.ridal.Components.Popup
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -12,11 +11,11 @@ import tv.ridal.Components.Layout.LayoutHelper
 class PopupFrame(context: Context) : FrameLayout(context)
 {
 
-    interface DismissListener
+    private var dismissListener: (() -> Unit)? = null
+    fun onDismiss(l: () -> Unit)
     {
-        fun onDismiss()
+        dismissListener = l
     }
-    var dismissListener: DismissListener? = null
 
     private var animator: ObjectAnimator
     private var animatorDismissListener = object : Animator.AnimatorListener {
@@ -82,7 +81,7 @@ class PopupFrame(context: Context) : FrameLayout(context)
             start()
         }
 
-        dismissListener?.onDismiss()
+        dismissListener?.invoke()
     }
 
 }

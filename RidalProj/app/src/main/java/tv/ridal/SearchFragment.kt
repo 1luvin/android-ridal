@@ -16,7 +16,7 @@ import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
-import tv.ridal.Components.PopupFrame
+import tv.ridal.Components.Popup.PopupFrame
 import tv.ridal.ActionBar.BigActionBar
 import tv.ridal.Components.View.SearchView
 import tv.ridal.HDRezka.Movie

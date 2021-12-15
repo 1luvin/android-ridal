@@ -32,6 +32,11 @@ class Locale
 
                     texts[text_favourites] = "Избранное"
                     texts[text_empty] = "Пусто"
+
+                    texts[text_newFolder] = "Новая папка..."
+                    texts[text_folderName] = "Название папки"
+                    texts[text_renameTo] = "Переименовать в..."
+                    texts[text_newFolderName] = "Новое название папки"
                 }
             }
         }
@@ -59,6 +64,11 @@ class Locale
 
         const val text_favourites = "text_favourites"
         const val text_empty = "text_empty"
+
+        const val text_newFolder = "text_newFolder"
+        const val text_folderName = "text_folderName"
+        const val text_renameTo = "text_renameTo"
+        const val text_newFolderName = "text_newFolderName"
 
         private var texts = HashMap<String, String>()
 

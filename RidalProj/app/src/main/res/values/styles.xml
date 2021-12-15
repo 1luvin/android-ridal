@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="BottomPopup" parent="Theme.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomPopupStyle</item>
+    </style>
+
+    <style name="BottomPopupStyle">
+        <item name="android:background">@drawable/bottom_popup</item>
+    </style>
+
+</resources>

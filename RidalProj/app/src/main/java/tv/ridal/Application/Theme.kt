@@ -56,6 +56,8 @@ class Theme
 
         const val color_negative = "color_negative"
 
+        const val color_popup_holder = "color_popup_holder"
+
         /*
             Темы
          */
@@ -79,6 +81,8 @@ class Theme
             this[color_bigActionBar_item_bg] = 0xFFEEEEEE.toInt()
 
             this[color_negative] = 0xFFFF6565.toInt()
+
+            this[color_popup_holder] = 0xFFAAAAAA.toInt()
         }
         // черная тема
         private val darkColors = HashMap<String, Int>().apply {

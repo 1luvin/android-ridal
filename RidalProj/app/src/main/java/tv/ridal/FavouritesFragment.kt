@@ -6,12 +6,14 @@ import android.view.*
 import android.widget.EdgeEffect
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import tv.ridal.ActionBar.ActionBar
 import tv.ridal.ActionBar.BigActionBar
 import tv.ridal.Application.Database.ApplicationDatabase
 import tv.ridal.Application.Database.Database
@@ -20,6 +22,10 @@ import tv.ridal.Application.Theme
 import tv.ridal.Cells.CatalogSectionCell
 import tv.ridal.Cells.EmptyFolderCell
 import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Components.Popup.BottomPopup
+import tv.ridal.Components.Popup.PopupFrame
+import tv.ridal.Components.View.ClearableInputView
+import tv.ridal.Utils.Utils
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -47,6 +53,7 @@ class FavouritesFragment : BaseFragment()
 //    private lateinit var scrollFrame: FrameLayout
 //    private lateinit var sortingCell: View
     private lateinit var foldersView: RecyclerView
+
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -100,7 +107,7 @@ class FavouritesFragment : BaseFragment()
     {
         val menu = BigActionBar.Menu(requireContext()).apply {
             addItem(Theme.drawable(R.drawable.folder_new, Theme.color_text)) {
-                showNewFolderFragment()
+                showRenameFolderPopup()
             }
         }
 
@@ -126,6 +133,91 @@ class FavouritesFragment : BaseFragment()
             adapter = FoldersAdapter()
         }
     }
+
+    private fun showNewFolderPopup()
+    {
+        val popup = BottomPopup(requireContext())
+
+        val actionBar = ActionBar(requireContext()).apply {
+            background = Theme.createRect(Theme.color_bg, FloatArray(4).apply {
+                fill(Utils.dp(16F))
+            })
+
+            title = Locale.text(Locale.text_newFolder)
+
+            actionButtonIcon = Theme.drawable(R.drawable.close, Theme.color_actionBar_back)
+            onActionButtonClick {
+                popup.dismiss()
+            }
+        }
+
+        val inputView = ClearableInputView(requireContext()).apply {
+            editText.apply {
+                hint = Locale.text(Locale.text_folderName)
+                setHintTextColor(Theme.color(Theme.color_text2))
+            }
+        }
+
+        val contentView = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+
+            background = Theme.createRect(Theme.color_bg, floatArrayOf(
+                Utils.dp(12F), Utils.dp(12F), 0F, 0F
+            ))
+
+            addView(actionBar)
+            addView(inputView)
+        }
+
+        popup.apply {
+            setContentView(contentView)
+        }
+
+        popup.show()
+    }
+
+    private fun showRenameFolderPopup()
+    {
+        val popup = BottomPopup(requireContext())
+
+        val actionBar = ActionBar(requireContext()).apply {
+            background = Theme.createRect(Theme.color_bg, FloatArray(4).apply {
+                fill(Utils.dp(16F))
+            })
+
+            title = Locale.text(Locale.text_renameTo)
+
+            actionButtonIcon = Theme.drawable(R.drawable.close, Theme.color_actionBar_back)
+            onActionButtonClick {
+                popup.dismiss()
+            }
+        }
+
+        val inputView = ClearableInputView(requireContext()).apply {
+            editText.apply {
+                hint = Locale.text(Locale.text_newFolderName)
+                setHintTextColor(Theme.color(Theme.color_text2))
+            }
+        }
+
+        val contentView = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+
+            background = Theme.createRect(Theme.color_bg, floatArrayOf(
+                Utils.dp(12F), Utils.dp(12F), 0F, 0F
+            ))
+
+            addView(actionBar)
+            addView(inputView)
+        }
+
+        popup.apply {
+            setContentView(contentView)
+        }
+
+        popup.show()
+    }
+
 
     private fun showNewFolderFragment()
     {

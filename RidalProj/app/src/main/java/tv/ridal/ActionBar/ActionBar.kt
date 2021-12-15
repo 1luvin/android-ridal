@@ -15,7 +15,7 @@ import tv.ridal.Utils.Utils
 
 class ActionBar(context: Context) : FrameLayout(context)
 {
-    val actionBarHeightPx: Int = 56
+    val actionBarHeightDp: Int = 56
     val actionBarHeight: Int = Utils.dp(56)
 
     // action button
@@ -124,10 +124,10 @@ class ActionBar(context: Context) : FrameLayout(context)
         if (actionButtonView != null)
         {
             actionButtonView!!.layoutParams = LayoutHelper.createFrame(
-                actionBarHeightPx, actionBarHeightPx,
+                actionBarHeightDp, actionBarHeightDp,
                 Gravity.START or Gravity.TOP
             )
-            actionButtonViewWidth = actionBarHeightPx
+            actionButtonViewWidth = actionBarHeightDp
         }
 
         if (titleFrame != null)
