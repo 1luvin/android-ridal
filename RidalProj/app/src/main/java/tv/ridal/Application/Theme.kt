@@ -10,6 +10,7 @@ import androidx.annotation.FloatRange
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.WindowInsetsControllerCompat
 import tv.ridal.ApplicationActivity
 import tv.ridal.Utils.Utils
 import kotlin.math.ceil
@@ -88,8 +89,23 @@ class Theme
         private val darkColors = HashMap<String, Int>().apply {
             this[color_main] = 0xFF00B2FF.toInt()
             this[color_bg] = 0xFF000000.toInt()
-            this[color_text] = 0xF
+            this[color_text] = 0xFFFFFFFF.toInt()
             this[color_text2] = 0xFFAAAAAA.toInt()
+
+            this[color_searchResult_best] = 0xFF00FF00.toInt()
+            this[color_searchResult_middle] = 0xFFAAAAAA.toInt()
+            this[color_searchResult_worst] = 0xFFFF0000.toInt()
+
+            this[color_bottomNavIcon_inactive] = 0xFFAAAAAA.toInt()
+            this[color_bottomNavIcon_active] = 0xFF00B2FF.toInt()
+
+            this[color_actionBar_back] = 0xFFAAAAAA.toInt()
+
+            this[color_bigActionBar_item_bg] = 0xFFEEEEEE.toInt()
+
+            this[color_negative] = 0xFFFF6565.toInt()
+
+            this[color_popup_holder] = 0xFFAAAAAA.toInt()
         }
         // список всех тем
         private val colorsList = listOf(
