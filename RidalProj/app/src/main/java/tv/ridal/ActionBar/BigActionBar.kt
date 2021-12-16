@@ -78,9 +78,9 @@ class BigActionBar(context: Context) : FrameLayout(context)
             )
         }
 
-        super.onMeasure(
-            MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(paddingTop + Utils.dp(90) + paddingBottom, MeasureSpec.EXACTLY)
+        setMeasuredDimension(
+            MeasureSpec.getSize(widthMeasureSpec),
+            paddingTop + Utils.dp(90) + paddingBottom
         )
     }
 

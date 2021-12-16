@@ -2,6 +2,7 @@ package tv.ridal
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.view.*
 import android.widget.EdgeEffect
 import android.widget.FrameLayout
@@ -25,6 +26,7 @@ import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.Components.Popup.BottomPopup
 import tv.ridal.Components.Popup.PopupFrame
 import tv.ridal.Components.View.ClearableInputView
+import tv.ridal.Components.View.LoadingTextView
 import tv.ridal.Utils.Utils
 import java.util.*
 import kotlin.collections.ArrayList
@@ -49,6 +51,8 @@ class FavouritesFragment : BaseFragment()
 
     private lateinit var rootFrame: FrameLayout
     private lateinit var actionBar: BigActionBar
+    private lateinit var foldersFrame: FrameLayout
+    private lateinit var loadingView: LoadingTextView
 //    private lateinit var scroll: ScrollView
 //    private lateinit var scrollFrame: FrameLayout
 //    private lateinit var sortingCell: View
@@ -75,12 +79,43 @@ class FavouritesFragment : BaseFragment()
 
         actionBar.measure(0, 0)
 
-        createFoldersView()
-        rootFrame.addView(foldersView, LayoutHelper.createFrame(
+        foldersFrame = FrameLayout(requireContext()).apply {
+//            setBackgroundColor(Theme.color(Theme.color_main))
+        }
+        rootFrame.addView(foldersFrame, LayoutHelper.createFrame(
             LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
-            Gravity.START or Gravity.TOP,
-            0, actionBar.measuredHeight, 0, 0
+            Gravity.TOP,
+            0, Utils.px(actionBar.measuredHeight), 0, 0
         ))
+
+        loadingView = LoadingTextView(requireContext()).apply {
+            text = "Мамочка"
+            textSize = 60F
+            typeface = Theme.typeface(Theme.tf_bold)
+
+            color = Theme.color(Theme.color_text)
+            loadColor = Theme.color(Theme.color_main)
+            loadSpanWidth = 0.6F
+            loadSpeed = 2
+        }
+
+        foldersFrame.addView(loadingView, LayoutHelper.createFrame(
+            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+            Gravity.CENTER
+        ))
+
+        loadingView.startLoading()
+
+//        lifecycleScope.launch {
+//            loadingView.startLoading()
+//        }
+
+//        createFoldersView()
+//        rootFrame.addView(foldersView, LayoutHelper.createFrame(
+//            LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
+//            Gravity.START or Gravity.TOP,
+//            0, Utils.px(actionBar.measuredHeight), 0, 0
+//        ))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
