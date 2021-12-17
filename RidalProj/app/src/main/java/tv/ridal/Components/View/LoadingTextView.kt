@@ -1,5 +1,7 @@
 package tv.ridal.Components.View
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.LinearGradient
@@ -20,11 +22,11 @@ class LoadingTextView(context: Context) : TextView(context)
         }
     var loadColor: Int = Theme.color(Theme.color_main)
 
-    var loadSpeed: Long = 2
+    var loadSpeed: Float = 2F
         set(value) {
             field = value
 
-            animator.duration = loadSpeed * 1000
+            animator.duration = (loadSpeed * 1000).toLong()
         }
 
     var loadSpanWidth: Float = 0.4F
@@ -40,14 +42,20 @@ class LoadingTextView(context: Context) : TextView(context)
 
     private var animator = ValueAnimator.ofFloat(0F, 1F + loadSpanWidth).apply {
         interpolator = DecelerateInterpolator()
-        duration = loadSpeed * 1000
+        duration = (loadSpeed * 1000).toLong()
         repeatCount = ValueAnimator.INFINITE
         repeatMode = ValueAnimator.RESTART
     }
 
+    private var needStopLoading: Boolean = false
+
     private var left: Float = 0F
     private var middle: Float = 0F
     private var right: Float = 0F
+
+    var isLoading: Boolean = false
+        private set
+        get() = animator.isRunning
 
     fun startLoading()
     {
@@ -91,9 +99,28 @@ class LoadingTextView(context: Context) : TextView(context)
                 this@LoadingTextView.paint.shader = shader
                 this@LoadingTextView.invalidate()
             }
+
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationRepeat(animation: Animator?) {
+                    super.onAnimationRepeat(animation)
+
+                    if (needStopLoading)
+                    {
+                        animator.cancel()
+                        needStopLoading = false
+                    }
+                }
+            })
         }
 
         animator.start()
+    }
+
+    fun stopLoading()
+    {
+        if ( ! animator.isRunning) return
+
+        needStopLoading = true
     }
 }
 

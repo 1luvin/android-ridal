@@ -1,26 +1,38 @@
 package tv.ridal
 
+import android.app.Dialog
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.*
 import android.widget.EdgeEffect
 import android.widget.FrameLayout
+import android.widget.LinearLayout
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import tv.ridal.Adapters.MoviesAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Theme
 import tv.ridal.ActionBar.ActionBar
+import tv.ridal.Application.Locale
+import tv.ridal.Components.BottomSheetSharedTransition
 import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Components.Popup.BottomPopup
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Navigator
 import tv.ridal.HDRezka.Parser
 import tv.ridal.Utils.Utils
+import tv.ridal.Utils.withFilters
 
 class MoviesFragment : BaseFragment()
 {
@@ -48,10 +60,13 @@ class MoviesFragment : BaseFragment()
     private var document: Document? = null
 
     private lateinit var rootFrame: FrameLayout
-
     private lateinit var actionBar: ActionBar
-
+    private lateinit var moviesFrame: FrameLayout
     private lateinit var moviesView: RecyclerView
+    private lateinit var filtersButton: FloatingActionButton
+    private lateinit var filtersBottomPopupFragment: FiltersBottomPopupFragment
+
+
     private val movies: ArrayList<Movie> = ArrayList()
 
     private var loading: Boolean = false
@@ -87,17 +102,31 @@ class MoviesFragment : BaseFragment()
 
         rootFrame.addView(actionBar, LayoutHelper.createFrame(
             LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-            Gravity.START or Gravity.TOP
+            Gravity.TOP
         ))
 
-        createMoviesView()
-        rootFrame.addView(moviesView, LayoutHelper.createFrame(
+        moviesFrame = FrameLayout(requireContext())
+        rootFrame.addView(moviesFrame, LayoutHelper.createFrame(
             LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
-            Gravity.START or Gravity.TOP,
+            Gravity.TOP,
             0, 56 + 25, 0, 0
         ))
 
-        actionBar.bringToFront()
+        createMoviesView()
+        moviesFrame.addView(moviesView, LayoutHelper.createFrame(
+            LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
+        ))
+
+        createFiltersButton()
+        moviesFrame.addView(filtersButton, LayoutHelper.createFrame(
+            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+            Gravity.END or Gravity.BOTTOM,
+            0, 0, 10, 10
+        ))
+
+
+        filtersBottomPopupFragment = FiltersBottomPopupFragment()
+
 
         loadMovies()
     }
@@ -114,7 +143,7 @@ class MoviesFragment : BaseFragment()
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         return rootFrame
     }
@@ -155,6 +184,24 @@ class MoviesFragment : BaseFragment()
         }
     }
 
+    private fun createFiltersButton()
+    {
+        filtersButton = FloatingActionButton(requireContext()).apply {
+            backgroundTintList = ColorStateList.valueOf(Theme.color(Theme.color_main))
+            rippleColor = Theme.ripplizeColor(Theme.color_main)
+
+            setImageDrawable(Theme.drawable(R.drawable.sett))
+            imageTintList = ColorStateList.valueOf(Theme.COLOR_WHITE)
+
+            setOnClickListener {
+                filtersBottomPopupFragment.show(
+                    ApplicationActivity.instance().supportFragmentManager,
+                    "tag"
+                )
+            }
+        }
+    }
+
     private fun loadMovies()
     {
         loading = true
@@ -187,6 +234,148 @@ class MoviesFragment : BaseFragment()
             }
         )
         requestQueue.add(stringRequest)
+    }
+
+    class FiltersBottomPopupFragment : BottomSheetDialogFragment()
+    {
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            setStyle(DialogFragment.STYLE_NORMAL, R.style.BottomPopup)
+        }
+
+        override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+            return inflater.inflate(R.layout.layout_bottom_sheet, container, false)
+        }
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+
+            childFragmentManager
+                .beginTransaction()
+                .add(
+                    R.id.super_container, FiltersFragment()
+                )
+                .addToBackStack("rootygfgfgfgf")
+                .commit()
+        }
+
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
+        {
+            return BottomPopup.Builder(requireContext()).build()
+        }
+
+        private fun transitToFragment(newFragment: Fragment) {
+            val currentFragmentRoot = childFragmentManager.fragments[0].requireView()
+            childFragmentManager
+                .beginTransaction()
+                .apply {
+                    addSharedElement(currentFragmentRoot, currentFragmentRoot.transitionName)
+                    setReorderingAllowed(true)
+
+                    newFragment.sharedElementEnterTransition = BottomSheetSharedTransition()
+                }
+                .replace(R.id.super_container, newFragment)
+                .addToBackStack(newFragment.javaClass.name)
+                .commit()
+        }
+
+        fun goToGenre() {
+            transitToFragment(GenreFragment())
+        }
+
+        fun goBack()
+        {
+            childFragmentManager.popBackStack()
+        }
+    }
+
+    class FiltersFragment : Fragment()
+    {
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+        {
+            return LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.VERTICAL
+
+                background = Theme.createRect(
+                    Theme.color_bg, floatArrayOf(
+                        Utils.dp(12F), Utils.dp(12F), 0F, 0F
+                    ))
+
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+
+                transitionName = "Anya"
+            }
+        }
+
+        private fun createActionBar() : ActionBar
+        {
+            return ActionBar(requireContext()).apply {
+                title = Locale.text(Locale.text_filters)
+
+                setOnClickListener {
+                    withFilters {
+                        goToGenre()
+                    }
+                }
+            }
+        }
+    }
+
+    class GenreFragment : Fragment()
+    {
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+        {
+
+            return LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.VERTICAL
+
+                background = Theme.createRect(
+                    Theme.color_bg, floatArrayOf(
+                        Utils.dp(12F), Utils.dp(12F), 0F, 0F
+                    ))
+
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+                addView(createActionBar())
+
+                transitionName = "Anya"
+            }
+        }
+
+        private fun createActionBar() : ActionBar
+        {
+            return ActionBar(requireContext()).apply {
+                title = Locale.text(Locale.text_genre)
+
+                actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
+                onActionButtonClick {
+                    withFilters {
+                        goBack()
+                    }
+                }
+            }
+        }
     }
 
 }

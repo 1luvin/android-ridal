@@ -1,16 +1,16 @@
 package tv.ridal.HDRezka
 
 import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+//import kotlinx.parcelize.Parcelize
 
-@Parcelize
-data class Movie(val name: String, val posterUrl: String, val type: Type, val url: String, var info: Info? = null) : Parcelable
+//@Parcelize
+data class Movie(val name: String, val posterUrl: String, val type: Type, val url: String, var info: Info? = null)
 {
-    @Parcelize
-    data class Type(val ruType: String, val isSerial: Boolean) : Parcelable
+    //@Parcelize
+    data class Type(val ruType: String, val isSerial: Boolean)
 
-    @Parcelize
-    class Info : Parcelable
+    //@Parcelize
+    class Info
     {
         var hdPosterUrl: String? = null
 
@@ -41,8 +41,8 @@ data class Movie(val name: String, val posterUrl: String, val type: Type, val ur
 
     }
 
-    @Parcelize
-    class Rating : Parcelable
+    //@Parcelize
+    class Rating
     {
         var whose: String? = null
         var value: Float? = null

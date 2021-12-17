@@ -37,6 +37,9 @@ class Locale
                     texts[text_folderName] = "Название папки"
                     texts[text_renameTo] = "Переименовать в..."
                     texts[text_newFolderName] = "Новое название папки"
+
+                    texts[text_filters] = "Фильтры"
+                    texts[text_genre] = "Жанр"
                 }
             }
         }
@@ -69,6 +72,9 @@ class Locale
         const val text_folderName = "text_folderName"
         const val text_renameTo = "text_renameTo"
         const val text_newFolderName = "text_newFolderName"
+
+        const val text_filters = "text_filters"
+        const val text_genre = "text_genre"
 
         private var texts = HashMap<String, String>()
 

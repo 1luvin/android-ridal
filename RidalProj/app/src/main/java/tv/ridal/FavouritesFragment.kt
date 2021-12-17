@@ -96,7 +96,11 @@ class FavouritesFragment : BaseFragment()
             color = Theme.color(Theme.color_text)
             loadColor = Theme.color(Theme.color_main)
             loadSpanWidth = 0.6F
-            loadSpeed = 2
+            loadSpeed = 1.2F
+
+            setOnClickListener {
+                startLoading()
+            }
         }
 
         foldersFrame.addView(loadingView, LayoutHelper.createFrame(
@@ -213,6 +217,8 @@ class FavouritesFragment : BaseFragment()
 
     private fun showRenameFolderPopup()
     {
+        loadingView.stopLoading()
+
         val popup = BottomPopup(requireContext())
 
         val actionBar = ActionBar(requireContext()).apply {

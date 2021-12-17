@@ -22,7 +22,7 @@ import tv.ridal.R
 import tv.ridal.Utils.Utils
 import kotlin.random.Random
 
-class BottomPopup(context: Context) : BottomSheetDialog(context, R.style.BottomPopup)
+open class BottomPopup(context: Context) : BottomSheetDialog(context, R.style.BottomPopup)
 {
 
     private val DIM_EXPANDED: Float = 0.33F
