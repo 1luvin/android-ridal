@@ -1,26 +1,24 @@
 package tv.ridal.Components.Popup
 
+import android.animation.Animator
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.RoundRectShape
-import android.graphics.drawable.shapes.Shape
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.RelativeLayout
-import androidx.fragment.app.FragmentManager
+import androidx.core.view.updateLayoutParams
+import androidx.transition.TransitionValues
+import androidx.transition.Visibility
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Theme
-import tv.ridal.ApplicationActivity
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.R
 import tv.ridal.Utils.Utils
-import kotlin.random.Random
 
 open class BottomPopup(context: Context) : BottomSheetDialog(context, R.style.BottomPopup)
 {
@@ -102,6 +100,7 @@ open class BottomPopup(context: Context) : BottomSheetDialog(context, R.style.Bo
         }
 
     }
+
 }
 
 

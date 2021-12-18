@@ -1,21 +1,24 @@
 package tv.ridal
 
-import android.app.Dialog
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
+import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.*
+import android.view.animation.DecelerateInterpolator
 import android.widget.EdgeEffect
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentContainerView
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.*
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -24,7 +27,6 @@ import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Theme
 import tv.ridal.ActionBar.ActionBar
 import tv.ridal.Application.Locale
-import tv.ridal.Components.BottomSheetSharedTransition
 import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.Components.Popup.BottomPopup
@@ -32,7 +34,6 @@ import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Navigator
 import tv.ridal.HDRezka.Parser
 import tv.ridal.Utils.Utils
-import tv.ridal.Utils.withFilters
 
 class MoviesFragment : BaseFragment()
 {
@@ -64,7 +65,6 @@ class MoviesFragment : BaseFragment()
     private lateinit var moviesFrame: FrameLayout
     private lateinit var moviesView: RecyclerView
     private lateinit var filtersButton: FloatingActionButton
-    private lateinit var filtersBottomPopupFragment: FiltersBottomPopupFragment
 
 
     private val movies: ArrayList<Movie> = ArrayList()
@@ -123,9 +123,6 @@ class MoviesFragment : BaseFragment()
             Gravity.END or Gravity.BOTTOM,
             0, 0, 10, 10
         ))
-
-
-        filtersBottomPopupFragment = FiltersBottomPopupFragment()
 
 
         loadMovies()
@@ -194,10 +191,11 @@ class MoviesFragment : BaseFragment()
             imageTintList = ColorStateList.valueOf(Theme.COLOR_WHITE)
 
             setOnClickListener {
-                filtersBottomPopupFragment.show(
-                    ApplicationActivity.instance().supportFragmentManager,
-                    "tag"
-                )
+//                filtersBottomPopupFragment.show(
+//                    ApplicationActivity.instance().supportFragmentManager,
+//                    "tag"
+//                )
+                FiltersPopup(requireContext()).show()
             }
         }
     }
@@ -236,146 +234,198 @@ class MoviesFragment : BaseFragment()
         requestQueue.add(stringRequest)
     }
 
-    class FiltersBottomPopupFragment : BottomSheetDialogFragment()
+    class FiltersPopup(context: Context) : BottomPopup(context)
     {
+        private var popupView: FrameLayout
 
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            setStyle(DialogFragment.STYLE_NORMAL, R.style.BottomPopup)
-        }
+        private var filtersView: LinearLayout
+        private var genreView: LinearLayout
 
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View? {
-            return inflater.inflate(R.layout.layout_bottom_sheet, container, false)
-        }
-
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-
-            childFragmentManager
-                .beginTransaction()
-                .add(
-                    R.id.super_container, FiltersFragment()
-                )
-                .addToBackStack("rootygfgfgfgf")
-                .commit()
-        }
-
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
+        init
         {
-            return BottomPopup.Builder(requireContext()).build()
-        }
 
-        private fun transitToFragment(newFragment: Fragment) {
-            val currentFragmentRoot = childFragmentManager.fragments[0].requireView()
-            childFragmentManager
-                .beginTransaction()
-                .apply {
-                    addSharedElement(currentFragmentRoot, currentFragmentRoot.transitionName)
-                    setReorderingAllowed(true)
-
-                    newFragment.sharedElementEnterTransition = BottomSheetSharedTransition()
-                }
-                .replace(R.id.super_container, newFragment)
-                .addToBackStack(newFragment.javaClass.name)
-                .commit()
-        }
-
-        fun goToGenre() {
-            transitToFragment(GenreFragment())
-        }
-
-        fun goBack()
-        {
-            childFragmentManager.popBackStack()
-        }
-    }
-
-    class FiltersFragment : Fragment()
-    {
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
-        {
-            return LinearLayout(requireContext()).apply {
+            filtersView = LinearLayout(context).apply {
                 orientation = LinearLayout.VERTICAL
+
+                layoutParams = LayoutHelper.createFrame(
+                    LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
+                    Gravity.TOP
+                )
 
                 background = Theme.createRect(
                     Theme.color_bg, floatArrayOf(
                         Utils.dp(12F), Utils.dp(12F), 0F, 0F
                     ))
 
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
+                addView(createActionBar(Locale.text(Locale.text_filters)))
+                addView(createActionBar(Locale.text(Locale.text_filters)))
+            }
 
-                transitionName = "Anya"
+            genreView = LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+
+                layoutParams = LayoutHelper.createFrame(
+                    LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
+                    Gravity.TOP
+                )
+
+                background = Theme.createRect(
+                    Theme.color_bg, floatArrayOf(
+                        Utils.dp(12F), Utils.dp(12F), 0F, 0F
+                    ))
+
+                addView(createActionBar(Locale.text(Locale.text_genre)))
+                addView(createActionBar(Locale.text(Locale.text_genre)))
+                addView(createActionBar(Locale.text(Locale.text_genre)))
+                addView(createActionBar(Locale.text(Locale.text_genre)))
+                addView(createActionBar(Locale.text(Locale.text_genre)))
+                addView(createActionBar(Locale.text(Locale.text_genre)))
+            }
+
+            popupView = FrameLayout(context).apply {
+                layoutParams = LayoutHelper.createFrame(
+                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
+                )
+
+                setBackgroundColor(Theme.color(Theme.color_bg))
+
+                addView(filtersView)
+                addView(genreView.apply {
+                    visibility = View.GONE
+                })
+            }
+
+            setContentView(popupView)
+        }
+
+        private fun showGenreView()
+        {
+            val alphaAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
+                addUpdateListener {
+                    val animatedAlpha = it.animatedValue as Float
+                    genreView.alpha = animatedAlpha
+                    filtersView.alpha = 1F - animatedAlpha
+                }
+            }
+
+            filtersView.measure(0, 0)
+            val startHeight = filtersView.measuredHeight
+            println(startHeight)
+            genreView.measure(0, 0)
+            val endHeight = genreView.measuredHeight
+            println(endHeight)
+
+            val heightAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
+                addUpdateListener {
+
+                    popupView.updateLayoutParams<FrameLayout.LayoutParams> {
+                        height = it.animatedValue as Int
+                    }
+                }
+            }
+
+            AnimatorSet().apply {
+                duration = 320L
+                interpolator = DecelerateInterpolator(1.1F)
+
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator?) {
+                        super.onAnimationStart(animation)
+
+                        popupView.updateLayoutParams<FrameLayout.LayoutParams> {
+                            height = filtersView.measuredHeight
+                        }
+
+                        genreView.alpha = 0F
+                        genreView.visibility = View.VISIBLE
+                    }
+
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+
+                        popupView.updateLayoutParams<FrameLayout.LayoutParams> {
+                            height = LayoutHelper.WRAP_CONTENT
+                        }
+
+                        filtersView.visibility = View.GONE
+                    }
+                })
+
+                playTogether(alphaAnimator, heightAnimator)
+
+                start()
             }
         }
 
-        private fun createActionBar() : ActionBar
+        private fun showFiltersView()
         {
-            return ActionBar(requireContext()).apply {
-                title = Locale.text(Locale.text_filters)
+            val alphaAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
+                addUpdateListener {
+                    val animatedAlpha = it.animatedValue as Float
+                    filtersView.alpha = animatedAlpha
+                    genreView.alpha = 1F - animatedAlpha
+                }
+            }
+
+            genreView.measure(0, 0)
+            val startHeight = genreView.measuredHeight
+            filtersView.measure(0, 0)
+            val endHeight = filtersView.measuredHeight
+
+            val heightAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
+                addUpdateListener {
+
+                    popupView.updateLayoutParams<FrameLayout.LayoutParams> {
+                        height = it.animatedValue as Int
+                    }
+                }
+            }
+
+            AnimatorSet().apply {
+                duration = 320L
+                interpolator = DecelerateInterpolator(1.1F)
+
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator?) {
+                        super.onAnimationStart(animation)
+
+                        popupView.updateLayoutParams<FrameLayout.LayoutParams> {
+                            height = genreView.measuredHeight
+                        }
+
+                        filtersView.alpha = 0F
+                        filtersView.visibility = View.VISIBLE
+                    }
+
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+
+                        popupView.updateLayoutParams<FrameLayout.LayoutParams> {
+                            height = LayoutHelper.WRAP_CONTENT
+                        }
+
+                        genreView.visibility = View.GONE
+                    }
+                })
+
+                playTogether(alphaAnimator, heightAnimator)
+
+                start()
+            }
+        }
+
+        private fun createActionBar(title: String) : ActionBar
+        {
+            return ActionBar(context).apply {
+                this.title = title
 
                 setOnClickListener {
-                    withFilters {
-                        goToGenre()
-                    }
+                    if (title == "Фильтры") showGenreView()
+                    else showFiltersView()
                 }
             }
         }
-    }
 
-    class GenreFragment : Fragment()
-    {
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
-        {
-
-            return LinearLayout(requireContext()).apply {
-                orientation = LinearLayout.VERTICAL
-
-                background = Theme.createRect(
-                    Theme.color_bg, floatArrayOf(
-                        Utils.dp(12F), Utils.dp(12F), 0F, 0F
-                    ))
-
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-                addView(createActionBar())
-
-                transitionName = "Anya"
-            }
-        }
-
-        private fun createActionBar() : ActionBar
-        {
-            return ActionBar(requireContext()).apply {
-                title = Locale.text(Locale.text_genre)
-
-                actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
-                onActionButtonClick {
-                    withFilters {
-                        goBack()
-                    }
-                }
-            }
-        }
     }
 
 }
