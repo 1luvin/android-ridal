@@ -44,7 +44,7 @@ class LayoutHelper
         fun createLinear(width: Int, height: Int, leftMargin: Int, topMargin: Int, rightMargin: Int, bottomMargin: Int): LinearLayout.LayoutParams
         {
             return LinearLayout.LayoutParams(size(width), size(height)).apply {
-                setMargins(leftMargin, topMargin, rightMargin, bottomMargin)
+                setMargins(size(leftMargin), size(topMargin), size(rightMargin), size(bottomMargin))
             }
         }
 

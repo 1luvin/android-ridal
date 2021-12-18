@@ -276,7 +276,7 @@ class Theme
         }
 
 
-        fun createOutlinedRect(color: Int, radii: FloatArray? = null) : Drawable
+        fun createOutlinedRect(fillColor: Int, outline: Outline, radii: FloatArray? = null) : Drawable
         {
             val radiiArray = FloatArray(8)
             if (radii != null) {
@@ -288,13 +288,42 @@ class Theme
             }
 
             return GradientDrawable().apply {
-                this.setColor(Color.TRANSPARENT)
+                setColor(fillColor)
                 cornerRadii = radiiArray
-                setStroke(Utils.dp(2), color)
+                setStroke(outline.width, outline.color)
             }
         }
 
+        fun createOutlinedRectSelector(fillColor: Int, outline: Outline, radii: FloatArray? = null) : Drawable
+        {
+            val colorStateList = ColorStateList(
+                arrayOf(StateSet.WILD_CARD),
+                intArrayOf(ripplizeColor(fillColor))
+            )
+
+            val radiiArray = FloatArray(8)
+            if (radii != null) {
+                for (i in radii.indices)
+                {
+                    radiiArray[i*2] = radii[i]
+                    radiiArray[i*2 + 1] = radii[i]
+                }
+            }
+
+            val defDrawable = Theme.createOutlinedRect(
+                fillColor,
+                outline,
+                radii
+            )
+
+            val rippleDrawable = ShapeDrawable(RoundRectShape(radiiArray, null, null))
+
+            return RippleDrawable(colorStateList, defDrawable, rippleDrawable)
+        }
+
     }
+
+    data class Outline(val color: Int, val width: Int = Utils.dp(1))
 }
 
 

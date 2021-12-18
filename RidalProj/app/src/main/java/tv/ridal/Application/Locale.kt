@@ -40,6 +40,14 @@ class Locale
 
                     texts[text_filters] = "Фильтры"
                     texts[text_genre] = "Жанр"
+                    texts[text_allGenres] = "Все жанры"
+
+                    texts[text_sorting] = "Сортировка"
+                    texts[sorting_last] = "Последние поступления"
+                    texts[sorting_popular] = "Популярные"
+                    texts[sorting_watching] = "Сейчас смотрят"
+
+                    texts[text_showResults] = "Показать результаты"
                 }
             }
         }
@@ -75,6 +83,14 @@ class Locale
 
         const val text_filters = "text_filters"
         const val text_genre = "text_genre"
+        const val text_allGenres = "text_allGenres"
+
+        const val text_sorting = "text_sorting"
+        const val sorting_last = "sorting_last"
+        const val sorting_popular = "sorting_popular"
+        const val sorting_watching = "sorting_watching"
+
+        const val text_showResults = "text_showResults"
 
         private var texts = HashMap<String, String>()
 

@@ -12,6 +12,7 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.EdgeEffect
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,6 +28,8 @@ import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Theme
 import tv.ridal.ActionBar.ActionBar
 import tv.ridal.Application.Locale
+import tv.ridal.Cells.FilterCell
+import tv.ridal.Cells.PointerCell
 import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.Components.Popup.BottomPopup
@@ -65,7 +68,6 @@ class MoviesFragment : BaseFragment()
     private lateinit var moviesFrame: FrameLayout
     private lateinit var moviesView: RecyclerView
     private lateinit var filtersButton: FloatingActionButton
-
 
     private val movies: ArrayList<Movie> = ArrayList()
 
@@ -243,22 +245,10 @@ class MoviesFragment : BaseFragment()
 
         init
         {
-
-            filtersView = LinearLayout(context).apply {
-                orientation = LinearLayout.VERTICAL
-
-                layoutParams = LayoutHelper.createFrame(
-                    LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
-                    Gravity.TOP
-                )
-
-                background = Theme.createRect(
-                    Theme.color_bg, floatArrayOf(
-                        Utils.dp(12F), Utils.dp(12F), 0F, 0F
-                    ))
-
-                addView(createActionBar(Locale.text(Locale.text_filters)))
-                addView(createActionBar(Locale.text(Locale.text_filters)))
+            filtersView = FiltersView().apply {
+                genreCell.setOnClickListener {
+                    showGenreView()
+                }
             }
 
             genreView = LinearLayout(context).apply {
@@ -275,11 +265,14 @@ class MoviesFragment : BaseFragment()
                     ))
 
                 addView(createActionBar(Locale.text(Locale.text_genre)))
-                addView(createActionBar(Locale.text(Locale.text_genre)))
-                addView(createActionBar(Locale.text(Locale.text_genre)))
-                addView(createActionBar(Locale.text(Locale.text_genre)))
-                addView(createActionBar(Locale.text(Locale.text_genre)))
-                addView(createActionBar(Locale.text(Locale.text_genre)))
+
+                val frame = FrameLayout(context).apply {
+                    layoutParams = LayoutHelper.createFrame(
+                        LayoutHelper.MATCH_PARENT, 400
+                    )
+                }
+
+                addView(frame)
             }
 
             popupView = FrameLayout(context).apply {
@@ -287,7 +280,10 @@ class MoviesFragment : BaseFragment()
                     LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
                 )
 
-                setBackgroundColor(Theme.color(Theme.color_bg))
+                background = Theme.createRect(
+                    Theme.color_bg, floatArrayOf(
+                        Utils.dp(12F), Utils.dp(12F), 0F, 0F
+                    ))
 
                 addView(filtersView)
                 addView(genreView.apply {
@@ -419,12 +415,97 @@ class MoviesFragment : BaseFragment()
             return ActionBar(context).apply {
                 this.title = title
 
+                actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
+                onActionButtonClick {
+                    showFiltersView()
+                }
+
                 setOnClickListener {
                     if (title == "Фильтры") showGenreView()
                     else showFiltersView()
                 }
             }
         }
+
+
+        class FiltersView : LinearLayout(ApplicationActivity.instance())
+        {
+
+            var genreCell: FilterCell
+            var sortingCell: FilterCell
+
+            init
+            {
+                orientation = LinearLayout.VERTICAL
+
+                genreCell = FilterCell().apply {
+                    filterName = Locale.text(Locale.text_genre)
+                    filterValue = Locale.text(Locale.text_allGenres)
+                }
+
+                sortingCell = FilterCell().apply {
+                    filterName = Locale.text(Locale.text_sorting)
+                    filterValue = Locale.text(Locale.sorting_last)
+                }
+
+                addView(createActionBar())
+                addView(genreCell, LayoutHelper.createLinear(
+                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                    20, 15, 20, 0
+                ))
+                addView(sortingCell, LayoutHelper.createLinear(
+                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                    20, 15, 20, 0
+                ))
+                addView(createShowResultsButton())
+            }
+
+            private fun createActionBar() : ActionBar
+            {
+                return ActionBar(context).apply {
+                    title = Locale.text(Locale.text_filters)
+                }
+            }
+
+            private fun createShowResultsButton() : TextView
+            {
+                return TextView(context).apply {
+                    layoutParams = LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        Utils.dp(50)
+                    ).apply {
+                        setMargins(Utils.dp(20), Utils.dp(25), Utils.dp(20), Utils.dp(15))
+                    }
+
+                    gravity = Gravity.CENTER
+
+                    background = Theme.createRectSelector(
+                        Theme.color_main,
+                        FloatArray(4).apply {
+                            fill(Utils.dp(7F))
+                        },
+                        true
+                    )
+
+                    this.text = Locale.text(Locale.text_showResults)
+
+                    textSize = 16F
+                    typeface = Theme.typeface(Theme.tf_bold)
+                    setTextColor(Theme.COLOR_WHITE)
+
+                    setOnClickListener {
+                        showResultsListener?.invoke()
+                    }
+                }
+            }
+
+            private var showResultsListener: (() -> Unit)? = null
+            fun onShowResults(l: () -> Unit)
+            {
+                showResultsListener = l
+            }
+        }
+
 
     }
 
