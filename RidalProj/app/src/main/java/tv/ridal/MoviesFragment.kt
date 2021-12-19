@@ -31,10 +31,9 @@ import tv.ridal.Cells.RadioCell
 import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.Components.Popup.BottomPopup
+import tv.ridal.Components.RadioGroup
 import tv.ridal.Components.View.NestedScrollView
-import tv.ridal.HDRezka.Movie
-import tv.ridal.HDRezka.Navigator
-import tv.ridal.HDRezka.Parser
+import tv.ridal.HDRezka.*
 import tv.ridal.Utils.Utils
 
 class MoviesFragment : BaseFragment()
@@ -53,20 +52,15 @@ class MoviesFragment : BaseFragment()
     }
 
     private lateinit var arguments: Arguments
-
     class Arguments
     {
         lateinit var title: String
         var url: String? = null
 
-        lateinit var filters: List<Filter>
+        var hasSections: Boolean = false
+        var applySection: String? = null
 
         var applyGenre: String? = null
-    }
-
-    enum class Filter
-    {
-        GENRE, SORTING, SECTION
     }
 
     private var subtitle: String? = null
@@ -80,10 +74,29 @@ class MoviesFragment : BaseFragment()
         subtitle = "$genre, $sorting"
     }
 
-    private var activeGenre: String = Locale.text(Locale.text_allGenres)
-    private var activeSorting: String = Locale.text(Locale.sorting_last)
+    /*
+        Фильтры
+     */
+
+    private var genres: List<String>? = null
+    private var activeGenre: String? = null
+    private var sortings: List<String> = listOf(
+        Locale.text(Locale.sorting_last),
+        Locale.text(Locale.sorting_popular),
+        Locale.text(Locale.sorting_watching)
+    )
+    private var activeSorting: String = sortings[0]
+    private var sections: List<String>? = null
+    private var activeSection: String? = null
+
+    private fun hasGenres(): Boolean = genres != null
+    private fun hasSections(): Boolean = sections != null
 
     private var document: Document? = null
+
+    /*
+        UI компоненты
+     */
 
     private lateinit var rootFrame: FrameLayout
     private lateinit var actionBar: ActionBar
@@ -104,11 +117,7 @@ class MoviesFragment : BaseFragment()
 
         createUi()
 
-        if (arguments.applyGenre != null) {
-            activeGenre = arguments.applyGenre!!
-        }
-        setSubtitle(activeGenre, activeSorting)
-
+        checkFilters()
 
 
         loadMovies()
@@ -184,7 +193,26 @@ class MoviesFragment : BaseFragment()
 
     private fun checkFilters()
     {
+        val title = arguments.title
+        if (title in HDRezka.SECTION_NAMES)
+        {
+            genres = Genre.createGenres(title)
+            activeGenre = if (arguments.applyGenre != null) {
+                arguments.applyGenre!!
+            } else {
+                Locale.text(Locale.text_allGenres)
+            }
+        }
 
+        if (arguments.hasSections)
+        {
+            sections = HDRezka.SECTION_NAMES
+            activeSection = if (arguments.applySection != null) {
+                arguments.applySection
+            } else {
+                sections!![0]
+            }
+        }
     }
 
 
@@ -272,62 +300,21 @@ class MoviesFragment : BaseFragment()
         requestQueue.add(stringRequest)
     }
 
-    class FiltersPopup() : BottomPopup(ApplicationActivity.instance())
+    inner class FiltersPopup() : BottomPopup(ApplicationActivity.instance())
     {
-        private var popupView: FrameLayout
+        private lateinit var popupView: FrameLayout
 
-        private var filtersView: LinearLayout
-        private var genreView: FrameLayout
+        private var filtersView: FiltersView? = null
+        private var genreView: GenreView? = null
+        private lateinit var sortingView: FrameLayout
 
         init
         {
-            filtersView = FiltersView().apply {
-                genreCell.setOnClickListener {
-                    showGenreView()
-                }
-            }
+            this.createUi()
+        }
 
-            val layout = LinearLayout(context).apply {
-                orientation = LinearLayout.VERTICAL
-
-                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
-                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
-                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
-                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
-                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
-                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
-                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
-                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
-            }
-            layout.measure(0, 0)
-            println("MSG HEIGHT " + layout.measuredHeight)
-
-            val scroll = NestedScrollView(context).apply {
-                addView(layout)
-            }
-
-            genreView = FrameLayout(context).apply {
-                background = Theme.createRect(
-                    Theme.color_bg, floatArrayOf(
-                        Utils.dp(12F), Utils.dp(12F), 0F, 0F
-                    ))
-
-                addView(createActionBar(Locale.text(Locale.text_genre)))
-
-                val availableHeight = (Utils.displayHeight * 0.5).toInt() - Utils.dp(56 + 15 + 50 + 15)
-                val scrollHeight = if (layout.measuredHeight < availableHeight) {
-                    LayoutHelper.WRAP_CONTENT
-                } else {
-                    Utils.px( availableHeight )
-                }
-
-                addView(scroll, LayoutHelper.createFrame(
-                    LayoutHelper.MATCH_PARENT, scrollHeight,
-                    Gravity.TOP,
-                    0, 56, 0, 0
-                ))
-            }
-
+        private fun createUi()
+        {
             popupView = FrameLayout(context).apply {
                 layoutParams = LayoutHelper.createFrame(
                     LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
@@ -337,24 +324,37 @@ class MoviesFragment : BaseFragment()
                     Theme.color_bg, floatArrayOf(
                         Utils.dp(12F), Utils.dp(12F), 0F, 0F
                     ))
+            }
 
-                addView(filtersView, LayoutHelper.createFrame(
+            if (hasGenres() || hasSections())
+            {
+                filtersView = FiltersView().apply {
+                    genreCell!!.setOnClickListener {
+                        showGenreView()
+                    }
+                }
+                popupView.addView(filtersView, LayoutHelper.createFrame(
                     LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
                     Gravity.TOP,
                     0, 0, 0, 15 + 50 + 15
                 ))
 
-                genreView.visibility = View.GONE
-                addView(genreView, LayoutHelper.createFrame(
-                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-                    Gravity.TOP,
-                    0, 0, 0, 15 + 50 + 15
-                ))
-
-                addView(createShowResultsButton(), LayoutHelper.createFrame(
+                popupView.addView(createShowResultsButton(), LayoutHelper.createFrame(
                     LayoutHelper.MATCH_PARENT, 50,
                     Gravity.BOTTOM,
                     20, 15, 20, 15
+                ))
+            }
+
+            if (hasGenres())
+            {
+                genreView = GenreView().apply {
+                    visibility = View.GONE
+                }
+                popupView.addView(genreView, LayoutHelper.createFrame(
+                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                    Gravity.TOP,
+                    0, 0, 0, 15 + 50 + 15
                 ))
             }
 
@@ -363,19 +363,22 @@ class MoviesFragment : BaseFragment()
 
         private fun showGenreView()
         {
+            val filtersV = filtersView!!
+            val genreV = genreView!!
+
             val alphaAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
                 addUpdateListener {
                     val animatedAlpha = it.animatedValue as Float
-                    genreView.alpha = animatedAlpha
-                    filtersView.alpha = 1F - animatedAlpha
+                    genreV.alpha = animatedAlpha
+                    filtersV.alpha = 1F - animatedAlpha
                 }
             }
 
-            filtersView.measure(0, 0)
-            val startHeight = filtersView.measuredHeight + Utils.dp(15 + 50 + 15)
+            filtersV.measure(0, 0)
+            val startHeight = filtersV.measuredHeight + Utils.dp(15 + 50 + 15)
             println(startHeight)
-            genreView.measure(0, 0)
-            val endHeight = genreView.measuredHeight + Utils.dp(15 + 50 + 15)
+            genreV.measure(0, 0)
+            val endHeight = genreV.measuredHeight + Utils.dp(15 + 50 + 15)
             println(endHeight)
 
             val heightAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
@@ -396,11 +399,11 @@ class MoviesFragment : BaseFragment()
                         super.onAnimationStart(animation)
 
                         popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                            height = filtersView.measuredHeight
+                            height = filtersV.measuredHeight
                         }
 
-                        genreView.alpha = 0F
-                        genreView.visibility = View.VISIBLE
+                        genreV.alpha = 0F
+                        genreV.visibility = View.VISIBLE
                     }
 
                     override fun onAnimationEnd(animation: Animator?) {
@@ -410,7 +413,7 @@ class MoviesFragment : BaseFragment()
                             height = LayoutHelper.WRAP_CONTENT
                         }
 
-                        filtersView.visibility = View.GONE
+                        filtersV.visibility = View.GONE
                     }
                 })
 
@@ -422,18 +425,21 @@ class MoviesFragment : BaseFragment()
 
         private fun showFiltersView()
         {
+            val filtersV = filtersView!!
+            val genreV = genreView!!
+
             val alphaAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
                 addUpdateListener {
                     val animatedAlpha = it.animatedValue as Float
-                    filtersView.alpha = animatedAlpha
-                    genreView.alpha = 1F - animatedAlpha
+                    filtersV.alpha = animatedAlpha
+                    genreV.alpha = 1F - animatedAlpha
                 }
             }
 
-            genreView.measure(0, 0)
-            val startHeight = genreView.measuredHeight + Utils.dp(15 + 50 + 15)
-            filtersView.measure(0, 0)
-            val endHeight = filtersView.measuredHeight + Utils.dp(15 + 50 + 15)
+            genreV.measure(0, 0)
+            val startHeight = genreV.measuredHeight + Utils.dp(15 + 50 + 15)
+            filtersV.measure(0, 0)
+            val endHeight = filtersV.measuredHeight + Utils.dp(15 + 50 + 15)
 
             val heightAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
                 addUpdateListener {
@@ -453,11 +459,11 @@ class MoviesFragment : BaseFragment()
                         super.onAnimationStart(animation)
 
                         popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                            height = genreView.measuredHeight
+                            height = genreV.measuredHeight
                         }
 
-                        filtersView.alpha = 0F
-                        filtersView.visibility = View.VISIBLE
+                        filtersV.alpha = 0F
+                        filtersV.visibility = View.VISIBLE
                     }
 
                     override fun onAnimationEnd(animation: Animator?) {
@@ -467,30 +473,13 @@ class MoviesFragment : BaseFragment()
                             height = LayoutHelper.WRAP_CONTENT
                         }
 
-                        genreView.visibility = View.GONE
+                        genreV.visibility = View.GONE
                     }
                 })
 
                 playTogether(alphaAnimator, heightAnimator)
 
                 start()
-            }
-        }
-
-        private fun createActionBar(title: String) : ActionBar
-        {
-            return ActionBar(context).apply {
-                this.title = title
-
-                actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
-                onActionButtonClick {
-                    showFiltersView()
-                }
-
-                setOnClickListener {
-                    if (title == "Фильтры") showGenreView()
-                    else showFiltersView()
-                }
             }
         }
 
@@ -514,43 +503,52 @@ class MoviesFragment : BaseFragment()
                 setTextColor(Theme.COLOR_WHITE)
 
                 setOnClickListener {
-                    showResultsListener?.invoke()
+
                 }
             }
         }
 
-        private var showResultsListener: (() -> Unit)? = null
-        fun onShowResults(l: () -> Unit)
-        {
-            showResultsListener = l
-        }
-
-
-        class FiltersView : LinearLayout(ApplicationActivity.instance())
+        inner class FiltersView : LinearLayout(ApplicationActivity.instance())
         {
 
-            var genreCell: FilterCell
+            var genreCell: FilterCell? = null
             var sortingCell: FilterCell
+            var sectionCell: FilterCell? = null
 
             init
             {
                 orientation = LinearLayout.VERTICAL
 
-                genreCell = FilterCell().apply {
-                    filterName = Locale.text(Locale.text_genre)
-                    filterValue = Locale.text(Locale.text_allGenres)
+                addView(createActionBar())
+
+                if (hasGenres())
+                {
+                    genreCell = FilterCell().apply {
+                        filterName = Locale.text(Locale.text_genre)
+                        filterValue = activeGenre!!
+                    }
+                    addView(genreCell, LayoutHelper.createLinear(
+                        LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                        20, 15, 20, 0
+                    ))
+                }
+
+                if (hasSections())
+                {
+                    sectionCell = FilterCell().apply {
+                        filterName = Locale.text(Locale.text_section)
+                        filterValue = activeSection!!
+                    }
+                    addView(genreCell, LayoutHelper.createLinear(
+                        LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                        20, 15, 20, 0
+                    ))
                 }
 
                 sortingCell = FilterCell().apply {
                     filterName = Locale.text(Locale.text_sorting)
                     filterValue = Locale.text(Locale.sorting_last)
                 }
-
-                addView(createActionBar())
-                addView(genreCell, LayoutHelper.createLinear(
-                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-                    20, 15, 20, 0
-                ))
                 addView(sortingCell, LayoutHelper.createLinear(
                     LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
                     20, 15, 20, 10
@@ -561,6 +559,50 @@ class MoviesFragment : BaseFragment()
             {
                 return ActionBar(context).apply {
                     title = Locale.text(Locale.text_filters)
+                }
+            }
+        }
+
+        inner class GenreView : LinearLayout(ApplicationActivity.instance())
+        {
+            init
+            {
+                orientation = LinearLayout.VERTICAL
+
+                addView(createActionBar())
+
+                val radioGroup = RadioGroup().apply {
+                    for (genre in genres!!)
+                    {
+                        addRadio(genre)
+                    }
+                }
+                radioGroup.measure(0, 0)
+                val scroll = NestedScrollView(context).apply {
+                    addView(radioGroup)
+                }
+
+                val availableHeight = (Utils.displayHeight * 0.7).toInt() - Utils.dp(56 + 15 + 50 + 15)
+                val scrollHeight = if (radioGroup.measuredHeight < availableHeight) {
+                    LayoutHelper.WRAP_CONTENT
+                } else {
+                    Utils.px( availableHeight )
+                }
+
+                addView(scroll, LayoutHelper.createLinear(
+                    LayoutHelper.MATCH_PARENT, scrollHeight
+                ))
+            }
+
+            private fun createActionBar() : ActionBar
+            {
+                return ActionBar(context).apply {
+                    title = Locale.text(Locale.text_genre)
+
+                    actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
+                    onActionButtonClick {
+                        showFiltersView()
+                    }
                 }
             }
         }

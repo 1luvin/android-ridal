@@ -1,5 +1,7 @@
 package tv.ridal.HDRezka
 
+import tv.ridal.Application.Locale
+
 class HDRezka
 {
     companion object
@@ -11,6 +13,14 @@ class HDRezka
         const val SERIAL = "Сериал"
         const val CARTOON = "Мультфильм"
         const val ANIME = "Аниме"
+
+        val SECTION_NAMES
+            get() = listOf(
+                Locale.text(Locale.text_films),
+                Locale.text(Locale.text_series),
+                Locale.text(Locale.text_cartoons),
+                Locale.text(Locale.text_anime)
+            )
 
         const val RATINGS = "Рейтинги"
         const val SLOGAN = "Слоган"

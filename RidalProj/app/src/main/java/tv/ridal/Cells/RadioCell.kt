@@ -46,7 +46,8 @@ class RadioCell : FrameLayout(ApplicationActivity.instance())
 
         textView = TextView(context).apply {
             setTextColor(textColor)
-            textSize = 17F
+            textSize = 16F
+            typeface = Theme.typeface(Theme.tf_normal)
             setLines(1)
             maxLines = 1
             isSingleLine = true
