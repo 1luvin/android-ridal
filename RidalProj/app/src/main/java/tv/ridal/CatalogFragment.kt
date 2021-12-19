@@ -161,6 +161,11 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
                             val args = MoviesFragment.Arguments().apply {
                                 title = sectionView.sectionName
                                 url = urls[i]
+
+                                filters = listOf(
+                                    MoviesFragment.Filter.GENRE,
+                                    MoviesFragment.Filter.SORTING
+                                )
                             }
 
                             startFragment(

@@ -9,10 +9,7 @@ import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.*
 import android.view.animation.DecelerateInterpolator
-import android.widget.EdgeEffect
-import android.widget.FrameLayout
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,9 +27,11 @@ import tv.ridal.ActionBar.ActionBar
 import tv.ridal.Application.Locale
 import tv.ridal.Cells.FilterCell
 import tv.ridal.Cells.PointerCell
+import tv.ridal.Cells.RadioCell
 import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.Components.Popup.BottomPopup
+import tv.ridal.Components.View.NestedScrollView
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Navigator
 import tv.ridal.HDRezka.Parser
@@ -57,9 +56,32 @@ class MoviesFragment : BaseFragment()
 
     class Arguments
     {
-        var title: String? = null
+        lateinit var title: String
         var url: String? = null
+
+        lateinit var filters: List<Filter>
+
+        var applyGenre: String? = null
     }
+
+    enum class Filter
+    {
+        GENRE, SORTING, SECTION
+    }
+
+    private var subtitle: String? = null
+        set(value) {
+            if (value == null) return
+            field = value
+            actionBar.subtitle = subtitle!!
+        }
+    private fun setSubtitle(genre: String, sorting: String)
+    {
+        subtitle = "$genre, $sorting"
+    }
+
+    private var activeGenre: String = Locale.text(Locale.text_allGenres)
+    private var activeSorting: String = Locale.text(Locale.sorting_last)
 
     private var document: Document? = null
 
@@ -80,6 +102,37 @@ class MoviesFragment : BaseFragment()
     {
         super.onCreate(savedInstanceState)
 
+        createUi()
+
+        if (arguments.applyGenre != null) {
+            activeGenre = arguments.applyGenre!!
+        }
+        setSubtitle(activeGenre, activeSorting)
+
+        loadMovies()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+    {
+        return rootFrame
+    }
+
+
+
+    private fun createUi()
+    {
         rootFrame = FrameLayout(requireContext()).apply {
             layoutParams = LayoutHelper.createFrame(
                 LayoutHelper.MATCH_PARENT,
@@ -125,26 +178,6 @@ class MoviesFragment : BaseFragment()
             Gravity.END or Gravity.BOTTOM,
             0, 0, 10, 10
         ))
-
-
-        loadMovies()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
-    {
-        return rootFrame
     }
 
 
@@ -197,7 +230,7 @@ class MoviesFragment : BaseFragment()
 //                    ApplicationActivity.instance().supportFragmentManager,
 //                    "tag"
 //                )
-                FiltersPopup(requireContext()).show()
+                FiltersPopup().show()
             }
         }
     }
@@ -236,12 +269,12 @@ class MoviesFragment : BaseFragment()
         requestQueue.add(stringRequest)
     }
 
-    class FiltersPopup(context: Context) : BottomPopup(context)
+    class FiltersPopup() : BottomPopup(ApplicationActivity.instance())
     {
         private var popupView: FrameLayout
 
         private var filtersView: LinearLayout
-        private var genreView: LinearLayout
+        private var genreView: FrameLayout
 
         init
         {
@@ -251,14 +284,26 @@ class MoviesFragment : BaseFragment()
                 }
             }
 
-            genreView = LinearLayout(context).apply {
+            val layout = LinearLayout(context).apply {
                 orientation = LinearLayout.VERTICAL
 
-                layoutParams = LayoutHelper.createFrame(
-                    LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
-                    Gravity.TOP
-                )
+                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
+                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
+                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
+                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
+                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
+                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
+                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
+                addView(RadioCell().apply { text = "Ахахахаха, типа работает" })
+            }
+            layout.measure(0, 0)
+            println("MSG HEIGHT " + layout.measuredHeight)
 
+            val scroll = NestedScrollView(context).apply {
+                addView(layout)
+            }
+
+            genreView = FrameLayout(context).apply {
                 background = Theme.createRect(
                     Theme.color_bg, floatArrayOf(
                         Utils.dp(12F), Utils.dp(12F), 0F, 0F
@@ -266,13 +311,18 @@ class MoviesFragment : BaseFragment()
 
                 addView(createActionBar(Locale.text(Locale.text_genre)))
 
-                val frame = FrameLayout(context).apply {
-                    layoutParams = LayoutHelper.createFrame(
-                        LayoutHelper.MATCH_PARENT, 400
-                    )
+                val availableHeight = (Utils.displayHeight * 0.5).toInt() - Utils.dp(56 + 15 + 50 + 15)
+                val scrollHeight = if (layout.measuredHeight < availableHeight) {
+                    LayoutHelper.WRAP_CONTENT
+                } else {
+                    Utils.px( availableHeight )
                 }
 
-                addView(frame)
+                addView(scroll, LayoutHelper.createFrame(
+                    LayoutHelper.MATCH_PARENT, scrollHeight,
+                    Gravity.TOP,
+                    0, 56, 0, 0
+                ))
             }
 
             popupView = FrameLayout(context).apply {
@@ -285,10 +335,24 @@ class MoviesFragment : BaseFragment()
                         Utils.dp(12F), Utils.dp(12F), 0F, 0F
                     ))
 
-                addView(filtersView)
-                addView(genreView.apply {
-                    visibility = View.GONE
-                })
+                addView(filtersView, LayoutHelper.createFrame(
+                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                    Gravity.TOP,
+                    0, 0, 0, 15 + 50 + 15
+                ))
+
+                genreView.visibility = View.GONE
+                addView(genreView, LayoutHelper.createFrame(
+                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                    Gravity.TOP,
+                    0, 0, 0, 15 + 50 + 15
+                ))
+
+                addView(createShowResultsButton(), LayoutHelper.createFrame(
+                    LayoutHelper.MATCH_PARENT, 50,
+                    Gravity.BOTTOM,
+                    20, 15, 20, 15
+                ))
             }
 
             setContentView(popupView)
@@ -305,10 +369,10 @@ class MoviesFragment : BaseFragment()
             }
 
             filtersView.measure(0, 0)
-            val startHeight = filtersView.measuredHeight
+            val startHeight = filtersView.measuredHeight + Utils.dp(15 + 50 + 15)
             println(startHeight)
             genreView.measure(0, 0)
-            val endHeight = genreView.measuredHeight
+            val endHeight = genreView.measuredHeight + Utils.dp(15 + 50 + 15)
             println(endHeight)
 
             val heightAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
@@ -321,7 +385,7 @@ class MoviesFragment : BaseFragment()
             }
 
             AnimatorSet().apply {
-                duration = 320L
+                duration = 280L
                 interpolator = DecelerateInterpolator(1.1F)
 
                 addListener(object : AnimatorListenerAdapter() {
@@ -364,9 +428,9 @@ class MoviesFragment : BaseFragment()
             }
 
             genreView.measure(0, 0)
-            val startHeight = genreView.measuredHeight
+            val startHeight = genreView.measuredHeight + Utils.dp(15 + 50 + 15)
             filtersView.measure(0, 0)
-            val endHeight = filtersView.measuredHeight
+            val endHeight = filtersView.measuredHeight + Utils.dp(15 + 50 + 15)
 
             val heightAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
                 addUpdateListener {
@@ -378,7 +442,7 @@ class MoviesFragment : BaseFragment()
             }
 
             AnimatorSet().apply {
-                duration = 320L
+                duration = 280L
                 interpolator = DecelerateInterpolator(1.1F)
 
                 addListener(object : AnimatorListenerAdapter() {
@@ -427,6 +491,37 @@ class MoviesFragment : BaseFragment()
             }
         }
 
+        private fun createShowResultsButton() : TextView
+        {
+            return TextView(context).apply {
+                gravity = Gravity.CENTER
+
+                background = Theme.createRectSelector(
+                    Theme.color_main,
+                    FloatArray(4).apply {
+                        fill(Utils.dp(7F))
+                    },
+                    true
+                )
+
+                this.text = Locale.text(Locale.text_showResults)
+
+                textSize = 16F
+                typeface = Theme.typeface(Theme.tf_bold)
+                setTextColor(Theme.COLOR_WHITE)
+
+                setOnClickListener {
+                    showResultsListener?.invoke()
+                }
+            }
+        }
+
+        private var showResultsListener: (() -> Unit)? = null
+        fun onShowResults(l: () -> Unit)
+        {
+            showResultsListener = l
+        }
+
 
         class FiltersView : LinearLayout(ApplicationActivity.instance())
         {
@@ -455,9 +550,8 @@ class MoviesFragment : BaseFragment()
                 ))
                 addView(sortingCell, LayoutHelper.createLinear(
                     LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-                    20, 15, 20, 0
+                    20, 15, 20, 10
                 ))
-                addView(createShowResultsButton())
             }
 
             private fun createActionBar() : ActionBar
@@ -466,46 +560,7 @@ class MoviesFragment : BaseFragment()
                     title = Locale.text(Locale.text_filters)
                 }
             }
-
-            private fun createShowResultsButton() : TextView
-            {
-                return TextView(context).apply {
-                    layoutParams = LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        Utils.dp(50)
-                    ).apply {
-                        setMargins(Utils.dp(20), Utils.dp(25), Utils.dp(20), Utils.dp(15))
-                    }
-
-                    gravity = Gravity.CENTER
-
-                    background = Theme.createRectSelector(
-                        Theme.color_main,
-                        FloatArray(4).apply {
-                            fill(Utils.dp(7F))
-                        },
-                        true
-                    )
-
-                    this.text = Locale.text(Locale.text_showResults)
-
-                    textSize = 16F
-                    typeface = Theme.typeface(Theme.tf_bold)
-                    setTextColor(Theme.COLOR_WHITE)
-
-                    setOnClickListener {
-                        showResultsListener?.invoke()
-                    }
-                }
-            }
-
-            private var showResultsListener: (() -> Unit)? = null
-            fun onShowResults(l: () -> Unit)
-            {
-                showResultsListener = l
-            }
         }
-
 
     }
 

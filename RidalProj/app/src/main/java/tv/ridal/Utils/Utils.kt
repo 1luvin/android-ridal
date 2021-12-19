@@ -10,7 +10,9 @@ class Utils
 {
     companion object
     {
-        private var density: Float = 1F //
+        var density: Float = 1F //
+
+        var displayHeight: Int = 0 //
 
         fun checkDisplaySize(context: Context)
         {
@@ -18,16 +20,20 @@ class Utils
             (context as Activity).windowManager.defaultDisplay.getMetrics(metrics)
 
             density = metrics.density
+
+            displayHeight = metrics.heightPixels
         }
 
-        fun dp(value: Int) : Int {
+        fun dp(value: Int) : Int
+        {
             if (value == 0) {
                 return 0
             }
             return ceil(density * value).toInt()
         }
 
-        fun dp(value: Float) : Float{
+        fun dp(value: Float) : Float
+        {
             if (value == 0F) {
                 return 0F
             }

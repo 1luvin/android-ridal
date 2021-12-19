@@ -59,6 +59,9 @@ class Theme
 
         const val color_popup_holder = "color_popup_holder"
 
+        // RadioButton
+        const val color_radio = "color_radio"
+
         /*
             Темы
          */
@@ -84,6 +87,8 @@ class Theme
             this[color_negative] = 0xFFFF6565.toInt()
 
             this[color_popup_holder] = 0xFFAAAAAA.toInt()
+
+            this[color_radio] = 0xFF777777.toInt()
         }
         // черная тема
         private val darkColors = HashMap<String, Int>().apply {

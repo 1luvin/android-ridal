@@ -93,9 +93,7 @@ class ActionBar(context: Context) : FrameLayout(context)
     var title: String = ""
         set(value) {
             field = value
-
             if (titleView == null) createTitleView()
-
             titleView!!.text = title
         }
     var titleTypeface: Typeface = Theme.typeface(Theme.tf_bold)
@@ -109,6 +107,40 @@ class ActionBar(context: Context) : FrameLayout(context)
             field = value
 
             titleView?.textSize = titleTextSize
+        }
+
+    private var subtitleView: TextView? = null
+    private fun createSubtitleView()
+    {
+        subtitleView = TextView(context).apply {
+            setTextColor(Theme.color(Theme.color_text2))
+            textSize = 16F
+            typeface = Theme.typeface(Theme.tf_normal)
+            setLines(1)
+            maxLines = 1
+            isSingleLine = true
+            ellipsize = TextUtils.TruncateAt.END
+        }
+
+        titleView!!.layoutParams = LayoutHelper.createFrame(
+            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+            Gravity.TOP or Gravity.CENTER_HORIZONTAL,
+            0, 7, 0, 0
+
+        )
+
+        titleFrame!!.addView(subtitleView, LayoutHelper.createFrame(
+            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+            Gravity.TOP or Gravity.CENTER_HORIZONTAL,
+            0, 7 + 22 + 2, 0, 0
+        ))
+    }
+
+    var subtitle: String = ""
+        set(value) {
+            field = value
+            if (subtitleView == null) createSubtitleView()
+            subtitleView!!.text = subtitle
         }
 
     init
