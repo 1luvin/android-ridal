@@ -167,7 +167,6 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
                                     MoviesFragment.Filter.SORTING
                                 )
                             }
-
                             startFragment(
                                 MoviesFragment.newInstance(args)
                             )

@@ -109,6 +109,8 @@ class MoviesFragment : BaseFragment()
         }
         setSubtitle(activeGenre, activeSorting)
 
+
+
         loadMovies()
     }
 
@@ -180,6 +182,11 @@ class MoviesFragment : BaseFragment()
         ))
     }
 
+    private fun checkFilters()
+    {
+
+    }
+
 
     private fun createMoviesView()
     {
@@ -226,10 +233,6 @@ class MoviesFragment : BaseFragment()
             imageTintList = ColorStateList.valueOf(Theme.COLOR_WHITE)
 
             setOnClickListener {
-//                filtersBottomPopupFragment.show(
-//                    ApplicationActivity.instance().supportFragmentManager,
-//                    "tag"
-//                )
                 FiltersPopup().show()
             }
         }
