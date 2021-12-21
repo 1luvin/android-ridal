@@ -80,12 +80,15 @@ class RadioCell : FrameLayout(ApplicationActivity.instance())
         )
     }
 
-    fun setChecked(checked: Boolean) {
+    fun setChecked(checked: Boolean, animated: Boolean = true) {
         if (checked == isChecked) {
             return
         }
-        radioButton.setChecked(checked)
-        animateCheckChange()
+        radioButton.setChecked(checked, animated)
+        if (animated) animateCheckChange()
+        else textView.setTextColor(
+            if (isChecked) textColorChecked else textColor
+        )
 
         isChecked = checked
     }

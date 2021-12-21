@@ -55,6 +55,12 @@ open class BottomPopup(context: Context) : BottomSheetDialog(context, R.style.Bo
         })
     }
 
+    var isDraggable: Boolean
+        get() = this.behavior.isDraggable
+        set(value) {
+            this.behavior.isDraggable = value
+        }
+
     class Builder(private val context: Context)
     {
         private val popup: BottomPopup = BottomPopup(context)

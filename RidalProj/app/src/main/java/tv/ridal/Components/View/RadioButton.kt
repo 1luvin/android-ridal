@@ -71,35 +71,40 @@ class RadioButton : View(ApplicationActivity.instance())
         }
     }
 
-    private fun cancelCheckAnimator() {
+    private fun cancelCheckAnimator()
+    {
         if (checkAnimator != null) {
             checkAnimator!!.cancel()
         }
     }
 
-    private fun animateToCheckedState(newCheckedState: Boolean) {
+    private fun animateToCheckedState(newCheckedState: Boolean)
+    {
         checkAnimator =
             ObjectAnimator.ofFloat(this, "progress", if (newCheckedState) 1F else 0F)
         checkAnimator!!.duration = 200
         checkAnimator!!.start()
     }
 
-    protected override fun onAttachedToWindow() {
+    protected override fun onAttachedToWindow()
+    {
         super.onAttachedToWindow()
         attachedToWindow = true
     }
 
-    protected override fun onDetachedFromWindow() {
+    protected override fun onDetachedFromWindow()
+    {
         super.onDetachedFromWindow()
         attachedToWindow = false
     }
 
-    fun setChecked(checked: Boolean) {
+    fun setChecked(checked: Boolean, animated: Boolean = true)
+    {
         if (checked == isChecked) {
             return
         }
         isChecked = checked
-        if (attachedToWindow) {
+        if (attachedToWindow && animated) {
             animateToCheckedState(checked)
         } else {
             cancelCheckAnimator()
@@ -107,7 +112,8 @@ class RadioButton : View(ApplicationActivity.instance())
         }
     }
 
-    protected override fun onDraw(canvas: Canvas) {
+    protected override fun onDraw(canvas: Canvas)
+    {
         if (bitmap == null || bitmap!!.width != measuredWidth) {
             if (bitmap != null) {
                 bitmap!!.recycle()

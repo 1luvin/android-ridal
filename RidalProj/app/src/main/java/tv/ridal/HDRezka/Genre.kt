@@ -9,6 +9,7 @@ class Genre
         fun createGenres(section: String) : ArrayList<String>
         {
             var genres = ArrayList<String>().apply {
+                add(Locale.text(Locale.text_allGenres))
                 add(Locale.text(Locale.genre_fiction))
                 add(Locale.text(Locale.genre_horror))
                 add(Locale.text(Locale.genre_adventures))

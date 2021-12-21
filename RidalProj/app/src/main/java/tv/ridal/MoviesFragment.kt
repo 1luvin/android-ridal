@@ -306,11 +306,13 @@ class MoviesFragment : BaseFragment()
 
         private var filtersView: FiltersView? = null
         private var genreView: GenreView? = null
-        private lateinit var sortingView: FrameLayout
+        private lateinit var sortingView: SortingView
 
         init
         {
             this.createUi()
+
+            this.isDraggable = false
         }
 
         private fun createUi()
@@ -330,7 +332,10 @@ class MoviesFragment : BaseFragment()
             {
                 filtersView = FiltersView().apply {
                     genreCell!!.setOnClickListener {
-                        showGenreView()
+                        navigate(filtersView!!, genreView!!)
+                    }
+                    sortingCell.setOnClickListener {
+                        navigate(filtersView!!, sortingView)
                     }
                 }
                 popupView.addView(filtersView, LayoutHelper.createFrame(
@@ -358,40 +363,44 @@ class MoviesFragment : BaseFragment()
                 ))
             }
 
+            sortingView = SortingView().apply {
+                visibility = View.GONE
+            }
+            popupView.addView(sortingView, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                Gravity.TOP,
+                0, 0, 0, 15 + 50 + 15
+            ))
+
             setContentView(popupView)
         }
 
-        private fun showGenreView()
+        private fun navigate(fromView: View, toView: View)
         {
-            val filtersV = filtersView!!
-            val genreV = genreView!!
-
             val alphaAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
                 addUpdateListener {
                     val animatedAlpha = it.animatedValue as Float
-                    genreV.alpha = animatedAlpha
-                    filtersV.alpha = 1F - animatedAlpha
+                    toView.alpha = animatedAlpha
+                    fromView.alpha = 1F - animatedAlpha
                 }
             }
 
-            filtersV.measure(0, 0)
-            val startHeight = filtersV.measuredHeight + Utils.dp(15 + 50 + 15)
-            println(startHeight)
-            genreV.measure(0, 0)
-            val endHeight = genreV.measuredHeight + Utils.dp(15 + 50 + 15)
-            println(endHeight)
+            fromView.measure(0 ,0)
+            val startHeight = fromView.measuredHeight
+            toView.measure(0, 0)
+            val endHeight = toView.measuredHeight
 
             val heightAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
                 addUpdateListener {
-
+                    val animatedHeight = it.animatedValue as Int
                     popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                        height = it.animatedValue as Int
+                        height = animatedHeight + Utils.dp(15 + 50 + 15)
                     }
                 }
             }
 
             AnimatorSet().apply {
-                duration = 280L
+                duration = 300L
                 interpolator = DecelerateInterpolator(1.1F)
 
                 addListener(object : AnimatorListenerAdapter() {
@@ -399,11 +408,13 @@ class MoviesFragment : BaseFragment()
                         super.onAnimationStart(animation)
 
                         popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                            height = filtersV.measuredHeight
+                            height = fromView.measuredHeight + Utils.dp(15 + 50 + 15)
                         }
 
-                        genreV.alpha = 0F
-                        genreV.visibility = View.VISIBLE
+                        toView.apply {
+                            alpha = 0F
+                            visibility = View.VISIBLE
+                        }
                     }
 
                     override fun onAnimationEnd(animation: Animator?) {
@@ -413,67 +424,9 @@ class MoviesFragment : BaseFragment()
                             height = LayoutHelper.WRAP_CONTENT
                         }
 
-                        filtersV.visibility = View.GONE
-                    }
-                })
-
-                playTogether(alphaAnimator, heightAnimator)
-
-                start()
-            }
-        }
-
-        private fun showFiltersView()
-        {
-            val filtersV = filtersView!!
-            val genreV = genreView!!
-
-            val alphaAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
-                addUpdateListener {
-                    val animatedAlpha = it.animatedValue as Float
-                    filtersV.alpha = animatedAlpha
-                    genreV.alpha = 1F - animatedAlpha
-                }
-            }
-
-            genreV.measure(0, 0)
-            val startHeight = genreV.measuredHeight + Utils.dp(15 + 50 + 15)
-            filtersV.measure(0, 0)
-            val endHeight = filtersV.measuredHeight + Utils.dp(15 + 50 + 15)
-
-            val heightAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
-                addUpdateListener {
-
-                    popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                        height = it.animatedValue as Int
-                    }
-                }
-            }
-
-            AnimatorSet().apply {
-                duration = 280L
-                interpolator = DecelerateInterpolator(1.1F)
-
-                addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationStart(animation: Animator?) {
-                        super.onAnimationStart(animation)
-
-                        popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                            height = genreV.measuredHeight
+                        fromView.apply {
+                            visibility = View.GONE
                         }
-
-                        filtersV.alpha = 0F
-                        filtersV.visibility = View.VISIBLE
-                    }
-
-                    override fun onAnimationEnd(animation: Animator?) {
-                        super.onAnimationEnd(animation)
-
-                        popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                            height = LayoutHelper.WRAP_CONTENT
-                        }
-
-                        genreV.visibility = View.GONE
                     }
                 })
 
@@ -503,10 +456,41 @@ class MoviesFragment : BaseFragment()
                 setTextColor(Theme.COLOR_WHITE)
 
                 setOnClickListener {
+                    val isFiltersChanged = applyNewFilters()
+                    if (isFiltersChanged) {
+                        newFiltersListener?.invoke()
+                    }
 
+                    this@FiltersPopup.dismiss()
                 }
             }
         }
+
+        private fun applyNewFilters(): Boolean
+        {
+            var changed = false
+            if (hasGenres()) {
+                val newGenre = genreView!!.currentGenre()
+                if (activeGenre != newGenre) {
+                    activeGenre = newGenre
+                    changed = true
+                }
+            }
+
+            val newSorting = sortingView.currentSorting()
+            if (activeSorting != newSorting) {
+                activeSorting = newSorting
+                changed = true
+            }
+
+            return changed
+        }
+
+        private var newFiltersListener: (() -> Unit)? = null
+        fun onNewFilters(l: () -> Unit) {
+            newFiltersListener = l
+        }
+
 
         inner class FiltersView : LinearLayout(ApplicationActivity.instance())
         {
@@ -547,7 +531,7 @@ class MoviesFragment : BaseFragment()
 
                 sortingCell = FilterCell().apply {
                     filterName = Locale.text(Locale.text_sorting)
-                    filterValue = Locale.text(Locale.sorting_last)
+                    filterValue = activeSorting
                 }
                 addView(sortingCell, LayoutHelper.createLinear(
                     LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
@@ -565,17 +549,20 @@ class MoviesFragment : BaseFragment()
 
         inner class GenreView : LinearLayout(ApplicationActivity.instance())
         {
+            private var radioGroup: RadioGroup
+
             init
             {
                 orientation = LinearLayout.VERTICAL
 
                 addView(createActionBar())
 
-                val radioGroup = RadioGroup().apply {
+                radioGroup = RadioGroup().apply {
                     for (genre in genres!!)
                     {
                         addRadio(genre)
                     }
+                    check(activeGenre!!)
                 }
                 radioGroup.measure(0, 0)
                 val scroll = NestedScrollView(context).apply {
@@ -601,9 +588,67 @@ class MoviesFragment : BaseFragment()
 
                     actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
                     onActionButtonClick {
-                        showFiltersView()
+                        filtersView!!.genreCell!!.filterValue = radioGroup.currentChecked()
+                        navigate(genreView!!, filtersView!!)
                     }
                 }
+            }
+
+            fun currentGenre(): String {
+                return radioGroup.currentChecked()
+            }
+        }
+
+        inner class SortingView : LinearLayout(ApplicationActivity.instance())
+        {
+            private var radioGroup: RadioGroup
+
+            init
+            {
+                orientation = LinearLayout.VERTICAL
+
+                addView(createActionBar())
+
+                radioGroup = RadioGroup().apply {
+                    for (sorting in sortings)
+                    {
+                        addRadio(sorting)
+                    }
+                    check(activeSorting)
+                }
+                radioGroup.measure(0, 0)
+
+                val scroll = NestedScrollView(context).apply {
+                    addView(radioGroup)
+                }
+
+                val availableHeight = (Utils.displayHeight * 0.7).toInt() - Utils.dp(56 + 15 + 50 + 15)
+                val scrollHeight = if (radioGroup.measuredHeight < availableHeight) {
+                    LayoutHelper.WRAP_CONTENT
+                } else {
+                    Utils.px( availableHeight )
+                }
+
+                addView(scroll, LayoutHelper.createLinear(
+                    LayoutHelper.MATCH_PARENT, scrollHeight
+                ))
+            }
+
+            private fun createActionBar() : ActionBar
+            {
+                return ActionBar(context).apply {
+                    title = Locale.text(Locale.text_sorting)
+
+                    actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
+                    onActionButtonClick {
+                        filtersView!!.sortingCell.filterValue = radioGroup.currentChecked()
+                        navigate(sortingView, filtersView!!)
+                    }
+                }
+            }
+
+            fun currentSorting(): String {
+                return radioGroup.currentChecked()
             }
         }
 

@@ -17,6 +17,12 @@ class RadioGroup : LinearLayout(ApplicationActivity.instance())
     {
         val radioCell = RadioCell().apply {
             this.text = text
+
+            setOnClickListener {
+                if (this.isChecked) return@setOnClickListener
+
+                check(this.text)
+            }
         }
         addView(radioCell)
 
@@ -34,6 +40,13 @@ class RadioGroup : LinearLayout(ApplicationActivity.instance())
             it.text == text
         }
         radioCell?.setChecked(true)
+    }
+
+    fun currentChecked(): String
+    {
+        return radioCells.find {
+            it.isChecked
+        }!!.text
     }
 
     fun size(): Int
