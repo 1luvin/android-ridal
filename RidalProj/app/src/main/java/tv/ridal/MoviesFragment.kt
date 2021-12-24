@@ -78,6 +78,8 @@ class MoviesFragment : BaseFragment()
         Фильтры
      */
 
+    private lateinit var filtersPopup: FiltersPopup
+
     private var genres: List<String>? = null
     private var activeGenre: String? = null
     private var sortings: List<String> = listOf(
@@ -118,7 +120,6 @@ class MoviesFragment : BaseFragment()
         createUi()
 
         checkFilters()
-
 
         loadMovies()
     }
@@ -214,7 +215,6 @@ class MoviesFragment : BaseFragment()
             }
         }
     }
-
 
     private fun createMoviesView()
     {

@@ -1,7 +1,6 @@
 package tv.ridal.Cells
 
 import android.animation.ArgbEvaluator
-import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.text.TextUtils
 import android.view.Gravity
@@ -71,7 +70,8 @@ class RadioCell : FrameLayout(ApplicationActivity.instance())
         ))
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
+    {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
         setMeasuredDimension(
@@ -80,12 +80,13 @@ class RadioCell : FrameLayout(ApplicationActivity.instance())
         )
     }
 
-    fun setChecked(checked: Boolean, animated: Boolean = true) {
+    fun setChecked(checked: Boolean, animated: Boolean = true)
+    {
         if (checked == isChecked) {
             return
         }
         radioButton.setChecked(checked, animated)
-        if (animated) animateCheckChange()
+        if (animated) animateTextColorChange()
         else textView.setTextColor(
             if (isChecked) textColorChecked else textColor
         )
@@ -93,17 +94,13 @@ class RadioCell : FrameLayout(ApplicationActivity.instance())
         isChecked = checked
     }
 
-    private fun animateCheckChange()
+    private fun animateTextColorChange()
     {
-        val startColor: Int
-        val endColor: Int
-
-        if (isChecked) {
-            startColor = textColorChecked
-            endColor = textColor
+        val startColor = textView.currentTextColor
+        val endColor = if (isChecked) {
+            textColor
         } else {
-            startColor = textColor
-            endColor = textColorChecked
+            textColorChecked
         }
 
         ValueAnimator.ofInt(startColor, endColor).apply {
