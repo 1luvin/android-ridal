@@ -4,7 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
-import android.content.Context
+import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.*
@@ -26,8 +26,6 @@ import tv.ridal.Application.Theme
 import tv.ridal.ActionBar.ActionBar
 import tv.ridal.Application.Locale
 import tv.ridal.Cells.FilterCell
-import tv.ridal.Cells.PointerCell
-import tv.ridal.Cells.RadioCell
 import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.Components.Popup.BottomPopup
@@ -111,6 +109,7 @@ class MoviesFragment : BaseFragment()
     private var loading: Boolean = false
 
     private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
+    private val requestTagMovies: String = "requestTagMovies"
 
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -124,16 +123,20 @@ class MoviesFragment : BaseFragment()
         loadMovies()
     }
 
-    override fun onResume() {
+    override fun onResume()
+    {
         super.onResume()
 
         requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }
 
-    override fun onStop() {
+    override fun onStop()
+    {
         super.onStop()
 
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+
+        cancelRequests()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -141,6 +144,11 @@ class MoviesFragment : BaseFragment()
         return rootFrame
     }
 
+
+    private fun cancelRequests()
+    {
+        requestQueue.cancelAll(requestTagMovies)
+    }
 
 
     private fun createUi()
@@ -214,6 +222,8 @@ class MoviesFragment : BaseFragment()
                 sections!![0]
             }
         }
+
+        filtersPopup = FiltersPopup()
     }
 
     private fun createMoviesView()
@@ -261,7 +271,7 @@ class MoviesFragment : BaseFragment()
             imageTintList = ColorStateList.valueOf(Theme.COLOR_WHITE)
 
             setOnClickListener {
-                FiltersPopup().show()
+                filtersPopup.show()
             }
         }
     }
@@ -282,22 +292,27 @@ class MoviesFragment : BaseFragment()
             }
         }
 
-        val stringRequest = StringRequest(
+        val moviesRequest = StringRequest(
             Request.Method.GET, url,
             { response ->
                 loading = false
 
                 document = Jsoup.parse(response)
 
-                movies.addAll(Parser.parseMovies(document!!)!!)
+                val newMovies = Parser.parseMovies(document!!)
+                if (newMovies == null) return@StringRequest
 
-                (moviesView.adapter as MoviesAdapter).notifyItemRangeInserted(movies.size, movies.size + 36)
+                movies.addAll(newMovies)
+
+                (moviesView.adapter as MoviesAdapter).notifyItemRangeInserted(movies.size, movies.size + newMovies.size)
             },
             {
                 println("ERROR!")
             }
-        )
-        requestQueue.add(stringRequest)
+        ).apply {
+            tag = requestTagMovies
+        }
+        requestQueue.add(moviesRequest)
     }
 
     inner class FiltersPopup() : BottomPopup(ApplicationActivity.instance())
@@ -308,9 +323,18 @@ class MoviesFragment : BaseFragment()
         private var genreView: GenreView? = null
         private lateinit var sortingView: SortingView
 
+        private lateinit var currentView: View
+
         init
         {
             this.createUi()
+
+            this.setOnShowListener {
+                if (currentView != filtersView)
+                {
+                    navigate(currentView, filtersView!!, false)
+                }
+            }
 
             this.isDraggable = false
         }
@@ -349,6 +373,8 @@ class MoviesFragment : BaseFragment()
                     Gravity.BOTTOM,
                     20, 15, 20, 15
                 ))
+
+                currentView = filtersView!!
             }
 
             if (hasGenres())
@@ -375,8 +401,10 @@ class MoviesFragment : BaseFragment()
             setContentView(popupView)
         }
 
-        private fun navigate(fromView: View, toView: View)
+        private fun navigate(fromView: View, toView: View, animated: Boolean = true)
         {
+            currentView = toView
+
             val alphaAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
                 addUpdateListener {
                     val animatedAlpha = it.animatedValue as Float
@@ -385,10 +413,29 @@ class MoviesFragment : BaseFragment()
                 }
             }
 
-            fromView.measure(0 ,0)
-            val startHeight = fromView.measuredHeight
             toView.measure(0, 0)
             val endHeight = toView.measuredHeight
+
+            if ( ! animated)
+            {
+                fromView.apply {
+                    alpha = 0F
+                    visibility = View.GONE
+                }
+                toView.apply {
+                    alpha = 1F
+                    visibility = View.VISIBLE
+                }
+
+                popupView.updateLayoutParams<FrameLayout.LayoutParams> {
+                    height = endHeight + Utils.dp(15 + 50 + 15)
+                }
+
+                return
+            }
+
+            fromView.measure(0 ,0)
+            val startHeight = fromView.measuredHeight
 
             val heightAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
                 addUpdateListener {
@@ -490,7 +537,6 @@ class MoviesFragment : BaseFragment()
         fun onNewFilters(l: () -> Unit) {
             newFiltersListener = l
         }
-
 
         inner class FiltersView : LinearLayout(ApplicationActivity.instance())
         {
@@ -651,6 +697,7 @@ class MoviesFragment : BaseFragment()
                 return radioGroup.currentChecked()
             }
         }
+
 
     }
 

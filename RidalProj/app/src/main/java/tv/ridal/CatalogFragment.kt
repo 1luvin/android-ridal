@@ -110,7 +110,6 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }
 
-
     private fun createScreenTitleView() : View
     {
         val menu = BigActionBar.Menu(requireContext()).apply {
@@ -122,6 +121,11 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
                 }
                 val shareIntent = Intent.createChooser(sendIntent, "")
                 startActivity(shareIntent)
+            }
+            addItem(Theme.drawable(R.drawable.sett, Theme.color_text)) {
+                startFragment(
+                    SettingsFragment.newInstance()
+                )
             }
         }
 

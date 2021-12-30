@@ -90,22 +90,20 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         return rootLayout
     }
 
-    override fun onResume() {
+    override fun onResume()
+    {
         super.onResume()
 
         requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }
 
-    override fun onStop() {
+    override fun onStop()
+    {
         super.onStop()
 
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
@@ -113,7 +111,7 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
 
     private fun createScreenTitleView() : View
     {
-        return BigActionBar(requireContext()).apply {
+        return BigActionBar(context).apply {
             title = Locale.text(Locale.text_sett)
         }
     }
@@ -137,7 +135,7 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
 
     private fun createDarkThemeSwitch()
     {
-        darkThemeSwitch = SwitchCompat(requireContext()).apply {
+        darkThemeSwitch = SwitchCompat(context).apply {
             layoutParams = ViewGroup.LayoutParams(
                 LayoutHelper.MATCH_PARENT,
                 Utils.dp(46)

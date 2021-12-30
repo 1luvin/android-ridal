@@ -6,11 +6,12 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.tunjid.androidx.navigation.Navigator
+import kotlin.random.Random
 
 open class BaseFragment : Fragment(), Navigator.TagProvider
 {
     override val stableTag: String
-        get() = "${View.generateViewId()}"
+        get() = "${Random.nextInt()}"
 
     override fun getContext(): Context {
         return ApplicationActivity.instance()
@@ -32,3 +33,43 @@ open class BaseFragment : Fragment(), Navigator.TagProvider
         ApplicationActivity.instance().multiStackNavigator.pop()
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//

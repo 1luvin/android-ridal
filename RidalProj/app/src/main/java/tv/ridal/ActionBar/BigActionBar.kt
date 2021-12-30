@@ -121,11 +121,12 @@ class BigActionBar(context: Context) : FrameLayout(context)
                     fill(Utils.dp(10F))
                 }, true)
 
-                scaleType = ImageView.ScaleType.FIT_XY
+                scaleType = ImageView.ScaleType.CENTER
             }
         }
 
-        private fun itemsCount(): Int {
+        private fun itemsCount(): Int
+        {
             return this.childCount
         }
 
