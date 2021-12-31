@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
-import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.*
@@ -322,6 +321,7 @@ class MoviesFragment : BaseFragment()
         private var filtersView: FiltersView? = null
         private var genreView: GenreView? = null
         private lateinit var sortingView: SortingView
+        private var sectionView: SectionView? = null
 
         private lateinit var currentView: View
 
@@ -330,10 +330,7 @@ class MoviesFragment : BaseFragment()
             this.createUi()
 
             this.setOnShowListener {
-                if (currentView != filtersView)
-                {
-                    navigate(currentView, filtersView!!, false)
-                }
+                onFiltersOpen()
             }
 
             this.isDraggable = false
@@ -341,6 +338,7 @@ class MoviesFragment : BaseFragment()
 
         private fun createUi()
         {
+            // создание контейнера для View с фильтрами
             popupView = FrameLayout(context).apply {
                 layoutParams = LayoutHelper.createFrame(
                     LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
@@ -351,13 +349,17 @@ class MoviesFragment : BaseFragment()
                         Utils.dp(12F), Utils.dp(12F), 0F, 0F
                     ))
             }
-
+            // добавление кнопки <Показать результаты>
+            popupView.addView(createShowResultsButton(), LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, 50,
+                Gravity.BOTTOM,
+                20, 15, 20, 15
+            ))
+            // если имеются Жанры или Секции (Фильмы, Сериалы, ...)
+            // добавляем FiltersView
             if (hasGenres() || hasSections())
             {
                 filtersView = FiltersView().apply {
-                    genreCell!!.setOnClickListener {
-                        navigate(filtersView!!, genreView!!)
-                    }
                     sortingCell.setOnClickListener {
                         navigate(filtersView!!, sortingView)
                     }
@@ -368,17 +370,35 @@ class MoviesFragment : BaseFragment()
                     0, 0, 0, 15 + 50 + 15
                 ))
 
-                popupView.addView(createShowResultsButton(), LayoutHelper.createFrame(
-                    LayoutHelper.MATCH_PARENT, 50,
-                    Gravity.BOTTOM,
-                    20, 15, 20, 15
-                ))
-
                 currentView = filtersView!!
             }
 
             if (hasGenres())
             {
+                filtersView!!.apply {
+                    genreCell!!.setOnClickListener {
+                        navigate(filtersView!!, genreView!!)
+                    }
+                }
+
+                genreView = GenreView().apply {
+                    visibility = View.GONE
+                }
+                popupView.addView(genreView, LayoutHelper.createFrame(
+                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                    Gravity.TOP,
+                    0, 0, 0, 15 + 50 + 15
+                ))
+            }
+
+            if (hasSections())
+            {
+                filtersView!!.apply {
+                    sectionCell!!.setOnClickListener {
+                        navigate(filtersView!!, sectionView!!)
+                    }
+                }
+
                 genreView = GenreView().apply {
                     visibility = View.GONE
                 }
@@ -390,7 +410,11 @@ class MoviesFragment : BaseFragment()
             }
 
             sortingView = SortingView().apply {
-                visibility = View.GONE
+                if (filtersView != null) {
+                    visibility = View.GONE
+                } else {
+                    currentView = this
+                }
             }
             popupView.addView(sortingView, LayoutHelper.createFrame(
                 LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
@@ -533,6 +557,36 @@ class MoviesFragment : BaseFragment()
             return changed
         }
 
+        private fun onFiltersOpen()
+        {
+            // если фильтры существуют
+            if (filtersView != null)
+            {
+                // Если экран при закрытии не равен экрану с фильтрами
+                // Показываем экран с фильтрами
+                if (currentView != filtersView)
+                {
+                    navigate(currentView, filtersView!!, false)
+                }
+
+                if (hasGenres()) {
+                    filtersView!!.genreCell!!.filterValue = activeGenre!!
+
+                    genreView!!.radioGroup.check(activeGenre!!)
+                }
+                if (hasSections()) {
+                    filtersView!!.sectionCell!!.filterValue = activeSection!!
+
+                    // sectionView!!.checkBoxGroup.check("xxx", "xxx")
+                }
+
+                filtersView!!.sortingCell.filterValue = activeSorting
+            }
+
+            sortingView.radioGroup.check(activeSorting)
+
+        }
+
         private var newFiltersListener: (() -> Unit)? = null
         fun onNewFilters(l: () -> Unit) {
             newFiltersListener = l
@@ -542,15 +596,20 @@ class MoviesFragment : BaseFragment()
         {
 
             var genreCell: FilterCell? = null
-            var sortingCell: FilterCell
+            lateinit var sortingCell: FilterCell
             var sectionCell: FilterCell? = null
 
             init
             {
                 orientation = LinearLayout.VERTICAL
 
-                addView(createActionBar())
+                createUi()
+            }
 
+            private fun createUi()
+            {
+                addView(createActionBar())
+                // Фильтры могут содержать либо Жанры либо Секции, вместе не может быть
                 if (hasGenres())
                 {
                     genreCell = FilterCell().apply {
@@ -562,8 +621,7 @@ class MoviesFragment : BaseFragment()
                         20, 15, 20, 0
                     ))
                 }
-
-                if (hasSections())
+                else if (hasSections())
                 {
                     sectionCell = FilterCell().apply {
                         filterName = Locale.text(Locale.text_section)
@@ -574,7 +632,7 @@ class MoviesFragment : BaseFragment()
                         20, 15, 20, 0
                     ))
                 }
-
+                // Сортировка есть всегда
                 sortingCell = FilterCell().apply {
                     filterName = Locale.text(Locale.text_sorting)
                     filterValue = activeSorting
@@ -589,13 +647,29 @@ class MoviesFragment : BaseFragment()
             {
                 return ActionBar(context).apply {
                     title = Locale.text(Locale.text_filters)
+
+                    menu = ActionBar.Menu(context).apply {
+                        addItem(Theme.drawable(R.drawable.refresh, Theme.color_text)) {
+                            if (hasGenres()) {
+                                // Применяем первоначальный Жанр
+                            }
+                            if (hasSections()) {
+                                // Применяем первоначальные Секции (то есть все)
+                            }
+
+                            activeSorting = sortings[0]
+
+                            // Закрываем Фильтры
+                            dismiss()
+                        }
+                    }
                 }
             }
         }
 
         inner class GenreView : LinearLayout(ApplicationActivity.instance())
         {
-            private var radioGroup: RadioGroup
+            var radioGroup: RadioGroup
 
             init
             {
@@ -647,7 +721,7 @@ class MoviesFragment : BaseFragment()
 
         inner class SortingView : LinearLayout(ApplicationActivity.instance())
         {
-            private var radioGroup: RadioGroup
+            var radioGroup: RadioGroup
 
             init
             {
@@ -682,20 +756,32 @@ class MoviesFragment : BaseFragment()
 
             private fun createActionBar() : ActionBar
             {
-                return ActionBar(context).apply {
+                val actionBar = ActionBar(context).apply {
                     title = Locale.text(Locale.text_sorting)
+                }
 
-                    actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
-                    onActionButtonClick {
-                        filtersView!!.sortingCell.filterValue = radioGroup.currentChecked()
-                        navigate(sortingView, filtersView!!)
+                if (filtersView != null)
+                {
+                    actionBar.apply {
+                        actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
+                        onActionButtonClick {
+                            filtersView!!.sortingCell.filterValue = radioGroup.currentChecked()
+                            navigate(sortingView, filtersView!!)
+                        }
                     }
                 }
+
+                return actionBar
             }
 
             fun currentSorting(): String {
                 return radioGroup.currentChecked()
             }
+        }
+
+        inner class SectionView : LinearLayout(ApplicationActivity.instance())
+        {
+
         }
 
 
