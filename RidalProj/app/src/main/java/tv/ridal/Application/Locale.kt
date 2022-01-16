@@ -242,6 +242,7 @@ class Locale
 
         const val text_showResults = "text_showResults"
 
+
         private var texts = HashMap<String, String>()
 
         fun text(textKey: String) : String

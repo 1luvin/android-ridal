@@ -222,7 +222,19 @@ class MoviesFragment : BaseFragment()
             }
         }
 
-        filtersPopup = FiltersPopup()
+        createFiltersPopup()
+    }
+
+    private fun createFiltersPopup()
+    {
+        filtersPopup = FiltersPopup().apply {
+            onNewFilters {
+                setSubtitle(activeGenre ?: "", activeSorting)
+
+                clearMovies()
+                loadMovies()
+            }
+        }
     }
 
     private fun createMoviesView()
@@ -279,9 +291,16 @@ class MoviesFragment : BaseFragment()
     {
         loading = true
 
-        var url: String = ""
+        var url = ""
         if (document == null) {
             url = arguments.url!!
+            if ( hasGenres() ) {
+                println(activeGenre)
+                url += Genre.url(activeGenre!!)
+            }
+            url += Sorting.url(activeSorting)
+
+            println(url)
         } else {
             if (Navigator.isNextPageExist(document!!)) {
                 url = Navigator.nextPageUrl(document!!)
@@ -290,6 +309,8 @@ class MoviesFragment : BaseFragment()
                 return
             }
         }
+
+        println(url)
 
         val moviesRequest = StringRequest(
             Request.Method.GET, url,
@@ -300,6 +321,8 @@ class MoviesFragment : BaseFragment()
 
                 val newMovies = Parser.parseMovies(document!!)
                 if (newMovies == null) return@StringRequest
+
+                println(newMovies.size)
 
                 movies.addAll(newMovies)
 
@@ -312,6 +335,13 @@ class MoviesFragment : BaseFragment()
             tag = requestTagMovies
         }
         requestQueue.add(moviesRequest)
+    }
+
+    private fun clearMovies()
+    {
+        document = null
+        movies.clear()
+        moviesView.adapter!!.notifyDataSetChanged()
     }
 
     inner class FiltersPopup() : BottomPopup(ApplicationActivity.instance())
@@ -651,14 +681,14 @@ class MoviesFragment : BaseFragment()
                     menu = ActionBar.Menu(context).apply {
                         addItem(Theme.drawable(R.drawable.refresh, Theme.color_text)) {
                             if (hasGenres()) {
-                                // Применяем первоначальный Жанр
+                                activeGenre = genres!![0]
                             }
                             if (hasSections()) {
                                 // Применяем первоначальные Секции (то есть все)
                             }
-
                             activeSorting = sortings[0]
 
+                            newFiltersListener?.invoke()
                             // Закрываем Фильтры
                             dismiss()
                         }

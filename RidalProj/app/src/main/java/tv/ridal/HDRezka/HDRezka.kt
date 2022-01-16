@@ -47,6 +47,28 @@ class HDRezka
         val SECTION_URLS
             get() = listOf(URL_FILMS, URL_SERIES, URL_CARTOONS, URL_ANIME)
 
+
+        // Секции
+        const val url_films = "films/"
+        const val url_series = "series/"
+        const val url_cartoons = "cartoons/"
+        const val url_anime = "animation/"
+
+        // Фильтры
+        const val sorting_base = "?filter="
+        const val sorting_last = "last"
+        const val sorting_popular = "popular"
+        const val sorting_watching = "watching"
+
+        fun createUrl(section: String, genre: String = "", sorting: String = "") : String
+        {
+            var url = url_base + section + genre
+            if (sorting != "")
+                url += sorting_base + sorting
+
+            return url
+        }
+
     }
 }
 

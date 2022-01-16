@@ -18,7 +18,7 @@ class ApplicationActivity : BaseActivity()
 {
 
     companion object {
-        val tabs = intArrayOf(R.id.navigation, R.id.search, R.id.favourites)
+        val tabs = intArrayOf(R.id.navigation, R.id.search)
 
         @Volatile
         private var INSTANCE: ApplicationActivity? = null
@@ -41,16 +41,15 @@ class ApplicationActivity : BaseActivity()
     ) { index ->
         when(index)
         {
-            //0 -> SettingsFragment.newInstance() to SettingsFragment.TAG
             0 -> CatalogFragment.newInstance() to CatalogFragment.TAG
             1 -> {
                 val f = SearchFragment.instance()
                 Pair(f, f.stableTag)
             }
-            2 -> {
-                val f = FavouritesFragment.instance()
-                Pair(f, f.stableTag)
-            }
+//            2 -> {
+//                val f = FavouritesFragment.instance()
+//                Pair(f, f.stableTag)
+//            }
             else -> Fragment() to "Fragment"
         }
     }

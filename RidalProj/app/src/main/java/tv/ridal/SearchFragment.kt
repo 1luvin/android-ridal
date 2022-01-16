@@ -1,5 +1,6 @@
 package tv.ridal
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.*
@@ -19,6 +20,7 @@ import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.Components.Popup.PopupFrame
 import tv.ridal.ActionBar.BigActionBar
 import tv.ridal.Components.View.SearchView
+import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Parser
 import tv.ridal.HDRezka.SearchResult
@@ -59,33 +61,35 @@ class SearchFragment : BaseFragment()
 
     private lateinit var resultsPopupFrame: PopupFrame
 
+    override fun getContext(): Context {
+        return ApplicationActivity.instance()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
 
-        rootFrame = FrameLayout(requireContext()).apply {
+        rootFrame = FrameLayout(context).apply {
             layoutParams = LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT)
 
             setBackgroundColor(Theme.color(Theme.color_bg))
         }
 
-        rootLayout = LinearLayout(requireContext()).apply {
+        rootLayout = LinearLayout(context).apply {
             layoutParams = LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT)
             orientation = LinearLayout.VERTICAL
         }
         // rootLayout's children creation
         createBigActionBar()
-
         createSearchView()
-        resultsFrame = FrameLayout(requireContext()).apply {
+        resultsFrame = FrameLayout(context).apply {
             layoutParams = LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT)
         }
         // resultsFrame's children creation
         createMovieSuggestionsView()
-        resultsPopupFrame = PopupFrame(requireContext())
+        resultsPopupFrame = PopupFrame(context)
         // resultsPopupFrame's ListView child
-        resultsListView = ListView(requireContext()).apply {
+        resultsListView = ListView(context).apply {
             background = Theme.createRect(Theme.color_bg)
 
             adapter = SearchAdapter(searchResults)
@@ -97,7 +101,14 @@ class SearchFragment : BaseFragment()
         }
 
         resultsFrame.apply {
-            addView(movieSuggestionsView)
+            addView( createMovieSuggestionsText(), LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, 40
+            ) )
+            addView(movieSuggestionsView, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                Gravity.TOP,
+                0, 40, 0, 0
+            ))
         }
 
         rootLayout.apply {
@@ -135,6 +146,28 @@ class SearchFragment : BaseFragment()
 
     private val movies: ArrayList<Movie> = ArrayList()
 
+
+    private fun createBigActionBar()
+    {
+        bigActionBar = BigActionBar(requireContext()).apply {
+            title = Locale.text(Locale.text_search)
+        }
+    }
+
+    private fun createMovieSuggestionsText() : TextView
+    {
+        return TextView(context).apply {
+            setPadding(Utils.dp(15), 0, Utils.dp(15), 0)
+            gravity = Gravity.CENTER_VERTICAL
+
+            setTextColor(Theme.color(Theme.color_text))
+            textSize = 16F
+            typeface = Theme.typeface(Theme.tf_normal)
+
+            text = Locale.text(Locale.sorting_watching)
+        }
+    }
+
     private fun createMovieSuggestionsView()
     {
         movieSuggestionsView = RecyclerView(requireContext()).apply {
@@ -149,13 +182,6 @@ class SearchFragment : BaseFragment()
             addItemDecoration(GridSpacingItemDecoration(3, Utils.dp(15)))
 
             adapter = MoviesAdapter(movies)
-        }
-    }
-
-    private fun createBigActionBar()
-    {
-        bigActionBar = BigActionBar(requireContext()).apply {
-            title = Locale.text(Locale.text_search)
         }
     }
 
@@ -275,19 +301,23 @@ class SearchFragment : BaseFragment()
     private fun loadMovieSuggestions()
     {
         val urls = listOf(
-            "https://rezka.ag/films/?filter=watching",
-            "https://rezka.ag/series/?filter=watching",
-            "https://rezka.ag/cartoons/?filter=watching",
-            "https://rezka.ag/animation/?filter=watching"
+            HDRezka.createUrl(HDRezka.url_films, sorting = HDRezka.sorting_watching),
+            HDRezka.createUrl(HDRezka.url_series, sorting = HDRezka.sorting_watching),
+            HDRezka.createUrl(HDRezka.url_cartoons, sorting = HDRezka.sorting_watching),
+            HDRezka.createUrl(HDRezka.url_anime, sorting = HDRezka.sorting_watching),
         )
 
         for (i in urls.indices)
         {
             val stringRequest = StringRequest(Request.Method.GET, urls[i],
                 { response ->
-                    movies.addAll(Parser.parseMovies(response, 5)!!)
+                    val moviesN = 5
 
-                    (movieSuggestionsView.adapter as MoviesAdapter).notifyDataSetChanged()
+                    movies.addAll( Parser.parseMovies(response, moviesN)!! )
+
+                    (movieSuggestionsView.adapter as MoviesAdapter).notifyItemRangeInserted(
+                        movies.size, moviesN
+                    )
                 },
                 {
                     println("ERROR!")
