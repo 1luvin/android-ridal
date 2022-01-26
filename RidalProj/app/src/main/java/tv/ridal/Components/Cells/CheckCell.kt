@@ -67,12 +67,12 @@ class CheckCell(context: Context) : FrameLayout(context)
             isSingleLine = true
             ellipsize = TextUtils.TruncateAt.END
 
-            translationX = - Utils.dp(24F + 15F)
+            translationX = - Utils.dp(19F + 10F)
         }
         addView(textView, LayoutHelper.createFrame(
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.CENTER_VERTICAL,
-            20 + 24 + 15, 0, 15, 0
+            25 + 19 + 10, 0, 15, 0
         ))
     }
 
@@ -98,11 +98,14 @@ class CheckCell(context: Context) : FrameLayout(context)
         else
         {
             checkView.apply {
-                scaleX = if (isChecked) 0F else 1F
-                scaleY = if (isChecked) 0F else 1F
-                alpha = if (isChecked) 0F else 1F
+                scaleX = if (checked) 1F else 0F
+                scaleY = if (checked) 1F else 0F
+                alpha = if (checked) 1F else 0F
             }
-            textView.setTextColor( if (isChecked) textColorChecked else textColor )
+            textView.apply {
+                setTextColor( if (checked) textColorChecked else textColor )
+                translationX = if (checked) 0F else - Utils.dp(19F + 10F)
+            }
         }
 
         isChecked = checked
@@ -131,7 +134,7 @@ class CheckCell(context: Context) : FrameLayout(context)
 
         val startTranslation = textView.translationX
         val endTranslation = if (isChecked) {
-            - Utils.dp(24F + 15F)
+            - Utils.dp(19F + 10F)
         } else {
             0F
         }

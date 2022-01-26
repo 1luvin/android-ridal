@@ -29,7 +29,6 @@ import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.Components.Layout.SingleCheckGroup
 import tv.ridal.Components.Popup.BottomPopup
-import tv.ridal.Components.RadioGroup
 import tv.ridal.Components.View.NestedScrollView
 import tv.ridal.HDRezka.*
 import tv.ridal.Utils.Utils
@@ -615,7 +614,6 @@ class MoviesFragment : BaseFragment()
             }
 
             sortingView.singleCheckGroup.check(activeSorting)
-
         }
 
         private var newFiltersListener: (() -> Unit)? = null
@@ -698,15 +696,18 @@ class MoviesFragment : BaseFragment()
             }
         }
 
-        inner class GenreView : LinearLayout(ApplicationActivity.instance())
+        inner class GenreView : FrameLayout(ApplicationActivity.instance())
         {
+            private lateinit var actionBar: ActionBar
             var singleCheckGroup: SingleCheckGroup
+            private lateinit var doneButton: FloatingActionButton
+
+            private lateinit var scroll: NestedScrollView
 
             init
             {
-                orientation = LinearLayout.VERTICAL
-
-                addView(createActionBar())
+                createActionBar()
+                addView(actionBar)
 
                 singleCheckGroup = SingleCheckGroup(context).apply {
                     for (genre in genres!!)
@@ -716,7 +717,7 @@ class MoviesFragment : BaseFragment()
                     check(activeGenre!!)
                 }
                 singleCheckGroup.measure(0, 0)
-                val scroll = NestedScrollView(context).apply {
+                scroll = NestedScrollView(context).apply {
                     addView(singleCheckGroup)
                 }
 
@@ -727,18 +728,54 @@ class MoviesFragment : BaseFragment()
                     Utils.px( availableHeight )
                 }
 
-                addView(scroll, LayoutHelper.createLinear(
-                    LayoutHelper.MATCH_PARENT, scrollHeight
+                addView(scroll, LayoutHelper.createFrame(
+                    LayoutHelper.MATCH_PARENT, scrollHeight,
+                    Gravity.START or Gravity.TOP,
+                    0, 56, 0, 0
+                ))
+
+                createDoneButton()
+                addView(doneButton, LayoutHelper.createFrame(
+                    LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+                    Gravity.END or Gravity.BOTTOM,
+                    0, 0, 10, 10
                 ))
             }
 
-            private fun createActionBar() : ActionBar
+            override fun onVisibilityChanged(changedView: View, visibility: Int) {
+                super.onVisibilityChanged(changedView, visibility)
+                // открытие жанров
+                if (visibility == View.VISIBLE)
+                {
+                    singleCheckGroup.check( filtersView!!.genreCell!!.filterValue, false )
+                    singleCheckGroup.moveCheckedOnTop()
+
+                    scroll.scrollTo(0, 0)
+                }
+            }
+
+            private fun createActionBar()
             {
-                return ActionBar(context).apply {
+                actionBar = ActionBar(context).apply {
                     title = Locale.text(Locale.text_genre)
 
                     actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
                     onActionButtonClick {
+                        navigate(genreView!!, filtersView!!)
+                    }
+                }
+            }
+
+            private fun createDoneButton()
+            {
+                doneButton = FloatingActionButton(requireContext()).apply {
+                    backgroundTintList = ColorStateList.valueOf(Theme.color(Theme.color_main))
+                    rippleColor = Theme.ripplizeColor(Theme.color_main)
+
+                    setImageDrawable(Theme.drawable(R.drawable.done))
+                    imageTintList = ColorStateList.valueOf(Theme.COLOR_WHITE)
+
+                    setOnClickListener {
                         filtersView!!.genreCell!!.filterValue = singleCheckGroup.currentChecked()
                         navigate(genreView!!, filtersView!!)
                     }

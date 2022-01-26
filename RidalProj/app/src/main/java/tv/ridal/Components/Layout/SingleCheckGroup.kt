@@ -29,17 +29,30 @@ class SingleCheckGroup(context: Context) : LinearLayout(context)
         checkCells.add(checkCell)
     }
 
-    fun check(text: String)
+    fun check(text: String, animated: Boolean = true)
     {
         val checkedCell = checkCells.find {
             it.isChecked
         }
-        checkedCell?.setChecked(false)
+        checkedCell?.setChecked(false, animated)
 
         val toCheck = checkCells.find {
             it.text == text
         }
-        toCheck?.setChecked(true)
+        toCheck?.setChecked(true, animated)
+    }
+
+    fun moveCheckedOnTop()
+    {
+        val checkedCell = checkCells.find { it.isChecked }
+        if ( indexOfChild(checkedCell) == 0 ) return
+
+        val prevChecked = getChildAt(0) as CheckCell
+        removeView(prevChecked)
+        addView(prevChecked, checkCells.indexOf(prevChecked))
+
+        removeView(checkedCell)
+        addView(checkedCell, 0)
     }
 
     fun currentChecked(): String = checkCells.find {
