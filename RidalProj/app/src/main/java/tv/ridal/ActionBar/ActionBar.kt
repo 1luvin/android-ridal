@@ -28,9 +28,9 @@ class ActionBar(context: Context) : FrameLayout(context)
             isClickable = true
             scaleType = ImageView.ScaleType.CENTER
 
-            background = Theme.createCircleSelector(Theme.color_bg)
+//            background = Theme.createCircleSelector(Theme.color_bg)
 
-            setOnTouchListener(InstantPressListener())
+            setOnTouchListener(InstantPressListener(this))
         }
 
         this.addView(actionButtonView)
@@ -231,7 +231,7 @@ class ActionBar(context: Context) : FrameLayout(context)
         {
             return ImageView(context).apply {
                 isClickable = true
-                setOnTouchListener(InstantPressListener())
+                setOnTouchListener(InstantPressListener(this))
 
                 background = Theme.createCircleSelector(Theme.color_bigActionBar_item_bg)
 

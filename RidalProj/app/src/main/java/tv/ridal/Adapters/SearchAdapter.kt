@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import tv.ridal.Application.ApplicationLoader
-import tv.ridal.Cells.SearchResultCell
+import tv.ridal.Components.Cells.SearchResultCell
 import tv.ridal.HDRezka.SearchResult
 import kotlin.random.Random
 

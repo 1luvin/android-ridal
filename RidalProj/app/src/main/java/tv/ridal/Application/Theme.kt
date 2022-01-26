@@ -280,7 +280,6 @@ class Theme
             return createRectSelector(color(colorKey), radii, fillAfter)
         }
 
-
         fun createOutlinedRect(fillColor: Int, outline: Outline, radii: FloatArray? = null) : Drawable
         {
             val radiiArray = FloatArray(8)
@@ -298,7 +297,6 @@ class Theme
                 setStroke(outline.width, outline.color)
             }
         }
-
         fun createOutlinedRectSelector(fillColor: Int, outline: Outline, radii: FloatArray? = null) : Drawable
         {
             val colorStateList = ColorStateList(

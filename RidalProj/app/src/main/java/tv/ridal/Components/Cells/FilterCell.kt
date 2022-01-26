@@ -1,4 +1,4 @@
-package tv.ridal.Cells
+package tv.ridal.Components.Cells
 
 import android.text.TextUtils
 import android.view.Gravity
@@ -35,7 +35,7 @@ class FilterCell : FrameLayout(ApplicationActivity.instance())
     init
     {
         isClickable = true
-        setOnTouchListener(InstantPressListener())
+        setOnTouchListener(InstantPressListener(this))
 
         background = Theme.createOutlinedRectSelector(
             Theme.color(Theme.color_bg),

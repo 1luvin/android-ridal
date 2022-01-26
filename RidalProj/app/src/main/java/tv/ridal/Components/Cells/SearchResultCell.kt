@@ -1,4 +1,4 @@
-package tv.ridal.Cells
+package tv.ridal.Components.Cells
 
 import android.content.Context
 import android.text.TextUtils

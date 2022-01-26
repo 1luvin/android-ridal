@@ -2,7 +2,7 @@ package tv.ridal.Components
 
 import android.widget.LinearLayout
 import tv.ridal.ApplicationActivity
-import tv.ridal.Cells.RadioCell
+import tv.ridal.Components.Cells.RadioCell
 
 class RadioGroup : LinearLayout(ApplicationActivity.instance())
 {

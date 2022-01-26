@@ -1,4 +1,4 @@
-package tv.ridal.Cells
+package tv.ridal.Components.Cells
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
@@ -33,7 +33,7 @@ class RadioCell : FrameLayout(ApplicationActivity.instance())
     init
     {
         isClickable = true
-        setOnTouchListener(InstantPressListener())
+        setOnTouchListener(InstantPressListener(this))
 
         background = Theme.createRectSelector(
             Theme.color_bg

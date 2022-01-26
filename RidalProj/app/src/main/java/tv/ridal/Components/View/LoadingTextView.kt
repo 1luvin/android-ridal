@@ -49,13 +49,11 @@ class LoadingTextView(context: Context) : TextView(context)
 
     private var needStopLoading: Boolean = false
 
-    private var left: Float = 0F
-    private var middle: Float = 0F
-    private var right: Float = 0F
+    private var left: Float = 0F // !
+    private var middle: Float = 0F // !
+    private var right: Float = 0F // !
 
-    var isLoading: Boolean = false
-        private set
-        get() = animator.isRunning
+    fun isLoading() = animator.isRunning
 
     fun startLoading()
     {
@@ -118,7 +116,7 @@ class LoadingTextView(context: Context) : TextView(context)
 
     fun stopLoading()
     {
-        if ( ! animator.isRunning) return
+        if ( ! isLoading()) return
 
         needStopLoading = true
     }

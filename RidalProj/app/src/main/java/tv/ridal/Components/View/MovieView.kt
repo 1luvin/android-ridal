@@ -166,7 +166,7 @@ class MovieView(context: Context) : FrameLayout(context)
     init
     {
         isClickable = true
-        setOnTouchListener(InstantPressListener())
+        setOnTouchListener(InstantPressListener(this))
 
         background = Theme.createRect(Theme.color(Theme.color_bg))
         foreground = Theme.createRectSelector(Theme.color(Theme.color_main))

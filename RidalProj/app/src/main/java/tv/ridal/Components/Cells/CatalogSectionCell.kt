@@ -1,4 +1,4 @@
-package tv.ridal.Cells
+package tv.ridal.Components.Cells
 
 import android.content.Context
 import android.text.TextUtils
@@ -35,7 +35,7 @@ class CatalogSectionCell(context: Context) : FrameLayout(context)
     init
     {
         isClickable = true
-        setOnTouchListener(InstantPressListener())
+        setOnTouchListener( InstantPressListener(this) )
 
         background = Theme.createRectSelector(Theme.color_bg)
 

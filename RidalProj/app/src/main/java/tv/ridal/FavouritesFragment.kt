@@ -2,12 +2,10 @@ package tv.ridal
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
 import android.view.*
 import android.widget.EdgeEffect
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,16 +18,14 @@ import tv.ridal.Application.Database.ApplicationDatabase
 import tv.ridal.Application.Database.Database
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
-import tv.ridal.Cells.CatalogSectionCell
-import tv.ridal.Cells.EmptyFolderCell
+import tv.ridal.Components.Cells.CatalogSectionCell
+import tv.ridal.Components.Cells.EmptyFolderCell
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.Components.Popup.BottomPopup
-import tv.ridal.Components.Popup.PopupFrame
 import tv.ridal.Components.View.ClearableInputView
 import tv.ridal.Components.View.LoadingTextView
 import tv.ridal.Utils.Utils
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class FavouritesFragment : BaseFragment()

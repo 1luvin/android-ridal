@@ -3,8 +3,7 @@ package tv.ridal.Components.View
 import android.content.Context
 import android.widget.LinearLayout
 import tv.ridal.Adapters.MoviesAdapter
-import tv.ridal.Cells.CatalogSectionCell
-import kotlin.concurrent.fixedRateTimer
+import tv.ridal.Components.Cells.CatalogSectionCell
 
 class SectionView(context: Context) : LinearLayout(context)
 {

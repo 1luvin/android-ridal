@@ -24,9 +24,10 @@ import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Theme
 import tv.ridal.ActionBar.ActionBar
 import tv.ridal.Application.Locale
-import tv.ridal.Cells.FilterCell
+import tv.ridal.Components.Cells.FilterCell
 import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Components.Layout.SingleCheckGroup
 import tv.ridal.Components.Popup.BottomPopup
 import tv.ridal.Components.RadioGroup
 import tv.ridal.Components.View.NestedScrollView
@@ -602,7 +603,7 @@ class MoviesFragment : BaseFragment()
                 if (hasGenres()) {
                     filtersView!!.genreCell!!.filterValue = activeGenre!!
 
-                    genreView!!.radioGroup.check(activeGenre!!)
+                    genreView!!.singleCheckGroup.check(activeGenre!!)
                 }
                 if (hasSections()) {
                     filtersView!!.sectionCell!!.filterValue = activeSection!!
@@ -613,7 +614,7 @@ class MoviesFragment : BaseFragment()
                 filtersView!!.sortingCell.filterValue = activeSorting
             }
 
-            sortingView.radioGroup.check(activeSorting)
+            sortingView.singleCheckGroup.check(activeSorting)
 
         }
 
@@ -699,7 +700,7 @@ class MoviesFragment : BaseFragment()
 
         inner class GenreView : LinearLayout(ApplicationActivity.instance())
         {
-            var radioGroup: RadioGroup
+            var singleCheckGroup: SingleCheckGroup
 
             init
             {
@@ -707,20 +708,20 @@ class MoviesFragment : BaseFragment()
 
                 addView(createActionBar())
 
-                radioGroup = RadioGroup().apply {
+                singleCheckGroup = SingleCheckGroup(context).apply {
                     for (genre in genres!!)
                     {
-                        addRadio(genre)
+                        addCheck(genre)
                     }
                     check(activeGenre!!)
                 }
-                radioGroup.measure(0, 0)
+                singleCheckGroup.measure(0, 0)
                 val scroll = NestedScrollView(context).apply {
-                    addView(radioGroup)
+                    addView(singleCheckGroup)
                 }
 
                 val availableHeight = (Utils.displayHeight * 0.7).toInt() - Utils.dp(56 + 15 + 50 + 15)
-                val scrollHeight = if (radioGroup.measuredHeight < availableHeight) {
+                val scrollHeight = if (singleCheckGroup.measuredHeight < availableHeight) {
                     LayoutHelper.WRAP_CONTENT
                 } else {
                     Utils.px( availableHeight )
@@ -738,20 +739,20 @@ class MoviesFragment : BaseFragment()
 
                     actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
                     onActionButtonClick {
-                        filtersView!!.genreCell!!.filterValue = radioGroup.currentChecked()
+                        filtersView!!.genreCell!!.filterValue = singleCheckGroup.currentChecked()
                         navigate(genreView!!, filtersView!!)
                     }
                 }
             }
 
             fun currentGenre(): String {
-                return radioGroup.currentChecked()
+                return singleCheckGroup.currentChecked()
             }
         }
 
         inner class SortingView : LinearLayout(ApplicationActivity.instance())
         {
-            var radioGroup: RadioGroup
+            var singleCheckGroup: SingleCheckGroup
 
             init
             {
@@ -759,21 +760,21 @@ class MoviesFragment : BaseFragment()
 
                 addView(createActionBar())
 
-                radioGroup = RadioGroup().apply {
+                singleCheckGroup = SingleCheckGroup(context).apply {
                     for (sorting in sortings)
                     {
-                        addRadio(sorting)
+                        addCheck(sorting)
                     }
                     check(activeSorting)
                 }
-                radioGroup.measure(0, 0)
+                singleCheckGroup.measure(0, 0)
 
                 val scroll = NestedScrollView(context).apply {
-                    addView(radioGroup)
+                    addView(singleCheckGroup)
                 }
 
                 val availableHeight = (Utils.displayHeight * 0.7).toInt() - Utils.dp(56 + 15 + 50 + 15)
-                val scrollHeight = if (radioGroup.measuredHeight < availableHeight) {
+                val scrollHeight = if (singleCheckGroup.measuredHeight < availableHeight) {
                     LayoutHelper.WRAP_CONTENT
                 } else {
                     Utils.px( availableHeight )
@@ -795,7 +796,7 @@ class MoviesFragment : BaseFragment()
                     actionBar.apply {
                         actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
                         onActionButtonClick {
-                            filtersView!!.sortingCell.filterValue = radioGroup.currentChecked()
+                            filtersView!!.sortingCell.filterValue = singleCheckGroup.currentChecked()
                             navigate(sortingView, filtersView!!)
                         }
                     }
@@ -805,7 +806,7 @@ class MoviesFragment : BaseFragment()
             }
 
             fun currentSorting(): String {
-                return radioGroup.currentChecked()
+                return singleCheckGroup.currentChecked()
             }
         }
 
