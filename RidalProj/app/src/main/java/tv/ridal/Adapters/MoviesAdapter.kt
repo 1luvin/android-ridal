@@ -10,23 +10,21 @@ import tv.ridal.Components.View.MovieView
 import tv.ridal.HDRezka.Movie
 import tv.ridal.SearchFragment
 
-class MoviesAdapter(private val movies: ArrayList<Movie>, private val isMoviesSelectable: Boolean = false) : RecyclerView.Adapter<MoviesAdapter.ViewHolder>()
+class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter<MoviesAdapter.ViewHolder>()
 {
-    var onMovieClick: ((Movie) -> Unit)? = null
+    private var onMovieClick: ((Movie) -> Unit)? = null
+    fun onMovieClick(l: ((Movie) -> Unit))
+    {
+        onMovieClick = l
+    }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
     {
         init {
             val movieView = itemView as MovieView
             movieView.apply {
-                isSelectable = isMoviesSelectable
-
                 setOnClickListener {
-                    if (isMoviesSelectable) {
-                        movieView.select( ! movieView.isMovieSelected)
-                    } else {
-                        onMovieClick?.invoke(movies[adapterPosition])
-                    }
+                    onMovieClick?.invoke(movies[adapterPosition])
                 }
             }
         }

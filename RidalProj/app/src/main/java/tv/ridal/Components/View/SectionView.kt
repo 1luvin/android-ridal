@@ -8,11 +8,11 @@ import tv.ridal.Components.Cells.CatalogSectionCell
 class SectionView(context: Context) : LinearLayout(context)
 {
 
-    interface OpenListener
+    private var openListener: (() -> Unit)? = null
+    fun onOpen(l: (() -> Unit))
     {
-        fun onOpen()
+        openListener = l
     }
-    var openListener: OpenListener? = null
 
     private var nameCell: CatalogSectionCell
 
@@ -45,7 +45,7 @@ class SectionView(context: Context) : LinearLayout(context)
 
         nameCell = CatalogSectionCell(context).apply {
             setOnClickListener {
-                openListener?.onOpen()
+                openListener?.invoke()
             }
         }
         addView(nameCell)

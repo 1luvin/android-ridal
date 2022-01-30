@@ -10,6 +10,7 @@ import android.view.*
 import android.view.animation.DecelerateInterpolator
 import android.widget.*
 import androidx.core.view.updateLayoutParams
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.*
@@ -29,7 +30,6 @@ import tv.ridal.Components.GridSpacingItemDecoration
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.Components.Layout.SingleCheckGroup
 import tv.ridal.Components.Popup.BottomPopup
-import tv.ridal.Components.View.NestedScrollView
 import tv.ridal.HDRezka.*
 import tv.ridal.Utils.Utils
 
@@ -250,13 +250,16 @@ class MoviesFragment : BaseFragment()
             layoutManager = GridLayoutManager(requireContext(), 3)
             addItemDecoration(GridSpacingItemDecoration(3, Utils.dp(15)))
 
-            adapter = MoviesAdapter(movies, true)
+            adapter = MoviesAdapter(movies).apply {
+                onMovieClick {
+                    val movieFragment = MovieFragment.newInstance(it)
+                    startFragment(movieFragment)
+                }
+            }
 
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
-
-                    println(recyclerView.computeVerticalScrollOffset())
 
                     val offset = recyclerView.computeVerticalScrollOffset()
                     val range = recyclerView.computeVerticalScrollRange()
@@ -319,14 +322,11 @@ class MoviesFragment : BaseFragment()
 
                 document = Jsoup.parse(response)
 
-                val newMovies = Parser.parseMovies(document!!)
-                if (newMovies == null) return@StringRequest
-
-                println(newMovies.size)
+                val newMovies = Parser.parseMovies(document!!) ?: return@StringRequest
 
                 movies.addAll(newMovies)
 
-                (moviesView.adapter as MoviesAdapter).notifyItemRangeInserted(movies.size, movies.size + newMovies.size)
+                (moviesView.adapter as MoviesAdapter).notifyItemRangeInserted(movies.size, newMovies.size)
             },
             {
                 println("ERROR!")

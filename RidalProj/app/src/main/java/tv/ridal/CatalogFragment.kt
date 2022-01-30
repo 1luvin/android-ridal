@@ -155,13 +155,18 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
 
                     val movies = Parser.parseMovies(response, 10)!!
 
-                    sectionView.sectionName = sectionNames[i]
-                    sectionView.sectionSubtext = Parser.parseSectionMoviesSize(response)
+                    sectionView.apply {
+                        sectionName = sectionNames[i]
+                        sectionSubtext = Parser.parseSectionMoviesSize(response)
 
-                    sectionView.adapter = MoviesAdapter(movies)
+                        adapter = MoviesAdapter(movies).apply {
+                            onMovieClick {
+                                val movieFragment = MovieFragment.newInstance(it)
+                                startFragment(movieFragment)
+                            }
+                        }
 
-                    sectionView.openListener = object : SectionView.OpenListener {
-                        override fun onOpen() {
+                        onOpen {
                             val args = MoviesFragment.Arguments().apply {
                                 title = sectionView.sectionName
                                 url = urls[i]
@@ -179,7 +184,6 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
             requestQueue.add(stringRequest)
         }
     }
-
 
 }
 

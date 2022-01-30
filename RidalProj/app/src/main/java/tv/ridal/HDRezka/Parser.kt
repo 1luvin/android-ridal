@@ -268,6 +268,11 @@ class Parser
             return mi
         }
 
+        fun parseMovieInfo(html: String) : Movie.Info
+        {
+            return parseMovieInfo(Jsoup.parse(html))
+        }
+
         /*
             Результаты поиска
          */

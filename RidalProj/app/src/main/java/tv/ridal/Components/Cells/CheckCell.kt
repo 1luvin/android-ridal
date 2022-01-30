@@ -1,5 +1,6 @@
 package tv.ridal.Components.Cells
 
+import android.animation.AnimatorSet
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
@@ -16,7 +17,6 @@ import tv.ridal.Utils.Utils
 
 class CheckCell(context: Context) : FrameLayout(context)
 {
-
     private var checkView: ImageView
 
     private var textView: TextView
@@ -32,6 +32,10 @@ class CheckCell(context: Context) : FrameLayout(context)
 
     var isChecked = false
         private set
+
+    private var textAnimator: AnimatorSet? = null
+    private var checkAnimator: ValueAnimator? = null
+    private val ANIM_DURATION: Long = 190L
 
     init
     {
@@ -92,15 +96,16 @@ class CheckCell(context: Context) : FrameLayout(context)
 
         if (animated)
         {
-            animateCheckChange()
             animateTextChange()
+            animateCheckChange()
         }
         else
         {
+            val v = if (checked) 1F else 0F
             checkView.apply {
-                scaleX = if (checked) 1F else 0F
-                scaleY = if (checked) 1F else 0F
-                alpha = if (checked) 1F else 0F
+                scaleX = v
+                scaleY = v
+                alpha = v
             }
             textView.apply {
                 setTextColor( if (checked) textColorChecked else textColor )
@@ -120,18 +125,6 @@ class CheckCell(context: Context) : FrameLayout(context)
             textColorChecked
         }
 
-        ValueAnimator.ofInt(startColor, endColor).apply {
-            duration = 200L
-            setEvaluator(ArgbEvaluator())
-
-            addUpdateListener {
-                val animatedColor = it.animatedValue as Int
-                textView.setTextColor(animatedColor)
-            }
-
-            start()
-        }
-
         val startTranslation = textView.translationX
         val endTranslation = if (isChecked) {
             - Utils.dp(19F + 10F)
@@ -139,13 +132,26 @@ class CheckCell(context: Context) : FrameLayout(context)
             0F
         }
 
-        ValueAnimator.ofFloat(startTranslation, endTranslation).apply {
-            duration = 200L
+        textAnimator?.cancel()
+        textAnimator = AnimatorSet().apply {
+            duration = ANIM_DURATION
 
-            addUpdateListener {
-                val animatedTranslation = it.animatedValue as Float
-                textView.translationX = animatedTranslation
-            }
+            playTogether(
+                ValueAnimator.ofInt(startColor, endColor).apply {
+                    setEvaluator(ArgbEvaluator())
+
+                    addUpdateListener {
+                        val animatedColor = it.animatedValue as Int
+                        textView.setTextColor(animatedColor)
+                    }
+                },
+                ValueAnimator.ofFloat(startTranslation, endTranslation).apply {
+                    addUpdateListener {
+                        val animatedTranslation = it.animatedValue as Float
+                        textView.translationX = animatedTranslation
+                    }
+                }
+            )
 
             start()
         }
@@ -160,16 +166,17 @@ class CheckCell(context: Context) : FrameLayout(context)
             1F
         }
 
-        ValueAnimator.ofFloat(startScale, endScale).apply {
-            duration = 200L
+        checkAnimator?.cancel()
+        checkAnimator = ValueAnimator.ofFloat(startScale, endScale).apply {
+            duration = ANIM_DURATION
 
             addUpdateListener {
-                val animatedScale = it.animatedValue as Float
+                val animatedScaleAlpha = it.animatedValue as Float
 
                 checkView.apply {
-                    scaleX = animatedScale
-                    scaleY = animatedScale
-                    alpha = animatedScale
+                    scaleX = animatedScaleAlpha
+                    scaleY = animatedScaleAlpha
+                    alpha = animatedScaleAlpha
                 }
             }
 

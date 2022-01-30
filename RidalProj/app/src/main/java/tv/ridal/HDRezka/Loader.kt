@@ -1,10 +1,13 @@
 package tv.ridal.HDRezka
 
 import android.content.Context
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.view.View
 import coil.imageLoader
 import coil.request.ImageRequest
+import coil.transition.TransitionTarget
 import tv.ridal.Application.ApplicationLoader
 
 class Loader
