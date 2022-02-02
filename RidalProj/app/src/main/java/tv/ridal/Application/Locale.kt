@@ -130,7 +130,7 @@ class Locale
         /*
             Ключи для строк
          */
-
+        
         const val text_sett = "text_sett"
         const val text_visualAppearance = "text_visualAppearance"
         const val text_darkTheme = "text_darkTheme"
