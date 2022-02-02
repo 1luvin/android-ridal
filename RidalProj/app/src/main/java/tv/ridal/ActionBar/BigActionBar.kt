@@ -84,7 +84,6 @@ class BigActionBar(context: Context) : FrameLayout(context)
         )
     }
 
-
     class Menu(context: Context) : LinearLayout(context)
     {
         init
@@ -125,10 +124,7 @@ class BigActionBar(context: Context) : FrameLayout(context)
             }
         }
 
-        private fun itemsCount(): Int
-        {
-            return this.childCount
-        }
+        private fun itemsCount(): Int = this.childCount
 
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
         {

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.ScrollView
@@ -80,13 +81,11 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
 
         containerLayout.addView(createScreenTitleView())
 
-
         for (i in HDRezka.SECTION_URLS.indices)
         {
             sectionViews.add( SectionView(requireContext()) )
             containerLayout.addView(sectionViews[i])
         }
-
 
         loadSections()
     }
@@ -99,6 +98,12 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
     override fun onResume()
     {
         super.onResume()
+
+//        requireActivity().window.apply {
+//            decorView.systemUiVisibility =
+//                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//            statusBarColor = Theme.COLOR_TRANSPARENT
+//        }
 
         requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }

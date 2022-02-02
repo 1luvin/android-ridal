@@ -138,7 +138,7 @@ class CheckCell(context: Context) : FrameLayout(context)
 
             playTogether(
                 ValueAnimator.ofInt(startColor, endColor).apply {
-                    setEvaluator(ArgbEvaluator())
+                    setEvaluator( ArgbEvaluator() )
 
                     addUpdateListener {
                         val animatedColor = it.animatedValue as Int

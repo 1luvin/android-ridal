@@ -33,6 +33,10 @@ class ActionBar(context: Context) : FrameLayout(context)
             setOnTouchListener(InstantPressListener(this))
         }
 
+        val x = TextView(context).apply {
+
+        }
+
         this.addView(actionButtonView)
     }
 
@@ -141,6 +145,7 @@ class ActionBar(context: Context) : FrameLayout(context)
     var subtitle: String = ""
         set(value) {
             field = value
+
             if (subtitleView == null) createSubtitleView()
             subtitleView!!.text = subtitle
         }
@@ -158,7 +163,7 @@ class ActionBar(context: Context) : FrameLayout(context)
 
     init
     {
-
+        println("FDSFSDJHFSDVJGSDGSDGSDGSDGSDGSDGGSD $x")
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)

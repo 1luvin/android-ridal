@@ -7,6 +7,7 @@ import org.jsoup.select.Elements
 
 class Parser
 {
+
     companion object
     {
 

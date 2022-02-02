@@ -42,9 +42,11 @@ class InstantPressListener(private val ofView: View) : View.OnTouchListener
             {
 //                v.background?.setHotspot(event.x, event.y)
 //                v.isPressed = true
-                alphaAnimator.cancel()
-                alphaAnimator.setFloatValues(ofView.alpha, ALPHA_PRESSED)
-                alphaAnimator.start()
+                alphaAnimator.apply {
+                    cancel()
+                    setFloatValues(ofView.alpha, ALPHA_PRESSED)
+                    start()
+                }
 
                 scaleAnimator.apply {
                     cancel()
