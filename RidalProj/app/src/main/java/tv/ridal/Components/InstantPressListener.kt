@@ -2,21 +2,18 @@ package tv.ridal.Components
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
-import android.graphics.ColorFilter
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
-import tv.ridal.Application.Theme
+import android.view.animation.DecelerateInterpolator
 
 class InstantPressListener(private val ofView: View) : View.OnTouchListener
 {
     private val ALPHA_PRESSED: Float = 0.6F
 
     private val alphaAnimator: ValueAnimator = ValueAnimator().apply {
+        duration = 100
         setEvaluator( ArgbEvaluator() )
-        setDuration(100)
 
         addUpdateListener {
             val animatedAlpha = it.animatedValue as Float
@@ -25,7 +22,7 @@ class InstantPressListener(private val ofView: View) : View.OnTouchListener
     }
 
     private val scaleAnimator: ValueAnimator = ValueAnimator().apply {
-        setDuration(100)
+        duration = 100
 
         addUpdateListener {
             val animatedScale = it.animatedValue as Float
@@ -34,14 +31,34 @@ class InstantPressListener(private val ofView: View) : View.OnTouchListener
         }
     }
 
+    private fun cancelPress()
+    {
+        if ( ! wasPressed ) return
+        wasPressed = false
+
+        alphaAnimator.apply {
+            cancel()
+            setFloatValues(ofView.alpha, ALPHA_PRESSED, 1F)
+            start()
+        }
+
+        scaleAnimator.apply {
+            cancel()
+            setFloatValues(ofView.scaleX, 0.98F, 1F)
+            start()
+        }
+    }
+
+    private var wasPressed: Boolean = false
+
     override fun onTouch(v: View, event: MotionEvent): Boolean
     {
         when (event.action)
         {
             MotionEvent.ACTION_DOWN ->
             {
-//                v.background?.setHotspot(event.x, event.y)
-//                v.isPressed = true
+                wasPressed = true
+
                 alphaAnimator.apply {
                     cancel()
                     setFloatValues(ofView.alpha, ALPHA_PRESSED)
@@ -57,36 +74,25 @@ class InstantPressListener(private val ofView: View) : View.OnTouchListener
             }
             MotionEvent.ACTION_UP ->
             {
-                alphaAnimator.apply {
-                    cancel()
-                    setFloatValues(ofView.alpha, 1F)
-                    start()
-                }
+                cancelPress()
 
-                scaleAnimator.apply {
-                    cancel()
-                    setFloatValues(ofView.scaleX, 1F)
-                    start()
-                }
-//                pressAnimator.reverse()
                 if (isUpInside(event)) {
                     ofView.performClick()
                 }
+
                 return true
             }
             MotionEvent.ACTION_CANCEL ->
             {
-                alphaAnimator.apply {
-                    cancel()
-                    setFloatValues(ofView.alpha, 1F)
-                    start()
+                cancelPress()
+                return true
+            }
+            MotionEvent.ACTION_MOVE ->
+            {
+                if ( ! isUpInside(event)) {
+                    cancelPress()
                 }
-
-                scaleAnimator.apply {
-                    cancel()
-                    setFloatValues(ofView.scaleX, 1F)
-                    start()
-                }
+                return true
             }
         }
         return false

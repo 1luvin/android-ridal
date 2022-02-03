@@ -21,7 +21,7 @@ class LayoutHelper
         fun createFrame(width: Int, height: Int, gravity: Int, leftMargin: Int, topMargin: Int, rightMargin: Int, bottomMargin: Int): FrameLayout.LayoutParams
         {
             return FrameLayout.LayoutParams(size(width), size(height), gravity).apply {
-                setMargins(Utils.dp(leftMargin), Utils.dp(topMargin), Utils.dp(rightMargin), Utils.dp(bottomMargin))
+                setMargins(size(leftMargin), size(topMargin), size(rightMargin), size(bottomMargin))
             }
         }
         fun createFrame(width: Int, height: Int, gravity: Int) : FrameLayout.LayoutParams

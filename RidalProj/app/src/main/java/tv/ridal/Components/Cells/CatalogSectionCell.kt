@@ -37,8 +37,6 @@ class CatalogSectionCell(context: Context) : FrameLayout(context)
         isClickable = true
         setOnTouchListener( InstantPressListener(this) )
 
-        background = Theme.createRectSelector(Theme.color_bg)
-
         sectionNameView = TextView(context).apply {
             setTextColor(Theme.color(Theme.color_text))
             textSize = 21F

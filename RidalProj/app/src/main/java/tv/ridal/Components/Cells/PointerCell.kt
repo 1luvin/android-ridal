@@ -30,8 +30,6 @@ class PointerCell : FrameLayout(ApplicationActivity.instance())
         isClickable = true
         setOnTouchListener(InstantPressListener(this))
 
-        background = Theme.createRectSelector(Theme.color_bg)
-
         textView = TextView(context).apply {
             setTextColor(Theme.color(Theme.color_text))
             textSize = 17F

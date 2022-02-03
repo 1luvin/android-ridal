@@ -70,9 +70,9 @@ class EmptyFolderCell(context: Context) : FrameLayout(context)
         pointerImage = ImageView(context).apply {
             setImageDrawable(pointerDrawable)
 
-            background = Theme.createRectSelector(Theme.color_bigActionBar_item_bg, FloatArray(4).apply {
+            background = Theme.createRect(Theme.color_bigActionBar_item_bg, radii = FloatArray(4).apply {
                 fill(Utils.dp(10F))
-            }, true)
+            })
 
             scaleType = ImageView.ScaleType.CENTER
 

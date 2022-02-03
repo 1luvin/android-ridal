@@ -116,10 +116,6 @@ class BigActionBar(context: Context) : FrameLayout(context)
                 isClickable = true
                 setOnTouchListener(InstantPressListener(this))
 
-                background = Theme.createRectSelector(Theme.color_bigActionBar_item_bg, FloatArray(4).apply {
-                    fill(Utils.dp(10F))
-                }, true)
-
                 scaleType = ImageView.ScaleType.CENTER
             }
         }

@@ -27,11 +27,13 @@ import tv.ridal.ActionBar.ActionBar
 import tv.ridal.Application.Locale
 import tv.ridal.Components.Cells.FilterCell
 import tv.ridal.Components.GridSpacingItemDecoration
+import tv.ridal.Components.InstantPressListener
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.Components.Layout.SingleCheckGroup
 import tv.ridal.Components.Popup.BottomPopup
 import tv.ridal.HDRezka.*
 import tv.ridal.Utils.Utils
+import kotlin.math.abs
 
 class MoviesFragment : BaseFragment()
 {
@@ -375,7 +377,7 @@ class MoviesFragment : BaseFragment()
                 )
 
                 background = Theme.createRect(
-                    Theme.color_bg, floatArrayOf(
+                    Theme.color_bg, radii = floatArrayOf(
                         Utils.dp(12F), Utils.dp(12F), 0F, 0F
                     ))
             }
@@ -459,14 +461,6 @@ class MoviesFragment : BaseFragment()
         {
             currentView = toView
 
-            val alphaAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
-                addUpdateListener {
-                    val animatedAlpha = it.animatedValue as Float
-                    toView.alpha = animatedAlpha
-                    fromView.alpha = 1F - animatedAlpha
-                }
-            }
-
             toView.measure(0, 0)
             val endHeight = toView.measuredHeight
 
@@ -491,6 +485,14 @@ class MoviesFragment : BaseFragment()
             fromView.measure(0 ,0)
             val startHeight = fromView.measuredHeight
 
+            val alphaAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
+                addUpdateListener {
+                    val animatedAlpha = it.animatedValue as Float
+                    toView.alpha = animatedAlpha
+                    fromView.alpha = 1F - animatedAlpha
+                }
+            }
+
             val heightAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
                 addUpdateListener {
                     val animatedHeight = it.animatedValue as Int
@@ -501,7 +503,7 @@ class MoviesFragment : BaseFragment()
             }
 
             AnimatorSet().apply {
-                duration = 300L
+                duration = 320L + abs(endHeight - startHeight) / 40
                 interpolator = DecelerateInterpolator(1.1F)
 
                 addListener(object : AnimatorListenerAdapter() {
@@ -531,7 +533,10 @@ class MoviesFragment : BaseFragment()
                     }
                 })
 
-                playTogether(alphaAnimator, heightAnimator)
+                playTogether(
+                    alphaAnimator,
+                    heightAnimator
+                )
 
                 start()
             }
@@ -541,13 +546,13 @@ class MoviesFragment : BaseFragment()
         {
             return TextView(context).apply {
                 gravity = Gravity.CENTER
+                setOnTouchListener( InstantPressListener(this) )
 
-                background = Theme.createRectSelector(
+                background = Theme.createRect(
                     Theme.color_main,
-                    FloatArray(4).apply {
+                    radii = FloatArray(4).apply {
                         fill(Utils.dp(7F))
-                    },
-                    true
+                    }
                 )
 
                 this.text = Locale.text(Locale.text_showResults)
@@ -647,7 +652,7 @@ class MoviesFragment : BaseFragment()
                     }
                     addView(genreCell, LayoutHelper.createLinear(
                         LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-                        20, 15, 20, 0
+                        0, 15, 0, 0
                     ))
                 }
                 else if (hasSections())
@@ -668,7 +673,7 @@ class MoviesFragment : BaseFragment()
                 }
                 addView(sortingCell, LayoutHelper.createLinear(
                     LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-                    20, 15, 20, 10
+                    0, 15, 0, 10
                 ))
             }
 

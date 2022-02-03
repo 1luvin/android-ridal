@@ -23,11 +23,8 @@ import com.android.volley.toolbox.StringRequest
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Theme
 import tv.ridal.Components.Layout.LayoutHelper
-import tv.ridal.HDRezka.HDRezka
-import tv.ridal.HDRezka.Loader
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Parser
-import tv.ridal.Utils.Utils
 import kotlin.random.Random
 
 class MovieFragment : BaseFragment()

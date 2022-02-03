@@ -64,10 +64,9 @@ class SearchView(context: Context) : FrameLayout(context)
     init
     {
 
-        background = Theme.createOutlinedRect(
-            Theme.COLOR_TRANSPARENT,
-            Theme.Outline(Theme.alphaColor(Theme.color_main, 0.1F)),
-            FloatArray(4).apply {
+        background = Theme.createRect(
+            outline = Theme.Outline(Theme.alphaColor(Theme.color_main, 0.1F)),
+            radii = FloatArray(4).apply {
                 fill(10F)
             }
         )

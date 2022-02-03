@@ -4,7 +4,13 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.marginBottom
+import androidx.core.view.marginEnd
+import androidx.core.view.marginTop
+import androidx.core.view.updateLayoutParams
+import okhttp3.internal.Util
 import tv.ridal.Application.Theme
 import tv.ridal.ApplicationActivity
 import tv.ridal.Components.InstantPressListener
@@ -19,17 +25,19 @@ class FilterCell : FrameLayout(ApplicationActivity.instance())
     private var pointerView: ImageView
 
     var filterName: String = ""
-    set(value) {
-        field = value
+        set(value) {
+            field = value
 
-        nameView.text = filterName
-    }
+            nameView.text = filterName
+            requestLayout()
+        }
 
     var filterValue: String = ""
         set(value) {
             field = value
 
             valueView.text = filterValue
+            requestLayout()
         }
 
     init
@@ -37,17 +45,11 @@ class FilterCell : FrameLayout(ApplicationActivity.instance())
         isClickable = true
         setOnTouchListener(InstantPressListener(this))
 
-        background = Theme.createOutlinedRectSelector(
-            Theme.color(Theme.color_bg),
-            Theme.Outline(Theme.ripplizeColor(Theme.color_bg)),
-            FloatArray(4).apply {
-                fill(Utils.dp(10F))
-            }
-        )
+        setPadding(Utils.dp(20), Utils.dp(10), Utils.dp(15), Utils.dp(10))
 
         nameView = TextView(context).apply {
-            setTextColor(Theme.color(Theme.color_main))
-            textSize = 16F
+            setTextColor(Theme.color(Theme.color_text))
+            textSize = 17F
             typeface = Theme.typeface(Theme.tf_bold)
             setLines(1)
             maxLines = 1
@@ -56,13 +58,11 @@ class FilterCell : FrameLayout(ApplicationActivity.instance())
         }
         addView(nameView, LayoutHelper.createFrame(
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-            Gravity.START or Gravity.TOP,
-            15, 10, 15 + 24 + 15, 0)
-        )
+            Gravity.START or Gravity.CENTER_VERTICAL))
 
         valueView = TextView(context).apply {
-            setTextColor(Theme.color(Theme.color_text))
-            textSize = 17F
+            setTextColor(Theme.color(Theme.color_main))
+            textSize = 16.5F
             typeface = Theme.typeface(Theme.tf_normal)
             setLines(1)
             maxLines = 1
@@ -71,8 +71,8 @@ class FilterCell : FrameLayout(ApplicationActivity.instance())
         }
         addView(valueView, LayoutHelper.createFrame(
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-            Gravity.START or Gravity.TOP,
-            15, 10 + 16 + 5, 15 + 24 + 15, 10))
+            Gravity.END or Gravity.CENTER_VERTICAL,
+            0, 0, 24, 0))
 
         val pointerDrawable = Theme.drawable(R.drawable.pointer_forward, Theme.color_main)
         pointerView = ImageView(context).apply {
@@ -82,15 +82,30 @@ class FilterCell : FrameLayout(ApplicationActivity.instance())
         }
         addView(pointerView, LayoutHelper.createFrame(
             24, 24,
-            Gravity.END or Gravity.CENTER_VERTICAL,
-            15, 0, 15, 0))
+            Gravity.END or Gravity.CENTER_VERTICAL))
     }
+
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
     {
         super.onMeasure(
             MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec), MeasureSpec.UNSPECIFIED)
+        )
+
+        val availableWidth = measuredWidth - paddingLeft - paddingRight - Utils.dp(24)
+        var width = availableWidth / 2
+
+        valueView.measure(
+            MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST),
+            0
+        )
+
+        width = availableWidth - valueView.measuredWidth - Utils.dp(10)
+
+        nameView.measure(
+            MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST),
+            0
         )
     }
 }

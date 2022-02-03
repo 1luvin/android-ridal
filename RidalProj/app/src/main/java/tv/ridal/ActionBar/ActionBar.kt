@@ -163,7 +163,7 @@ class ActionBar(context: Context) : FrameLayout(context)
 
     init
     {
-        println("FDSFSDJHFSDVJGSDGSDGSDGSDGSDGSDGGSD $x")
+
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)

@@ -1,18 +1,11 @@
 package tv.ridal.Components.Popup
 
-import android.animation.Animator
-import android.animation.AnimatorSet
-import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.drawable.ShapeDrawable
 import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.core.view.updateLayoutParams
-import androidx.transition.TransitionValues
-import androidx.transition.Visibility
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import tv.ridal.Application.Theme
@@ -85,7 +78,7 @@ open class BottomPopup(context: Context) : BottomSheetDialog(context, R.style.Bo
                 )
             }
 
-            val holder = Theme.createRect(Theme.color_popup_holder, FloatArray(4).apply {
+            val holder = Theme.createRect(Theme.color_popup_holder, radii = FloatArray(4).apply {
                 fill(Utils.dp(4F))
             })
             (holder as ShapeDrawable).apply {

@@ -3,17 +3,10 @@ package tv.ridal.Application
 import android.content.res.ColorStateList
 import android.graphics.*
 import android.graphics.drawable.*
-import android.graphics.drawable.shapes.RectShape
-import android.graphics.drawable.shapes.RoundRectShape
 import android.util.StateSet
-import androidx.annotation.FloatRange
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.toBitmap
-import androidx.core.view.WindowInsetsControllerCompat
-import tv.ridal.ApplicationActivity
 import tv.ridal.Utils.Utils
-import kotlin.math.ceil
 
 class Theme
 {
@@ -23,6 +16,7 @@ class Theme
         const val COLOR_WHITE = 0xFFFFFFFF.toInt()
         const val COLOR_BLACK = 0xFF000000.toInt()
 
+        const val COLOR_TWITCH = 0xFF7C24FF.toInt()
         const val COLOR_LIGHT_CHERRY = 0xFFFF005F.toInt()
 
         const val LIGHT: Int = 0
@@ -68,7 +62,7 @@ class Theme
 
         // светлая тема
         private val lightColors = HashMap<String, Int>().apply {
-            this[color_main] = 0xFF00B2FF.toInt()
+            this[color_main] = COLOR_TWITCH
             this[color_bg] = 0xFFFFFFFF.toInt()
             this[color_text] = 0xFF000000.toInt()
             this[color_text2] = 0xFF666666.toInt()
@@ -78,7 +72,7 @@ class Theme
             this[color_searchResult_worst] = 0xFFFF0000.toInt()
 
             this[color_bottomNavIcon_inactive] = 0xFFAAAAAA.toInt()
-            this[color_bottomNavIcon_active] = 0xFF00B2FF.toInt()
+            this[color_bottomNavIcon_active] = COLOR_TWITCH
 
             this[color_actionBar_back] = 0xFF666666.toInt()
 
@@ -230,57 +224,25 @@ class Theme
             return createCircleSelector(color(colorKey), radius)
         }
 
-        fun createRect(color: Int, radii: FloatArray? = null) : Drawable
+        /*
+            Rect
+         */
+
+        fun createRect(color: Int, outline: Outline? = null, radii: FloatArray? = null) : Drawable
         {
-            val radiiArray = FloatArray(8)
-            if (radii != null) {
-                for (i in radii.indices)
-                {
-                    radiiArray[i*2] = radii[i]
-                    radiiArray[i*2 + 1] = radii[i]
-                }
-            }
-
-            return ShapeDrawable(RoundRectShape(radiiArray, null, null)).apply {
-                paint.color = color
-            }
-        }
-        fun createRect(colorKey: String, radii: FloatArray? = null) : Drawable
-        {
-            return createRect(color(colorKey), radii)
-        }
-
-        fun createRectSelector(color: Int, radii: FloatArray? = null, fillAfter: Boolean = false) : Drawable
-        {
-            val colorStateList = ColorStateList(
-                arrayOf(StateSet.WILD_CARD),
-                intArrayOf(ripplizeColor(color))
-            )
-
-            val radiiArray = FloatArray(8)
-            if (radii != null) {
-                for (i in 0 until radii.size)
-                {
-                    radiiArray[i*2] = radii[i]
-                    radiiArray[i*2 + 1] = radii[i]
-                }
-            }
-
-            val defDrawable = Theme.createRect(
-                if (fillAfter) color else COLOR_TRANSPARENT,
+            return createRect(
+                Fill( intArrayOf(color, color) ),
+                outline,
                 radii
             )
-
-            val rippleDrawable = ShapeDrawable(RoundRectShape(radiiArray, null, null))
-
-            return RippleDrawable(colorStateList, defDrawable, rippleDrawable)
         }
-        fun createRectSelector(colorKey: String, radii: FloatArray? = null, fillAfter: Boolean = false) : Drawable
+
+        fun createRect(colorKey: String, outline: Outline? = null, radii: FloatArray? = null) : Drawable
         {
-            return createRectSelector(color(colorKey), radii, fillAfter)
+            return createRect( color(colorKey), outline, radii )
         }
 
-        fun createOutlinedRect(fillColor: Int, outline: Outline, radii: FloatArray? = null) : Drawable
+        fun createRect(fill: Fill? = null, outline: Outline? = null, radii: FloatArray? = null) : Drawable
         {
             val radiiArray = FloatArray(8)
             if (radii != null) {
@@ -292,41 +254,21 @@ class Theme
             }
 
             return GradientDrawable().apply {
-                setColor(fillColor)
-                cornerRadii = radiiArray
-                setStroke(outline.width, outline.color)
-            }
-        }
-        fun createOutlinedRectSelector(fillColor: Int, outline: Outline, radii: FloatArray? = null) : Drawable
-        {
-            val colorStateList = ColorStateList(
-                arrayOf(StateSet.WILD_CARD),
-                intArrayOf(ripplizeColor(fillColor))
-            )
-
-            val radiiArray = FloatArray(8)
-            if (radii != null) {
-                for (i in radii.indices)
-                {
-                    radiiArray[i*2] = radii[i]
-                    radiiArray[i*2 + 1] = radii[i]
+                if (fill != null) {
+                    colors = fill.colors
+                    orientation = fill.orientation
                 }
+                if (outline != null) {
+                    setStroke(outline.width, outline.color)
+                }
+                cornerRadii = radiiArray
             }
-
-            val defDrawable = Theme.createOutlinedRect(
-                fillColor,
-                outline,
-                radii
-            )
-
-            val rippleDrawable = ShapeDrawable(RoundRectShape(radiiArray, null, null))
-
-            return RippleDrawable(colorStateList, defDrawable, rippleDrawable)
         }
 
     }
 
     data class Outline(val color: Int, val width: Int = Utils.dp(1))
+    data class Fill(val colors: IntArray, val orientation: GradientDrawable.Orientation = GradientDrawable.Orientation.LEFT_RIGHT)
 }
 
 

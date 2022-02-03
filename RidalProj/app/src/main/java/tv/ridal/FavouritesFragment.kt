@@ -174,7 +174,7 @@ class FavouritesFragment : BaseFragment()
         val popup = BottomPopup(requireContext())
 
         val actionBar = ActionBar(requireContext()).apply {
-            background = Theme.createRect(Theme.color_bg, FloatArray(4).apply {
+            background = Theme.createRect(Theme.color_bg, radii = FloatArray(4).apply {
                 fill(Utils.dp(16F))
             })
 
@@ -196,7 +196,7 @@ class FavouritesFragment : BaseFragment()
         val contentView = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.VERTICAL
 
-            background = Theme.createRect(Theme.color_bg, floatArrayOf(
+            background = Theme.createRect(Theme.color_bg, radii = floatArrayOf(
                 Utils.dp(12F), Utils.dp(12F), 0F, 0F
             ))
 
@@ -218,7 +218,7 @@ class FavouritesFragment : BaseFragment()
         val popup = BottomPopup(requireContext())
 
         val actionBar = ActionBar(requireContext()).apply {
-            background = Theme.createRect(Theme.color_bg, FloatArray(4).apply {
+            background = Theme.createRect(Theme.color_bg, radii = FloatArray(4).apply {
                 fill(Utils.dp(16F))
             })
 
@@ -240,7 +240,7 @@ class FavouritesFragment : BaseFragment()
         val contentView = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.VERTICAL
 
-            background = Theme.createRect(Theme.color_bg, floatArrayOf(
+            background = Theme.createRect(Theme.color_bg, radii = floatArrayOf(
                 Utils.dp(12F), Utils.dp(12F), 0F, 0F
             ))
 

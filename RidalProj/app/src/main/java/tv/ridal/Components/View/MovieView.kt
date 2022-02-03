@@ -1,7 +1,5 @@
 package tv.ridal.Components.View
 
-import android.animation.Animator
-import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
@@ -11,12 +9,10 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.children
 import tv.ridal.Application.Theme
 import tv.ridal.Components.InstantPressListener
 import tv.ridal.Components.Layout.LayoutHelper
 import tv.ridal.HDRezka.Loader
-import tv.ridal.R
 import tv.ridal.Utils.Utils
 import kotlin.math.ceil
 
@@ -91,8 +87,7 @@ class MovieView(context: Context) : FrameLayout(context)
         isClickable = true
         setOnTouchListener(InstantPressListener(this))
 
-        background = Theme.createRect(Theme.color(Theme.color_bg))
-        foreground = Theme.createRectSelector(Theme.color(Theme.color_main))
+        background = Theme.createRect(Theme.color_bg)
 
         posterView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.FIT_XY
@@ -105,7 +100,7 @@ class MovieView(context: Context) : FrameLayout(context)
         movieTypeView = TextView(context).apply {
             setPadding(Utils.dp(5), Utils.dp(2), Utils.dp(5), Utils.dp(2))
 
-            background = Theme.createRect(Theme.alphaColor(Theme.COLOR_LIGHT_CHERRY, 0.7F), floatArrayOf(
+            background = Theme.createRect(Theme.alphaColor(Theme.COLOR_LIGHT_CHERRY, 0.7F), radii = floatArrayOf(
                 0F, 0F, 0F, Utils.dp(7F)
             ))
 
