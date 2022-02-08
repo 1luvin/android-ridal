@@ -23,6 +23,7 @@ class HDRezka
             )
 
         const val RATINGS = "Рейтинги"
+        const val IN_LISTS = "Входит в спписки"
         const val SLOGAN = "Слоган"
         const val RELEASE_DATE = "Дата выхода"
         const val COUNTRY = "Страна"

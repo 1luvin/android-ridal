@@ -1,20 +1,14 @@
-package tv.ridal.Components.Cells
+package tv.ridal.Ui.Cells
 
 import android.text.TextUtils
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.marginBottom
-import androidx.core.view.marginEnd
-import androidx.core.view.marginTop
-import androidx.core.view.updateLayoutParams
-import okhttp3.internal.Util
 import tv.ridal.Application.Theme
 import tv.ridal.ApplicationActivity
-import tv.ridal.Components.InstantPressListener
-import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Ui.InstantPressListener
+import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.R
 import tv.ridal.Utils.Utils
 

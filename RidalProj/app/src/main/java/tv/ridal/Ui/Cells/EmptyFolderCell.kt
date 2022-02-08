@@ -1,4 +1,4 @@
-package tv.ridal.Components.Cells
+package tv.ridal.Ui.Cells
 
 import android.content.Context
 import android.text.TextUtils
@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
-import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.R
 import tv.ridal.Utils.Utils
 

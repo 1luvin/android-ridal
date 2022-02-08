@@ -1,8 +1,8 @@
-package tv.ridal.Components.Layout
+package tv.ridal.Ui.Layout
 
 import android.content.Context
 import android.widget.LinearLayout
-import tv.ridal.Components.Cells.CheckCell
+import tv.ridal.Ui.Cells.CheckCell
 
 class SingleCheckGroup(context: Context) : LinearLayout(context)
 {

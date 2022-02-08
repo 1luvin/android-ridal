@@ -1,4 +1,4 @@
-package tv.ridal.Components.Cells
+package tv.ridal.Ui.Cells
 
 import android.content.Context
 import android.text.TextUtils
@@ -6,7 +6,7 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.TextView
 import tv.ridal.Application.Theme
-import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.Utils.Utils
 
 class SearchResultCell(context: Context) : FrameLayout(context)

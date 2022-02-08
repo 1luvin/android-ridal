@@ -1,9 +1,9 @@
-package tv.ridal.Components.View
+package tv.ridal.Ui.View
 
 import android.content.Context
 import android.widget.LinearLayout
 import tv.ridal.Adapters.MoviesAdapter
-import tv.ridal.Components.Cells.CatalogSectionCell
+import tv.ridal.Ui.Cells.CatalogSectionCell
 
 class SectionView(context: Context) : LinearLayout(context)
 {

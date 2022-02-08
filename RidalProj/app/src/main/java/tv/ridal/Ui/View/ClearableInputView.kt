@@ -1,17 +1,16 @@
-package tv.ridal.Components.View
+package tv.ridal.Ui.View
 
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.text.Editable
 import android.text.InputType
-import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import tv.ridal.Application.Theme
-import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.R
 
 class ClearableInputView(context: Context) : FrameLayout(context)

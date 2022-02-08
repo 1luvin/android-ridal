@@ -1,4 +1,4 @@
-package tv.ridal.Components.Cells
+package tv.ridal.Ui.Cells
 
 import android.animation.AnimatorSet
 import android.animation.ArgbEvaluator
@@ -10,8 +10,8 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import tv.ridal.Application.Theme
-import tv.ridal.Components.InstantPressListener
-import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Ui.InstantPressListener
+import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.R
 import tv.ridal.Utils.Utils
 

@@ -1,4 +1,4 @@
-package tv.ridal.Components.View
+package tv.ridal.Ui.View
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -6,9 +6,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.LinearGradient
 import android.graphics.Shader
-import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
-import android.view.animation.LinearInterpolator
 import android.widget.TextView
 import tv.ridal.Application.Theme
 

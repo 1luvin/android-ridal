@@ -22,7 +22,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Theme
-import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Parser
 import kotlin.random.Random
@@ -147,6 +147,8 @@ class MovieFragment : BaseFragment()
 
             context.imageLoader.enqueue(request)
         }
+
+        //
     }
 
 
@@ -156,7 +158,8 @@ class MovieFragment : BaseFragment()
 
         private var topGradientPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-        fun setPoster(drawable: Drawable) {
+        fun setPoster(drawable: Drawable)
+        {
             posterView.setImageDrawable(drawable)
             invalidate()
         }

@@ -15,11 +15,11 @@ import tv.ridal.Adapters.SearchAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
-import tv.ridal.Components.GridSpacingItemDecoration
-import tv.ridal.Components.Layout.LayoutHelper
-import tv.ridal.Components.Popup.PopupFrame
-import tv.ridal.ActionBar.BigActionBar
-import tv.ridal.Components.View.SearchView
+import tv.ridal.Ui.GridSpacingItemDecoration
+import tv.ridal.Ui.Layout.LayoutHelper
+import tv.ridal.Ui.Popup.PopupFrame
+import tv.ridal.Ui.ActionBar.BigActionBar
+import tv.ridal.Ui.View.SearchView
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Parser

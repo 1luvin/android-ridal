@@ -1,20 +1,16 @@
-package tv.ridal.ActionBar
+package tv.ridal.Ui.ActionBar
 
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.view.Gravity
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.marginLeft
-import androidx.core.view.marginRight
-import androidx.core.view.updateLayoutParams
 import tv.ridal.Application.Theme
-import tv.ridal.Components.InstantPressListener
-import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Ui.InstantPressListener
+import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.Utils.Utils
 
 class BigActionBar(context: Context) : FrameLayout(context)

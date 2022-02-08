@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.ScrollView
@@ -18,9 +17,9 @@ import tv.ridal.Adapters.MoviesAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
-import tv.ridal.Components.Layout.LayoutHelper
-import tv.ridal.ActionBar.BigActionBar
-import tv.ridal.Components.View.SectionView
+import tv.ridal.Ui.Layout.LayoutHelper
+import tv.ridal.Ui.ActionBar.BigActionBar
+import tv.ridal.Ui.View.SectionView
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Parser
 

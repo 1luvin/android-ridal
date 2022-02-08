@@ -1,9 +1,8 @@
-package tv.ridal.Components.Layout
+package tv.ridal.Ui.Layout
 
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import tv.ridal.Utils.Utils
 
 class LayoutHelper

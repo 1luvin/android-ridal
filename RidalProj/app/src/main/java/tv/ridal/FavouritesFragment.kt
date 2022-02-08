@@ -12,18 +12,18 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import tv.ridal.ActionBar.ActionBar
-import tv.ridal.ActionBar.BigActionBar
+import tv.ridal.Ui.ActionBar.ActionBar
+import tv.ridal.Ui.ActionBar.BigActionBar
 import tv.ridal.Application.Database.ApplicationDatabase
 import tv.ridal.Application.Database.Database
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
-import tv.ridal.Components.Cells.CatalogSectionCell
-import tv.ridal.Components.Cells.EmptyFolderCell
-import tv.ridal.Components.Layout.LayoutHelper
-import tv.ridal.Components.Popup.BottomPopup
-import tv.ridal.Components.View.ClearableInputView
-import tv.ridal.Components.View.LoadingTextView
+import tv.ridal.Ui.Cells.CatalogSectionCell
+import tv.ridal.Ui.Cells.EmptyFolderCell
+import tv.ridal.Ui.Layout.LayoutHelper
+import tv.ridal.Ui.Popup.BottomPopup
+import tv.ridal.Ui.View.ClearableInputView
+import tv.ridal.Ui.View.LoadingTextView
 import tv.ridal.Utils.Utils
 import java.util.*
 

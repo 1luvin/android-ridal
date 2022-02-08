@@ -1,4 +1,4 @@
-package tv.ridal.Components.Popup
+package tv.ridal.Ui.Popup
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
@@ -6,7 +6,7 @@ import android.content.Context
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import tv.ridal.Application.Theme
-import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Ui.Layout.LayoutHelper
 
 class PopupFrame(context: Context) : FrameLayout(context)
 {

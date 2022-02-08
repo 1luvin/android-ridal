@@ -1,4 +1,4 @@
-package tv.ridal.Components.Cells
+package tv.ridal.Ui.Cells
 
 import android.text.TextUtils
 import android.view.Gravity
@@ -7,8 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import tv.ridal.Application.Theme
 import tv.ridal.ApplicationActivity
-import tv.ridal.Components.InstantPressListener
-import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Ui.InstantPressListener
+import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.R
 import tv.ridal.Utils.Utils
 
@@ -30,6 +30,8 @@ class PointerCell : FrameLayout(ApplicationActivity.instance())
         isClickable = true
         setOnTouchListener(InstantPressListener(this))
 
+        setPadding(Utils.dp(20), 0, Utils.dp(20), 0)
+
         textView = TextView(context).apply {
             setTextColor(Theme.color(Theme.color_text))
             textSize = 17F
@@ -42,10 +44,10 @@ class PointerCell : FrameLayout(ApplicationActivity.instance())
         addView(textView, LayoutHelper.createFrame(
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.CENTER_VERTICAL,
-            20, 0, 15 + 24 + 20, 0
+            0, 0, 15 + 24, 0
         ))
 
-        val pointerDrawable = Theme.drawable(R.drawable.pointer_forward_mini, Theme.color_main)
+        val pointerDrawable = Theme.drawable(R.drawable.pointer_forward, Theme.color_main)
         pointerView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.CENTER
 
@@ -53,8 +55,7 @@ class PointerCell : FrameLayout(ApplicationActivity.instance())
         }
         addView(pointerView, LayoutHelper.createFrame(
             24, 24,
-            Gravity.END or Gravity.CENTER_VERTICAL,
-            15, 0, 20, 0))
+            Gravity.END or Gravity.CENTER_VERTICAL))
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)

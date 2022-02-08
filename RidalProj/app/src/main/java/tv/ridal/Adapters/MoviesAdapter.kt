@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import tv.ridal.ApplicationActivity
 import tv.ridal.CatalogFragment
-import tv.ridal.Components.Layout.LayoutHelper
-import tv.ridal.Components.View.MovieView
+import tv.ridal.Ui.Layout.LayoutHelper
+import tv.ridal.Ui.View.MovieView
 import tv.ridal.HDRezka.Movie
 import tv.ridal.SearchFragment
 
@@ -20,7 +20,8 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
     {
-        init {
+        init
+        {
             val movieView = itemView as MovieView
             movieView.apply {
                 setOnClickListener {

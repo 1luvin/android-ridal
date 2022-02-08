@@ -36,7 +36,7 @@ data class Movie(val name: String, val posterUrl: String, val type: Type, val ur
         var inCollections: ArrayList<List>? = null
         // В ролях актеры
         var actors: ArrayList<Person>? = null
-
+        // Описание
         var description: Description? = null
 
     }

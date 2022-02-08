@@ -1,4 +1,4 @@
-package tv.ridal.Components.View
+package tv.ridal.Ui.View
 
 import android.content.Context
 import android.graphics.Rect

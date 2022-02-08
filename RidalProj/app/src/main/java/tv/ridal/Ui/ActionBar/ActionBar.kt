@@ -1,4 +1,4 @@
-package tv.ridal.ActionBar
+package tv.ridal.Ui.ActionBar
 
 import android.content.Context
 import android.graphics.Typeface
@@ -10,8 +10,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import tv.ridal.Application.Theme
-import tv.ridal.Components.InstantPressListener
-import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Ui.InstantPressListener
+import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.Utils.Utils
 import kotlin.math.max
 

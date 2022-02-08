@@ -1,11 +1,10 @@
-package tv.ridal.Components
+package tv.ridal.Ui
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
-import android.view.animation.DecelerateInterpolator
 
 class InstantPressListener(private val ofView: View) : View.OnTouchListener
 {

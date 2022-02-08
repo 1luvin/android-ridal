@@ -9,7 +9,7 @@ class Genre
         fun createGenres(section: String) : ArrayList<String>
         {
             var genres = ArrayList<String>().apply {
-                ensureCapacity(20) // минимальное количество фильтров (секция Мультфильмы)
+                ensureCapacity(20) // минимальное количество фильтров (категория Мультфильмы)
 
                 add(Locale.text(Locale.text_allGenres))
                 add(Locale.text(Locale.genre_fiction))

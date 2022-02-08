@@ -1,4 +1,4 @@
-package tv.ridal.Components.Popup
+package tv.ridal.Ui.Popup
 
 import android.content.Context
 import android.graphics.drawable.ShapeDrawable
@@ -9,7 +9,7 @@ import android.widget.ImageView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import tv.ridal.Application.Theme
-import tv.ridal.Components.Layout.LayoutHelper
+import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.R
 import tv.ridal.Utils.Utils
 

@@ -163,6 +163,21 @@ class Parser
                             mi.ratings!!.add(rating)
                         }
                     }
+                    HDRezka.IN_LISTS -> {
+                        val aTags = tdData.getElementsByTag("a")
+                        if (aTags.size == 0) break
+
+                        mi.inLists = ArrayList()
+
+                        for (aTag in aTags)
+                        {
+                            val list = Movie.List().apply {
+                                name = aTag.text()
+                                url = aTag.attr("href")
+                            }
+                            mi.inLists!!.add(list)
+                        }
+                    }
                     HDRezka.SLOGAN -> {
                         mi.slogan = tdData.text()
                     }
@@ -274,9 +289,11 @@ class Parser
             return parseMovieInfo(Jsoup.parse(html))
         }
 
+
         /*
             Результаты поиска
          */
+
         fun parseSearchResults(doc: Document): ArrayList<SearchResult>?
         {
             val results = ArrayList<SearchResult>().apply {
@@ -346,6 +363,10 @@ class Parser
             return parseSearchResults(Jsoup.parse(html))
         }
 
+
+        /*
+            Количество единиц кино
+         */
 
         fun parseSectionMoviesSize(doc: Document) : String
         {
