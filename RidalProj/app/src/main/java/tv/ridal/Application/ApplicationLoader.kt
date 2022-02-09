@@ -35,7 +35,7 @@ class ApplicationLoader : Application()
 
         INSTANCE = this
 
-        Theme.setTheme(Theme.LIGHT)
+        Theme.setTheme(Theme.DARK)
         Locale.setLocale(Locale.RU)
     }
 }

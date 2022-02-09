@@ -1,5 +1,8 @@
 package tv.ridal
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -9,12 +12,17 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.view.children
 import com.tunjid.androidx.navigation.Navigator
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.Ui.ActionBar.BigActionBar
 import tv.ridal.Utils.Utils
+
+import tv.ridal.Ui.colorKey
+import tv.ridal.Ui.getAllViews
+import java.lang.reflect.Field
 
 class SettingsFragment : BaseFragment(), Navigator.TagProvider
 {
@@ -41,6 +49,9 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
     private lateinit var rootLayout: RelativeLayout
     private lateinit var scroll: ScrollView
     private lateinit var containerLayout: LinearLayout
+    private lateinit var actionBar: BigActionBar
+
+    private lateinit var visualAppearanceSectionView: TextView
 
     private lateinit var darkThemeSwitch: SwitchCompat
 
@@ -78,9 +89,11 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
 
         //
 
-        containerLayout.addView(createScreenTitleView())
+        createActionBar()
+        containerLayout.addView(actionBar)
 
-        containerLayout.addView(createSectionView(Locale.text(Locale.text_visualAppearance)))
+        visualAppearanceSectionView = createSectionView( Locale.text(Locale.text_visualAppearance) )
+        containerLayout.addView( visualAppearanceSectionView )
 
         createDarkThemeSwitch()
         containerLayout.addView(darkThemeSwitch)
@@ -109,14 +122,14 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }
 
-    private fun createScreenTitleView() : View
+    private fun createActionBar()
     {
-        return BigActionBar(context).apply {
+        actionBar = BigActionBar(context).apply {
             title = Locale.text(Locale.text_sett)
         }
     }
 
-    private fun createSectionView(text: String) : View
+    private fun createSectionView(text: String) : TextView
     {
         return TextView(requireContext()).apply {
             layoutParams = ViewGroup.LayoutParams(
@@ -127,7 +140,7 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
 
             this.text = text
 
-            textSize = 16F
+            textSize = 17F
             typeface = Theme.typeface(Theme.tf_bold)
             setTextColor(Theme.color(Theme.color_main))
         }
@@ -156,6 +169,52 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
                     Color.GRAY
                 )
             ))
+
+            setOnCheckedChangeListener { buttonView, isChecked ->
+                switchTheme(isChecked)
+            }
+        }
+    }
+
+    private fun switchTheme(isDark: Boolean)
+    {
+        val views = rootLayout.getAllViews()
+        for (view in views)
+        {
+            if (view is TextView)
+            {
+                println( view.colorKey )
+            }
+        }
+
+        val fromColors = Theme.activeColors
+        val toTheme = if (isDark) 1 else 0
+        val toColors = Theme.colorsList[toTheme]
+
+        ValueAnimator.ofFloat(0F, 1F).apply {
+
+            addUpdateListener {
+
+                val animRatio = it.animatedValue as Float
+
+                rootLayout.apply {
+                    setBackgroundColor(
+                        Theme.mixColors( fromColors[Theme.color_bg]!!, toColors[Theme.color_bg]!!, animRatio )
+                    )
+                }
+
+                actionBar.titleColor = Theme.mixColors( fromColors[Theme.color_text]!!, toColors[Theme.color_text]!!, animRatio )
+            }
+
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+
+                    Theme.setTheme( toTheme )
+                }
+            })
+
+            start()
         }
     }
 

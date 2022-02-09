@@ -42,6 +42,7 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
     private lateinit var rootLayout: RelativeLayout
     private lateinit var scroll: ScrollView
     private lateinit var containerLayout: LinearLayout
+    private lateinit var actionBar: BigActionBar
 
     private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
 
@@ -78,7 +79,8 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
         scroll.addView(containerLayout)
         rootLayout.addView(scroll)
 
-        containerLayout.addView(createScreenTitleView())
+        createActionBar()
+        containerLayout.addView(actionBar)
 
         for (i in HDRezka.SECTION_URLS.indices)
         {
@@ -114,7 +116,7 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }
 
-    private fun createScreenTitleView() : View
+    private fun createActionBar()
     {
         val menu = BigActionBar.Menu(requireContext()).apply {
             addItem(Theme.drawable(R.drawable.invite, Theme.color_text)) {
@@ -127,13 +129,22 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
                 startActivity(shareIntent)
             }
             addItem(Theme.drawable(R.drawable.sett, Theme.color_text)) {
-                startFragment(
-                    SettingsFragment.newInstance()
+
+//                requireActivity().supportFragmentManager.beginTransaction().add(
+//                    SettingsFragment.newInstance(), SettingsFragment.TAG
+//                ).commit()
+
+                requireActivity().startActivity(
+                    Intent(requireActivity(), SettingsActivity::class.java)
                 )
+
+//                startFragment(
+//                    SettingsFragment.newInstance()
+//                )
             }
         }
 
-        return BigActionBar(requireContext()).apply {
+        actionBar = BigActionBar(requireContext()).apply {
             title = ApplicationLoader.APP_NAME
 
             this.menu = menu

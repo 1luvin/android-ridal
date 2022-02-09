@@ -65,7 +65,7 @@ class ApplicationActivity : BaseActivity()
 
         Utils.checkDisplaySize(this)
 
-        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
 
         bottomNavigationView = findViewById(R.id.bottom_navigation)
 

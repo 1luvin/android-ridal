@@ -21,9 +21,15 @@ class BigActionBar(context: Context) : FrameLayout(context)
         set(value) {
             field = value
 
-            titleView?.text = title
+            titleView.text = title
 
-            titleView?.measure(0, 0)
+            titleView.measure(0, 0)
+        }
+    var titleColor: Int = Theme.color(Theme.color_text)
+        set(value) {
+            field = value
+
+            titleView.setTextColor(titleColor)
         }
 
     var menu: BigActionBar.Menu? = null
@@ -45,7 +51,7 @@ class BigActionBar(context: Context) : FrameLayout(context)
         setPadding(0, Utils.dp(25), 0, 0)
 
         titleView = TextView(context).apply {
-            setTextColor(Theme.color(Theme.color_text))
+            setTextColor(titleColor)
             textSize = 36F
             typeface = Theme.typeface(Theme.tf_bold)
             setLines(1)
@@ -111,6 +117,10 @@ class BigActionBar(context: Context) : FrameLayout(context)
             return ImageView(context).apply {
                 isClickable = true
                 setOnTouchListener(InstantPressListener(this))
+
+                background = Theme.createRect( Theme.ripplizeColor(Theme.color_bg), radii = FloatArray(4).apply {
+                    fill( Utils.dp(10F) )
+                } )
 
                 scaleType = ImageView.ScaleType.CENTER
             }

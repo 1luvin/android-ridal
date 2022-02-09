@@ -61,7 +61,7 @@ class Theme
          */
 
         // светлая тема
-        private val lightColors = HashMap<String, Int>().apply {
+        val lightColors = HashMap<String, Int>().apply {
             this[color_main] = COLOR_TWITCH
             this[color_bg] = 0xFFFFFFFF.toInt()
             this[color_text] = 0xFF000000.toInt()
@@ -85,9 +85,9 @@ class Theme
             this[color_radio] = 0xFF777777.toInt()
         }
         // черная тема
-        private val darkColors = HashMap<String, Int>().apply {
-            this[color_main] = 0xFF00B2FF.toInt()
-            this[color_bg] = 0xFF000000.toInt()
+        val darkColors = HashMap<String, Int>().apply {
+            this[color_main] = COLOR_TWITCH
+            this[color_bg] = 0xFF201B4E.toInt()
             this[color_text] = 0xFFFFFFFF.toInt()
             this[color_text2] = 0xFFAAAAAA.toInt()
 
@@ -95,8 +95,8 @@ class Theme
             this[color_searchResult_middle] = 0xFFAAAAAA.toInt()
             this[color_searchResult_worst] = 0xFFFF0000.toInt()
 
-            this[color_bottomNavIcon_inactive] = 0xFFAAAAAA.toInt()
-            this[color_bottomNavIcon_active] = 0xFF00B2FF.toInt()
+            this[color_bottomNavIcon_inactive] = 0xFF3F3784.toInt()
+            this[color_bottomNavIcon_active] = COLOR_TWITCH
 
             this[color_actionBar_back] = 0xFFAAAAAA.toInt()
 
@@ -105,14 +105,17 @@ class Theme
             this[color_negative] = 0xFFFF6565.toInt()
 
             this[color_popup_holder] = 0xFFAAAAAA.toInt()
+
+            this[color_radio] = 0xFFBBBBBB.toInt()
         }
         // список всех тем
-        private val colorsList = listOf(
+        val colorsList = listOf(
             lightColors,
             darkColors,
         )
         // активная тема
-        private var activeColors = HashMap<String, Int>()
+        var activeColors = HashMap<String, Int>()
+            private set
 
         fun color(colorKey: String) : Int
         {
@@ -170,11 +173,11 @@ class Theme
             outHsv[0] = hsv[0]
             outHsv[1] = hsv[1]
             if (hsv[2] >= 0.5F) {
-                outHsv[2] = hsv[2] - 0.24F
+                outHsv[2] = hsv[2] - 0.05F
                 return Color.HSVToColor(outHsv)
             }
             else {
-                outHsv[2] = hsv[2] + 0.12F
+                outHsv[2] = hsv[2] + 0.05F
                 return Color.HSVToColor(outHsv)
             }
         }
@@ -261,7 +264,9 @@ class Theme
                 if (outline != null) {
                     setStroke(outline.width, outline.color)
                 }
-                cornerRadii = radiiArray
+                if (radii != null) {
+                    cornerRadii = radiiArray
+                }
             }
         }
 
