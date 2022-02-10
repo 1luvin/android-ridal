@@ -1,2 +1,2 @@
 rootProject.name = "Ridal"
-include ':app'
+include(":app")

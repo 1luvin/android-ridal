@@ -1,9 +1,9 @@
 package tv.ridal.Application
 
 import android.app.Application
-import android.content.Context
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
+import tv.ridal.Application.UserData.User
 
 class ApplicationLoader : Application()
 {
@@ -33,11 +33,14 @@ class ApplicationLoader : Application()
     {
         super.onCreate()
 
+        
+
         INSTANCE = this
 
         Theme.setTheme(Theme.DARK)
         Locale.setLocale(Locale.RU)
     }
+
 }
 
 

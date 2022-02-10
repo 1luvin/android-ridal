@@ -12,6 +12,40 @@ class Theme
 {
     companion object
     {
+
+        init
+        {
+            createColors()
+        }
+
+        private fun createColors()
+        {
+            mainColor = COLOR_TWITCH
+
+            var colorBg = 0xFF201B4E.toInt()
+            var colorText = 0xFFFFFFFF.toInt()
+            var colorText2 = mixColors(colorBg, colorText, 0.7F)
+            var colorBottomNavIconInactive = mixColors(colorBg, mainColor, 0.5F)
+            var colorSearchResultBest = 0xFF00FF00.toInt()
+            var colorSearchResultMiddle = mixColors(colorBg, colorText, 0.5F)
+            var colorSearchResultWorst = 0xFFFF0000.toInt()
+            var colorActionBarBack = mixColors(colorBg, colorText, 0.7F)
+
+            darkColors = HashMap<String, Int>().apply {
+                put(color_bg, colorBg)
+                put(color_text, colorText)
+                put(color_text2, colorText2)
+                put(color_bottomNavIcon_inactive, colorBottomNavIconInactive)
+                put(color_searchResult_best, colorSearchResultBest)
+                put(color_searchResult_middle, colorSearchResultMiddle)
+                put(color_searchResult_worst, colorSearchResultWorst)
+                put(color_actionBar_back, colorActionBarBack)
+                put(color_negative, 0xFFFF6565.toInt())
+                put(color_popup_holder, 0xFFAAAAAA.toInt())
+                put(color_radio, 0xFFBBBBBB.toInt())
+            }
+        }
+
         const val COLOR_TRANSPARENT = 0x00000000
         const val COLOR_WHITE = 0xFFFFFFFF.toInt()
         const val COLOR_BLACK = 0xFF000000.toInt()
@@ -85,29 +119,7 @@ class Theme
             this[color_radio] = 0xFF777777.toInt()
         }
         // черная тема
-        val darkColors = HashMap<String, Int>().apply {
-            this[color_main] = COLOR_TWITCH
-            this[color_bg] = 0xFF201B4E.toInt()
-            this[color_text] = 0xFFFFFFFF.toInt()
-            this[color_text2] = 0xFFAAAAAA.toInt()
-
-            this[color_searchResult_best] = 0xFF00FF00.toInt()
-            this[color_searchResult_middle] = 0xFFAAAAAA.toInt()
-            this[color_searchResult_worst] = 0xFFFF0000.toInt()
-
-            this[color_bottomNavIcon_inactive] = 0xFF3F3784.toInt()
-            this[color_bottomNavIcon_active] = COLOR_TWITCH
-
-            this[color_actionBar_back] = 0xFFAAAAAA.toInt()
-
-            this[color_bigActionBar_item_bg] = 0xFFEEEEEE.toInt()
-
-            this[color_negative] = 0xFFFF6565.toInt()
-
-            this[color_popup_holder] = 0xFFAAAAAA.toInt()
-
-            this[color_radio] = 0xFFBBBBBB.toInt()
-        }
+        lateinit var darkColors: HashMap<String, Int>
         // список всех тем
         val colorsList = listOf(
             lightColors,
@@ -116,10 +128,21 @@ class Theme
         // активная тема
         var activeColors = HashMap<String, Int>()
             private set
+        private var mainColor = 0 // !
 
         fun color(colorKey: String) : Int
         {
+            when (colorKey)
+            {
+                color_main -> return mainColor
+                color_bottomNavIcon_active -> return mainColor
+            }
             return activeColors[colorKey] ?: 0x0
+        }
+
+        fun setMainColor(color: Int)
+        {
+            mainColor = color
         }
 
         /*
@@ -129,13 +152,6 @@ class Theme
         // const val ...
         // ...
 
-        fun setMainColor(colorKey: String)
-        {
-            for (colors in colorsList)
-            {
-                colors[color_main] = color(colorKey)
-            }
-        }
 
         /*
             Шрифты

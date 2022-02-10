@@ -12,17 +12,13 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.view.children
 import com.tunjid.androidx.navigation.Navigator
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
+import tv.ridal.Application.UserData.User
 import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.Ui.ActionBar.BigActionBar
 import tv.ridal.Utils.Utils
-
-import tv.ridal.Ui.colorKey
-import tv.ridal.Ui.getAllViews
-import java.lang.reflect.Field
 
 class SettingsFragment : BaseFragment(), Navigator.TagProvider
 {
@@ -98,9 +94,7 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
         createDarkThemeSwitch()
         containerLayout.addView(darkThemeSwitch)
 
-        if (savedInstanceState != null) {
-            darkThemeSwitch.isChecked = savedInstanceState.getBoolean(key)
-        }
+        darkThemeSwitch.isChecked = User.settings.theme_isDark
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -178,14 +172,14 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
 
     private fun switchTheme(isDark: Boolean)
     {
-        val views = rootLayout.getAllViews()
-        for (view in views)
-        {
-            if (view is TextView)
-            {
-                println( view.colorKey )
-            }
-        }
+//        val views = rootLayout.getAllViews()
+//        for (view in views)
+//        {
+//            if (view is TextView)
+//            {
+//                println( view.colorKey )
+//            }
+//        }
 
         val fromColors = Theme.activeColors
         val toTheme = if (isDark) 1 else 0
@@ -216,6 +210,8 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
 
             start()
         }
+
+        User.settings.theme_isDark = isDark
     }
 
 }

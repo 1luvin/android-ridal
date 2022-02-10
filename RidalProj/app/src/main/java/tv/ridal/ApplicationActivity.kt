@@ -1,9 +1,12 @@
 package tv.ridal
 
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -11,8 +14,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.tunjid.androidx.navigation.MultiStackNavigator
 import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.multiStackNavigationController
+import tv.ridal.Application.UserData.User
 import tv.ridal.Application.Theme
 import tv.ridal.Utils.Utils
+import java.io.*
 
 class ApplicationActivity : BaseActivity()
 {
@@ -101,7 +106,101 @@ class ApplicationActivity : BaseActivity()
         }
 
         onBackPressedDispatcher.addCallback(this) { if( ! multiStackNavigator.pop()) finish() }
+
+        createUserDataObject()
     }
+
+    private fun createUserDataObject()
+    {
+        var canWrite = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        var canRead = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        if (canWrite == PackageManager.PERMISSION_DENIED)
+        {
+            requestPermissions( arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1337)
+        }
+        if (canRead == PackageManager.PERMISSION_DENIED)
+        {
+            requestPermissions( arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1338)
+        }
+
+        val userSettingsFile = File(this.filesDir, "user.settings")
+        if ( userSettingsFile.exists() )
+        {
+            val fis = FileInputStream(userSettingsFile)
+            val ois = ObjectInputStream(fis)
+
+            User.settings = ois.readObject() as User.Settings
+
+            ois.close()
+        }
+        else
+        {
+            println("LOLOLOLOLOLOLOLOL")
+            userSettingsFile.parentFile.mkdirs()
+            println(userSettingsFile.name)
+            //userSettingsFile.createNewFile()
+
+            val fos = FileOutputStream(userSettingsFile)
+            val oos = ObjectOutputStream(fos)
+
+            User.createSettings()
+            oos.writeObject(User.settings)
+
+            oos.close()
+        }
+    }
+
+    override fun onDestroy()
+    {
+        super.onDestroy()
+
+        updateUserSettings()
+    }
+
+    private fun updateUserSettings()
+    {
+        val fos = FileOutputStream("user.settings")
+        val oos = ObjectOutputStream(fos)
+
+        oos.writeObject(User.settings)
+
+        oos.close()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode)
+        {
+            1337 ->
+            {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    createUserDataObject()
+                }
+                else
+                {
+                    println("You fucking suck!")
+                }
+            }
+            1338 ->
+            {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    createUserDataObject()
+                }
+                else
+                {
+                    println("You fucking suck!")
+                }
+            }
+        }
+    }
+
 
     private fun FragmentTransaction.zoom()
     {
