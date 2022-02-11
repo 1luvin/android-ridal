@@ -3,7 +3,6 @@ package tv.ridal.Application
 import android.app.Application
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
-import tv.ridal.Application.UserData.User
 
 class ApplicationLoader : Application()
 {

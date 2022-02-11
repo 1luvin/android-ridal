@@ -15,7 +15,7 @@ import androidx.appcompat.widget.SwitchCompat
 import com.tunjid.androidx.navigation.Navigator
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
-import tv.ridal.Application.UserData.User
+import tv.ridal.Application.UserData.USER
 import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.Ui.ActionBar.BigActionBar
 import tv.ridal.Utils.Utils
@@ -94,7 +94,7 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
         createDarkThemeSwitch()
         containerLayout.addView(darkThemeSwitch)
 
-        darkThemeSwitch.isChecked = User.settings.theme_isDark
+        darkThemeSwitch.isChecked = USER.settings.theme_isDark
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -211,7 +211,7 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
             start()
         }
 
-        User.settings.theme_isDark = isDark
+        USER.settings.theme_isDark = isDark
     }
 
 }

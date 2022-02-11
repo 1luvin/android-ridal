@@ -14,10 +14,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.tunjid.androidx.navigation.MultiStackNavigator
 import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.multiStackNavigationController
-import tv.ridal.Application.UserData.User
+import tv.ridal.Application.UserData.USER
 import tv.ridal.Application.Theme
 import tv.ridal.Utils.Utils
-import java.io.*
 
 class ApplicationActivity : BaseActivity()
 {
@@ -123,48 +122,14 @@ class ApplicationActivity : BaseActivity()
             requestPermissions( arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1338)
         }
 
-        val userSettingsFile = File(this.filesDir, "user.settings")
-        if ( userSettingsFile.exists() )
-        {
-            val fis = FileInputStream(userSettingsFile)
-            val ois = ObjectInputStream(fis)
-
-            User.settings = ois.readObject() as User.Settings
-
-            ois.close()
-        }
-        else
-        {
-            println("LOLOLOLOLOLOLOLOL")
-            userSettingsFile.parentFile.mkdirs()
-            println(userSettingsFile.name)
-            //userSettingsFile.createNewFile()
-
-            val fos = FileOutputStream(userSettingsFile)
-            val oos = ObjectOutputStream(fos)
-
-            User.createSettings()
-            oos.writeObject(User.settings)
-
-            oos.close()
-        }
+        USER.checkSettings()
     }
 
     override fun onDestroy()
     {
         super.onDestroy()
 
-        updateUserSettings()
-    }
-
-    private fun updateUserSettings()
-    {
-        val fos = FileOutputStream("user.settings")
-        val oos = ObjectOutputStream(fos)
-
-        oos.writeObject(User.settings)
-
-        oos.close()
+        USER.updateSettings()
     }
 
     override fun onRequestPermissionsResult(
