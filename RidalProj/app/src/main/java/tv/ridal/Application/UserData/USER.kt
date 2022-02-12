@@ -15,7 +15,7 @@ class USER
 
         fun hasSettings() : Boolean
         {
-            return File(ApplicationLoader.instance().filesDir, settingsFileName).exists()
+            return File(ApplicationLoader.instance().filesDir, settingsFileName).exists() && settings != null
         }
 
         fun checkSettings()

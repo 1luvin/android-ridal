@@ -121,7 +121,7 @@ class ApplicationActivity : BaseActivity()
             requestPermissions( arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1338)
         }
 
-        USER.checkSettings()
+//        USER.checkSettings()
     }
 
     override fun onDestroy()
