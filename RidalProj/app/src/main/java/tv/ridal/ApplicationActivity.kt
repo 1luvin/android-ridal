@@ -20,7 +20,6 @@ import tv.ridal.Utils.Utils
 
 class ApplicationActivity : BaseActivity()
 {
-
     companion object {
         val tabs = intArrayOf(R.id.navigation, R.id.search)
 

@@ -94,7 +94,9 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
         createDarkThemeSwitch()
         containerLayout.addView(darkThemeSwitch)
 
-        darkThemeSwitch.isChecked = USER.settings.theme_isDark
+        if (USER.hasSettings()) {
+            darkThemeSwitch.isChecked = USER.settings!!.theme_isDark
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -211,7 +213,7 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
             start()
         }
 
-        USER.settings.theme_isDark = isDark
+        USER.settings?.theme_isDark = isDark
     }
 
 }

@@ -32,8 +32,6 @@ class ApplicationLoader : Application()
     {
         super.onCreate()
 
-        
-
         INSTANCE = this
 
         Theme.setTheme(Theme.DARK)

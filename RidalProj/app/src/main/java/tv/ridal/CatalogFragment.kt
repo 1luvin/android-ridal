@@ -13,7 +13,7 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import com.tunjid.androidx.navigation.Navigator
-import tv.ridal.Adapters.MoviesAdapter
+import tv.ridal.Ui.Adapters.MoviesAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme

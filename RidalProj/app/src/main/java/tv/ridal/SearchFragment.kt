@@ -10,8 +10,8 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
-import tv.ridal.Adapters.MoviesAdapter
-import tv.ridal.Adapters.SearchAdapter
+import tv.ridal.Ui.Adapters.MoviesAdapter
+import tv.ridal.Ui.Adapters.SearchAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme

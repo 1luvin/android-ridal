@@ -1,4 +1,4 @@
-package tv.ridal.Adapters
+package tv.ridal.Ui.Adapters
 
 import android.content.Context
 import android.view.View
