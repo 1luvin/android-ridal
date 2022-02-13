@@ -123,7 +123,7 @@ class Parser
 
 
         /*
-            Информаци о фильме
+            Информация о фильме
          */
 
         fun parseMovieInfo(doc: Document): Movie.Info
@@ -385,6 +385,13 @@ class Parser
         {
             return parseSectionMoviesSize(Jsoup.parse(html))
         }
+
+        /*
+            Стримы
+         */
+
+
+
 
 //        fun parsePersonPhotoUrl(doc: Document): String {
 //            val sideCover = doc.getElementsByClass("b-sidecover")

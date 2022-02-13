@@ -45,7 +45,7 @@ class MovieFragment : BaseFragment()
     {
         super.onCreate(savedInstanceState)
 
-        loadMovie()
+        loadMovieInfo()
 
         createUi()
     }
@@ -107,7 +107,7 @@ class MovieFragment : BaseFragment()
     private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
     private val requestTag: String = "requestTag"
 
-    private fun loadMovie()
+    private fun loadMovieInfo()
     {
         val request = StringRequest(Request.Method.GET, movie.url,
             { response ->
