@@ -247,7 +247,7 @@ class Theme
             Rect
          */
 
-        fun createRect(color: Int, outline: Outline? = null, radii: FloatArray? = null) : Drawable
+        fun createRect(color: Int, outline: Outline? = null, radii: FloatArray? = null) : GradientDrawable
         {
             return createRect(
                 Fill( intArrayOf(color, color) ),
@@ -256,12 +256,12 @@ class Theme
             )
         }
 
-        fun createRect(colorKey: String, outline: Outline? = null, radii: FloatArray? = null) : Drawable
+        fun createRect(colorKey: String, outline: Outline? = null, radii: FloatArray? = null) : GradientDrawable
         {
             return createRect( color(colorKey), outline, radii )
         }
 
-        fun createRect(fill: Fill? = null, outline: Outline? = null, radii: FloatArray? = null) : Drawable
+        fun createRect(fill: Fill? = null, outline: Outline? = null, radii: FloatArray? = null) : GradientDrawable
         {
             val radiiArray = FloatArray(8)
             if (radii != null) {

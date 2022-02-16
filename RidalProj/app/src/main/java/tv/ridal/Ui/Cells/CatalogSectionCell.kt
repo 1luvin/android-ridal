@@ -46,7 +46,7 @@ class CatalogSectionCell(context: Context) : FrameLayout(context)
             isSingleLine = true
             ellipsize = TextUtils.TruncateAt.END
         }
-        addView(sectionNameView,LayoutHelper.createFrame(
+        addView(sectionNameView, LayoutHelper.createFrame(
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.TOP,
             25, 7, 59, 0)

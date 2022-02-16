@@ -1,15 +1,20 @@
 package tv.ridal.Ui.ActionBar
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.view.Gravity
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import tv.ridal.Application.Theme
+import tv.ridal.Ui.Animators.StateValueAnimator
+import tv.ridal.Ui.Drawables.MultiDrawable
 import tv.ridal.Ui.InstantPressListener
 import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.Utils.Utils
@@ -20,8 +25,70 @@ class ActionBar(context: Context) : FrameLayout(context)
     val actionBarHeightDp: Int = 56
     val actionBarHeight: Int = Utils.dp(56)
 
-    // action button
+    var actionButtonIcon: Drawable? = null
+        set(value) {
+            field = value
+
+            if (actionButtonView == null) createActionButtonView()
+
+            actionButtonView!!.setImageDrawable(actionButtonIcon)
+        }
+    var actionButtonColor: Int = Theme.color(Theme.color_text)
+        set(value) {
+            field = value
+
+            actionButtonView?.drawable?.setTint(actionButtonColor)
+        }
+
+    var title: String = ""
+        set(value) {
+            field = value
+            if (titleView == null) createTitleView()
+            titleView!!.text = title
+        }
+    var titleTypeface: Typeface = Theme.typeface(Theme.tf_bold)
+        set(value) {
+            field = value
+
+            titleView?.typeface = titleTypeface
+        }
+    var titleTextSize: Float = 22F
+        set(value) {
+            field = value
+
+            titleView?.textSize = titleTextSize
+        }
+
+    var subtitle: String = ""
+        set(value) {
+            field = value
+
+            if (subtitleView == null) createSubtitleView()
+            subtitleView!!.text = subtitle
+        }
+
+    var menu: ActionBar.Menu? = null
+        set(value) {
+            value ?: return
+            field = value
+
+            this.addView(menu!!, LayoutHelper.createFrame(
+                LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+                Gravity.END or Gravity.CENTER_VERTICAL
+            ))
+        }
+
+    // animators
+    private var titleAnimator: StateValueAnimator = StateValueAnimator().apply {
+        duration = 200
+    }
+
+
     private var actionButtonView: ImageView? = null
+    private var titleFrame: FrameLayout? = null
+    private var titleView: TextView? = null
+    private var subtitleView: TextView? = null
+
     private fun createActionButtonView()
     {
         actionButtonView = ImageView(context).apply {
@@ -40,33 +107,6 @@ class ActionBar(context: Context) : FrameLayout(context)
         this.addView(actionButtonView)
     }
 
-    var actionButtonIcon: Drawable? = null
-        set(value) {
-            field = value
-
-            if (actionButtonView == null) createActionButtonView()
-
-            actionButtonView!!.setImageDrawable(actionButtonIcon)
-        }
-    var actionButtonColor: Int = Theme.color(Theme.color_text)
-        set(value) {
-            field = value
-
-            actionButtonView?.drawable?.setTint(actionButtonColor)
-        }
-
-    fun onActionButtonClick(l: () -> Unit)
-    {
-        actionButtonView?.setOnClickListener {
-            l.invoke()
-        }
-    }
-
-
-    // title
-    private var titleFrame: FrameLayout? = null
-
-    private var titleView: TextView? = null
     private fun createTitleView()
     {
         titleFrame = FrameLayout(context).apply {
@@ -96,26 +136,6 @@ class ActionBar(context: Context) : FrameLayout(context)
         this.addView(titleFrame)
     }
 
-    var title: String = ""
-        set(value) {
-            field = value
-            if (titleView == null) createTitleView()
-            titleView!!.text = title
-        }
-    var titleTypeface: Typeface = Theme.typeface(Theme.tf_bold)
-        set(value) {
-            field = value
-
-            titleView?.typeface = titleTypeface
-        }
-    var titleTextSize: Float = 22F
-        set(value) {
-            field = value
-
-            titleView?.textSize = titleTextSize
-        }
-
-    private var subtitleView: TextView? = null
     private fun createSubtitleView()
     {
         subtitleView = TextView(context).apply {
@@ -142,24 +162,110 @@ class ActionBar(context: Context) : FrameLayout(context)
         ))
     }
 
-    var subtitle: String = ""
-        set(value) {
-            field = value
 
-            if (subtitleView == null) createSubtitleView()
-            subtitleView!!.text = subtitle
+    fun setBackgrounds(layers: Array<out Drawable>)
+    {
+        background = MultiDrawable(layers)
+    }
+
+    fun showBackground(index: Int)
+    {
+        if (background !is MultiDrawable) return
+
+        (background as MultiDrawable).apply {
+            show(index)
         }
+    }
 
-    var menu: ActionBar.Menu? = null
-        set(value) {
-            value ?: return
-            field = value
 
-            this.addView(menu!!, LayoutHelper.createFrame(
-                LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-                Gravity.END or Gravity.CENTER_VERTICAL
-            ))
+
+    fun onActionButtonClick(l: () -> Unit)
+    {
+        actionButtonView?.setOnClickListener {
+            l.invoke()
         }
+    }
+
+
+
+    fun hideTitle(animated: Boolean = true)
+    {
+        if (titleView!!.visibility == View.GONE) return
+
+        if (animated)
+        {
+            if (titleAnimator.isRunning && titleAnimator.currentState == "hiding") return
+
+            titleAnimator.apply {
+                cancel()
+                removeAllListeners()
+
+                setFloatValues(titleView!!.alpha, 0F)
+
+                addUpdateListener {
+                    titleView!!.alpha = it.animatedValue as Float
+                }
+
+                addListener(object : AnimatorListenerAdapter(){
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+
+                        titleView!!.visibility = View.GONE
+                    }
+                })
+
+                currentState = "hiding"
+                start()
+            }
+        }
+        else
+        {
+            titleView!!.apply {
+                alpha = 0F
+                visibility = View.GONE
+            }
+        }
+    }
+
+    fun showTitle(animated: Boolean = true)
+    {
+        if (titleView!!.visibility == View.VISIBLE) return
+
+        if (animated)
+        {
+            if (titleAnimator.isRunning && titleAnimator.currentState == "showing") return
+
+            titleAnimator.apply {
+                cancel()
+                removeAllListeners()
+
+                setFloatValues(titleView!!.alpha, 1F)
+
+                addUpdateListener {
+                    titleView!!.alpha = it.animatedValue as Float
+                }
+
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator?) {
+                        super.onAnimationStart(animation)
+
+                        titleView!!.visibility = View.VISIBLE
+                    }
+                })
+
+                currentState = "showing"
+                start()
+            }
+        }
+        else
+        {
+            titleView!!.apply {
+                alpha = 1F
+                visibility = View.VISIBLE
+            }
+        }
+    }
+
 
     init
     {
@@ -203,7 +309,6 @@ class ActionBar(context: Context) : FrameLayout(context)
             MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(paddingTop + actionBarHeight + paddingBottom, MeasureSpec.EXACTLY))
     }
-
 
     class Menu(context: Context) : LinearLayout(context)
     {

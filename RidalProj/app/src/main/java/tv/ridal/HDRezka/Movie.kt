@@ -1,7 +1,7 @@
 package tv.ridal.HDRezka
 
 
-data class Movie(val name: String, val posterUrl: String, val type: Type, val url: String, var info: Info? = null)
+data class Movie(val name: String, val posterUrl: String, val type: Type, val url: String)
 {
     data class Type(val ruType: String, val isSerial: Boolean)
 

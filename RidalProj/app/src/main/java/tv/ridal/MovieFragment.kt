@@ -6,13 +6,15 @@ import android.graphics.Paint
 import android.graphics.Shader
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.text.TextUtils
+import android.util.TypedValue
+import android.view.*
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.widget.NestedScrollView
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -25,6 +27,9 @@ import tv.ridal.Application.Theme
 import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Parser
+import tv.ridal.HDRezka.Streams.StreamData
+import tv.ridal.Ui.ActionBar.ActionBar
+import tv.ridal.Utils.Utils
 import kotlin.random.Random
 
 class MovieFragment : BaseFragment()
@@ -40,6 +45,8 @@ class MovieFragment : BaseFragment()
 
     private lateinit var movie: Movie
     private lateinit var movieInfo: Movie.Info
+    private var streamData: StreamData? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -70,8 +77,9 @@ class MovieFragment : BaseFragment()
     }
 
     private lateinit var rootFrame: FrameLayout
-//    private lateinit var actionBar: ActionBar
+    private lateinit var actionBar: ActionBar
     private lateinit var scroll: NestedScrollView
+    private lateinit var scrollLayout: LinearLayout
     private lateinit var headerView: HeaderView
 
     private fun createUi()
@@ -86,19 +94,71 @@ class MovieFragment : BaseFragment()
         }
 
         createScroll()
-        rootFrame.addView(scroll)
+        scrollLayout = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+        scroll.addView(scrollLayout)
 
         headerView = HeaderView()
-        rootFrame.addView(headerView, LayoutHelper.createFrame(
-            LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
-        ))
+        scrollLayout.apply {
+            addView(headerView)
+        }
+
+        createActionBar()
+
+        rootFrame.apply {
+            addView(scroll, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
+            ))
+
+            addView(actionBar, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
+            ))
+        }
+    }
+
+    private fun createActionBar()
+    {
+        actionBar = ActionBar(context).apply {
+            setPadding(0, Utils.dp(25), 0, 0)
+
+            setBackgrounds(
+                arrayOf(
+                    Theme.createRect(
+                        Theme.Fill( intArrayOf(Theme.alphaColor(Theme.COLOR_BLACK, 0.5F), Theme.COLOR_TRANSPARENT), GradientDrawable.Orientation.TOP_BOTTOM )
+                    ),
+                    Theme.createRect( Theme.color_bg ),
+                )
+            )
+
+            actionButtonIcon = Theme.drawable(R.drawable.back, Theme.COLOR_WHITE)
+            onActionButtonClick {
+                finish()
+            }
+
+            title = movie.name
+            hideTitle(false)
+        }
     }
 
     private fun createScroll()
     {
         scroll = NestedScrollView(context).apply {
             setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-                println(scrollX)
+
+                val limitHeight = headerView.height - actionBar.height
+
+                if (scrollY > limitHeight) {
+                    actionBar.apply {
+                        showBackground(1)
+                        showTitle()
+                    }
+                } else {
+                    actionBar.apply {
+                        showBackground(0)
+                        hideTitle()
+                    }
+                }
             }
         }
     }
@@ -155,8 +215,9 @@ class MovieFragment : BaseFragment()
     inner class HeaderView : FrameLayout(ApplicationActivity.instance())
     {
         var posterView: ImageView
+        private lateinit var nameView: TextView
 
-        private var topGradientPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private var bottomGradPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
         fun setPoster(drawable: Drawable)
         {
@@ -174,6 +235,37 @@ class MovieFragment : BaseFragment()
             addView(posterView, LayoutHelper.createFrame(
                 LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
             ))
+
+            val view = View(context).apply {
+                background = Theme.createRect(
+                    Theme.Fill(
+                        intArrayOf( Theme.alphaColor(Theme.COLOR_BLACK, 0.5F), Theme.COLOR_TRANSPARENT ),
+                        GradientDrawable.Orientation.BOTTOM_TOP
+                    )
+                )
+            }
+            addView(view, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, 150,
+                Gravity.BOTTOM
+            ))
+
+            nameView = TextView(context).apply {
+                setTextColor( Theme.COLOR_WHITE )
+                setTextSize(TypedValue.COMPLEX_UNIT_DIP, 32F)
+                typeface = Theme.typeface(Theme.tf_bold)
+                setLines(1)
+                maxLines = 1
+                isSingleLine = true
+
+                ellipsize = TextUtils.TruncateAt.END
+
+                text = movie.name
+            }
+            addView(nameView, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                Gravity.START or Gravity.BOTTOM,
+                20, 0, 0, 20
+            ))
         }
 
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
@@ -187,14 +279,7 @@ class MovieFragment : BaseFragment()
         {
             super.dispatchDraw(canvas)
 
-            topGradientPaint.shader = LinearGradient(
-                0F, 0F, 0F, height / 4F,
-                Theme.alphaColor(Theme.COLOR_BLACK, 0.3F),
-                Theme.COLOR_TRANSPARENT,
-                Shader.TileMode.CLAMP
-            )
 
-            canvas.drawRect(0F, 0F, width + 0F, height / 4F, topGradientPaint)
         }
 
     }

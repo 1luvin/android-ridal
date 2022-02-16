@@ -4,6 +4,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
+import tv.ridal.HDRezka.Streams.Stream
+import tv.ridal.HDRezka.Streams.StreamData
 
 class Parser
 {
@@ -12,7 +14,7 @@ class Parser
     {
 
         /*
-            Фильмы
+            Фильмы, сериалы, мультфильмы, аниме
          */
 
         fun parseMovies(doc: Document, size: Int = HDRezka.PAGE_CAPACITY): ArrayList<Movie>?
@@ -390,7 +392,35 @@ class Parser
             Стримы
          */
 
+        fun parseStreams(html: String) : ArrayList<Stream>
+        {
+            val streams = ArrayList<Stream>()
 
+            val qualities = arrayOf("360p", "480p", "720p", "1080p", "1080p Ultra", "1440p", "2160p")
+            var q_it = 0
+            var i = 0
+            while (i < html.length - 2) {
+                if (html[i] == 'h' && html[i + 1] == 't' && html[i + 2] == 't') {
+                    val tmp = StringBuilder()
+                    var k = i
+                    while (true) {
+                        if (html[k] == ' ' || html[k] == ',' || html[k] == '\"') break
+                        tmp.append(html[k])
+                        k++
+                    }
+                    i = k
+                    var temp = tmp.toString()
+                    if ( ! temp.contains("m3u8") && temp.contains("mp4")) {
+                        temp = temp.replace("\\\\".toRegex(), "")
+                        streams.add( Stream(qualities[q_it], temp) )
+                        q_it++
+                    }
+                }
+                i++
+            }
+
+            return streams
+        }
 
 
 //        fun parsePersonPhotoUrl(doc: Document): String {
