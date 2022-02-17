@@ -1,5 +1,6 @@
 package tv.ridal.Ui.Layout
 
+import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -39,6 +40,13 @@ class LayoutHelper
         fun createLinear(width: Int, height: Int): LinearLayout.LayoutParams
         {
             return LinearLayout.LayoutParams(size(width), size(height))
+        }
+        fun createLinear(width: Int, height: Int, gravity: Int, leftMargin: Int, topMargin: Int, rightMargin: Int, bottomMargin: Int): LinearLayout.LayoutParams
+        {
+            return LinearLayout.LayoutParams(size(width), size(height)).apply {
+                setMargins(size(leftMargin), size(topMargin), size(rightMargin), size(bottomMargin))
+                this.gravity = gravity
+            }
         }
         fun createLinear(width: Int, height: Int, leftMargin: Int, topMargin: Int, rightMargin: Int, bottomMargin: Int): LinearLayout.LayoutParams
         {

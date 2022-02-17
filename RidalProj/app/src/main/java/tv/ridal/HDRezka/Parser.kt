@@ -160,7 +160,7 @@ class Parser
                         for (j in 0 until spans.size) {
                             val rating = Movie.Rating().apply {
                                 whose = spans[j].getElementsByTag("a")[0].text()
-                                value = spans[j].getElementsByTag("span")[1].text().toFloat()
+                                value = spans[j].getElementsByTag("span")[1].text()
                             }
                             mi.ratings!!.add(rating)
                         }

@@ -136,7 +136,7 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
 
             this.text = text
 
-            textSize = 17F
+            textSize = 18F
             typeface = Theme.typeface(Theme.tf_bold)
             setTextColor(Theme.color(Theme.color_main))
         }

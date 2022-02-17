@@ -51,7 +51,7 @@ data class Movie(val name: String, val posterUrl: String, val type: Type, val ur
     class Rating
     {
         var whose: String? = null
-        var value: Float? = null
+        var value: String? = null
     }
 
     class List

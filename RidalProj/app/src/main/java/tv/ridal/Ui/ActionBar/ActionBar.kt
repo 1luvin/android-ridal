@@ -80,7 +80,7 @@ class ActionBar(context: Context) : FrameLayout(context)
 
     // animators
     private var titleAnimator: StateValueAnimator = StateValueAnimator().apply {
-        duration = 200
+        duration = 170
     }
 
 
@@ -165,7 +165,9 @@ class ActionBar(context: Context) : FrameLayout(context)
 
     fun setBackgrounds(layers: Array<out Drawable>)
     {
-        background = MultiDrawable(layers)
+        background = MultiDrawable(layers).apply {
+            crossfadeDuration = 170
+        }
     }
 
     fun showBackground(index: Int)

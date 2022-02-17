@@ -23,6 +23,9 @@ class HDRezka
             )
 
         const val RATINGS = "Рейтинги"
+        const val IMDB = "IMDb"
+        const val KP = "Кинопоиск"
+
         const val IN_LISTS = "Входит в спписки"
         const val SLOGAN = "Слоган"
         const val RELEASE_DATE = "Дата выхода"
