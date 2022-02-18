@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -56,6 +57,7 @@ class MoviesFragment : BaseFragment()
         var url: String? = null
 
         var hasSections: Boolean = false
+        var hasSorting: Boolean = true
         var applySection: String? = null
 
         var applyGenre: String? = null
@@ -108,7 +110,7 @@ class MoviesFragment : BaseFragment()
 
     private var loading: Boolean = false
 
-    private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
+    private val requestQueue: RequestQueue = Volley.newRequestQueue( ApplicationLoader.instance() )
     private val requestTagMovies: String = "requestTagMovies"
 
 
@@ -296,16 +298,18 @@ class MoviesFragment : BaseFragment()
         loading = true
 
         var url = ""
-        if (document == null) {
+        if (document == null)
+        {
             url = arguments.url!!
             if ( hasGenres() ) {
                 println(activeGenre)
                 url += Genre.url(activeGenre!!)
             }
-            url += Sorting.url(activeSorting)
-
-            println(url)
-        } else {
+            if ( arguments.hasSorting ) {
+                url += Sorting.url(activeSorting)
+            }
+        }
+        else {
             if (Navigator.isNextPageExist(document!!)) {
                 url = Navigator.nextPageUrl(document!!)
             } else {
@@ -321,6 +325,8 @@ class MoviesFragment : BaseFragment()
             { response ->
                 loading = false
 
+                println("LOADED")
+
                 document = Jsoup.parse(response)
 
                 val newMovies = Parser.parseMovies(document!!) ?: return@StringRequest
@@ -335,6 +341,7 @@ class MoviesFragment : BaseFragment()
         ).apply {
             tag = requestTagMovies
         }
+
         requestQueue.add(moviesRequest)
     }
 

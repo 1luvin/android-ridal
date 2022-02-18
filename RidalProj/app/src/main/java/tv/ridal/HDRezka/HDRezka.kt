@@ -26,7 +26,7 @@ class HDRezka
         const val IMDB = "IMDb"
         const val KP = "Кинопоиск"
 
-        const val IN_LISTS = "Входит в спписки"
+        const val IN_LISTS = "Входит в списки"
         const val SLOGAN = "Слоган"
         const val RELEASE_DATE = "Дата выхода"
         const val COUNTRY = "Страна"
@@ -73,6 +73,19 @@ class HDRezka
             return url
         }
 
+
+        fun getSectionNameByMovieType(type: String) : String
+        {
+            return when (type)
+            {
+                FILM -> Locale.text(Locale.text_films)
+                SERIAL -> Locale.text(Locale.text_series)
+                ANIME -> Locale.text(Locale.text_anime)
+                CARTOON -> Locale.text(Locale.text_cartoons)
+
+                else -> "error_type"
+            }
+        }
     }
 }
 

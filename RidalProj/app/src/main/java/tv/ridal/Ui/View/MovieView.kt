@@ -82,8 +82,7 @@ class MovieView(context: Context) : FrameLayout(context)
             movieNameView.text = movieName
         }
 
-    init
-    {
+    init {
         isClickable = true
         setOnTouchListener(InstantPressListener(this))
 
@@ -92,17 +91,21 @@ class MovieView(context: Context) : FrameLayout(context)
         posterView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.FIT_XY
         }
-        addView(posterView, LayoutHelper.createFrame(
-            Utils.px(posterWidthPx), Utils.px(posterHeightPx),
-            Gravity.START or Gravity.TOP
-        ))
+        addView(
+            posterView, LayoutHelper.createFrame(
+                Utils.px(posterWidthPx), Utils.px(posterHeightPx),
+                Gravity.START or Gravity.TOP
+            )
+        )
 
         movieTypeView = TextView(context).apply {
             setPadding(Utils.dp(5), Utils.dp(2), Utils.dp(5), Utils.dp(2))
 
-            background = Theme.createRect(Theme.alphaColor(Theme.COLOR_LIGHT_CHERRY, 0.7F), radii = floatArrayOf(
-                0F, 0F, 0F, Utils.dp(7F)
-            ))
+            background = Theme.createRect(
+                Theme.alphaColor(Theme.COLOR_LIGHT_CHERRY, 0.7F), radii = floatArrayOf(
+                    0F, 0F, 0F, Utils.dp(7F)
+                )
+            )
 
             setTextColor(Theme.COLOR_WHITE)
             textSize = 13.3F
@@ -111,11 +114,12 @@ class MovieView(context: Context) : FrameLayout(context)
             maxLines = 1
             isSingleLine = true
         }
-        addView(movieTypeView, LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-            Gravity.END or Gravity.TOP
-        ))
-
+        addView(
+            movieTypeView, LayoutHelper.createFrame(
+                LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+                Gravity.END or Gravity.TOP
+            )
+        )
 
         gradient = LinearGradient(
             0F, posterHeightPx + 0F, 0F, posterHeightPx / 2F,
@@ -134,12 +138,13 @@ class MovieView(context: Context) : FrameLayout(context)
             isSingleLine = true
             ellipsize = TextUtils.TruncateAt.END
         }
-        addView(movieNameView, LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-            Gravity.START or Gravity.BOTTOM,
-            7, 0, 7, 5
-        ))
-
+        addView(
+            movieNameView, LayoutHelper.createFrame(
+                LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+                Gravity.START or Gravity.BOTTOM,
+                7, 0, 7, 5
+            )
+        )
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)

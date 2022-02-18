@@ -1,8 +1,6 @@
 package tv.ridal
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
@@ -10,12 +8,11 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.*
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.transition.TransitionTarget
@@ -23,6 +20,7 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import tv.ridal.Application.ApplicationLoader
+import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.Ui.Layout.LayoutHelper
@@ -30,9 +28,10 @@ import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Parser
 import tv.ridal.HDRezka.Streams.StreamData
 import tv.ridal.Ui.ActionBar.ActionBar
+import tv.ridal.Ui.Adapters.PeopleAdapter
+import tv.ridal.Ui.Cells.PointerCell
+import tv.ridal.Ui.SpacingItemDecoration
 import tv.ridal.Utils.Utils
-import java.util.regex.MatchResult
-import java.util.regex.Matcher
 import kotlin.random.Random
 
 
@@ -84,7 +83,9 @@ class MovieFragment : BaseFragment()
     private lateinit var actionBar: ActionBar
     private lateinit var scroll: NestedScrollView
     private lateinit var scrollLayout: LinearLayout
+
     private lateinit var headerView: HeaderView
+    private var actorsView: RecyclerView? = null
 
     private fun createUi()
     {
@@ -221,10 +222,9 @@ class MovieFragment : BaseFragment()
             headerView.setRatings(movieInfo.ratings!!)
         }
 
+        // описание
         if ( movieInfo.hasDescription() )
         {
-            scrollLayout.addView( createSectionNameView(movieInfo.description!!.title!!) )
-
             val tv = TextView(context).apply {
                 setPadding(Utils.dp(20), 0, Utils.dp(20), 0)
 
@@ -235,6 +235,103 @@ class MovieFragment : BaseFragment()
                 text = movieInfo.description!!.text!!
             }
             scrollLayout.addView(tv)
+        }
+
+        // входит в списки
+        if ( movieInfo.hasInLists() )
+        {
+            scrollLayout.addView( createSectionNameView(Locale.text(Locale.text_inLists)) )
+
+            val lists = movieInfo.inLists!!
+            for (list in lists)
+            {
+                val listCell = PointerCell(context).apply {
+                    text = list.name!!
+
+                    setOnClickListener {
+                        val args = MoviesFragment.Arguments().apply {
+                            title = list.name!!
+                            url = list.url!!
+
+                            hasSorting = false
+                        }
+                        startFragment( MoviesFragment.newInstance(args) )
+                    }
+                }
+                scrollLayout.addView(listCell)
+            }
+        }
+
+        // страна
+        if ( movieInfo.hasCountries() )
+        {
+            scrollLayout.addView( createSectionNameView(Locale.text(Locale.text_country)) )
+
+            val countries = movieInfo.countries!!
+            for (country in countries)
+            {
+                val countryCell = PointerCell(context).apply {
+                    text = country.name!!
+
+                    setOnClickListener {
+                        val args = MoviesFragment.Arguments().apply {
+                            title = country.name!!
+                            url = country.url!!
+                        }
+                        startFragment( MoviesFragment.newInstance(args) )
+                    }
+                }
+                scrollLayout.addView(countryCell)
+            }
+        }
+
+        // жанры
+        if ( movieInfo.hasGenres() )
+        {
+            scrollLayout.addView( createSectionNameView(Locale.text(Locale.text_genre)) )
+
+            val genres = movieInfo.genres!!
+            for (genre in genres)
+            {
+                val genreCell = PointerCell(context).apply {
+                    text = genre.name!!
+
+                    setOnClickListener {
+                        val args = MoviesFragment.Arguments().apply {
+                            title = HDRezka.getSectionNameByMovieType(movie.type.ruType)
+                            url = genre.url!!
+
+                            applyGenre = genre.name!!
+                        }
+                        startFragment( MoviesFragment.newInstance(args) )
+                    }
+                }
+                scrollLayout.addView(genreCell)
+            }
+        }
+
+        if ( movieInfo.hasActors() )
+        {
+            scrollLayout.addView( createSectionNameView(Locale.text(Locale.text_actors)) )
+            createActorsView()
+            scrollLayout.addView(actorsView)
+        }
+    }
+
+    private fun createActorsView()
+    {
+        actorsView = RecyclerView(context).apply {
+            edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
+                override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
+                    return EdgeEffect(view.context).apply { color = Theme.color(Theme.color_main) }
+                }
+            }
+            clipToPadding = false
+
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            addItemDecoration( SpacingItemDecoration(Utils.dp(13), Utils.dp(5), Utils.dp(10)) )
+
+            adapter = PeopleAdapter( movieInfo.actors!! )
         }
     }
 
@@ -427,7 +524,7 @@ class MovieFragment : BaseFragment()
                 if (rating.whose!! == HDRezka.IMDB)
                 {
                     background = Theme.createRect(COLOR_IMDB, radii = FloatArray(4).apply {
-                        fill(Utils.dp(5F))
+                        fill(Utils.dp(19F))
                     })
 
                     drawable = Theme.drawable(R.drawable.imdb)
@@ -435,7 +532,7 @@ class MovieFragment : BaseFragment()
                 else if (rating.whose!! == HDRezka.KP)
                 {
                     background = Theme.createRect(COLOR_KP, radii = FloatArray(4).apply {
-                        fill(Utils.dp(5F))
+                        fill(Utils.dp(19F))
                     })
 
                     drawable = Theme.drawable(R.drawable.kp)
@@ -462,7 +559,7 @@ class MovieFragment : BaseFragment()
                 addView(tv, LayoutHelper.createLinear(
                     LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
                     Gravity.CENTER_VERTICAL,
-                    7, 0, 0, 0
+                    5, 0, 0, 0
                 ))
             }
 

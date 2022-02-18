@@ -1,5 +1,6 @@
 package tv.ridal.Ui.Cells
 
+import android.content.Context
 import android.text.TextUtils
 import android.view.Gravity
 import android.widget.FrameLayout
@@ -12,9 +13,8 @@ import tv.ridal.Ui.Layout.LayoutHelper
 import tv.ridal.R
 import tv.ridal.Utils.Utils
 
-class PointerCell : FrameLayout(ApplicationActivity.instance())
+class PointerCell(context: Context) : FrameLayout(context)
 {
-
     private var textView: TextView
     private var pointerView: ImageView
 
@@ -62,7 +62,7 @@ class PointerCell : FrameLayout(ApplicationActivity.instance())
     {
         super.onMeasure(
             MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(Utils.dp(50), MeasureSpec.EXACTLY)
+            MeasureSpec.makeMeasureSpec(Utils.dp(40), MeasureSpec.EXACTLY)
         )
     }
 

@@ -25,7 +25,7 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
             val movieView = itemView as MovieView
             movieView.apply {
                 setOnClickListener {
-                    onMovieClick?.invoke(movies[adapterPosition])
+                    onMovieClick?.invoke( movies[adapterPosition] )
                 }
             }
         }

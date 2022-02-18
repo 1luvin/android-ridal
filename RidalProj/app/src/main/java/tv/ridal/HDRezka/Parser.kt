@@ -150,6 +150,7 @@ class Parser
                 } else {
                     tds[0]
                 }
+                println(tdTitle)
                 when (tdTitle) {
                     HDRezka.RATINGS -> {
                         val spans: Elements = tdData.getElementsByClass("b-post__info_rates")
@@ -176,6 +177,9 @@ class Parser
                             val list = Movie.List().apply {
                                 name = aTag.text()
                                 url = aTag.attr("href")
+                                if ( ! url!!.contains("https")) {
+                                    url = url!!.replace("http", "https")
+                                }
                             }
                             mi.inLists!!.add(list)
                         }
@@ -423,16 +427,18 @@ class Parser
         }
 
 
-//        fun parsePersonPhotoUrl(doc: Document): String {
-//            val sideCover = doc.getElementsByClass("b-sidecover")
-//            if (sideCover.isNotEmpty()) {
-//                val img = sideCover[0].getElementsByTag("img")
-//                if (img.isNotEmpty()) {
-//                    return img[0].attr("src")
-//                }
-//            }
-//            return HDRezka.url(HDRezka.url_noPersonPhoto)
-//        }
+        fun parsePersonPhotoUrl(html: String) : String
+        {
+            val doc = Jsoup.parse(html)
+            val sideCover = doc.getElementsByClass("b-sidecover")
+            if (sideCover.isNotEmpty()) {
+                val img = sideCover[0].getElementsByTag("img")
+                if (img.isNotEmpty()) {
+                    return img[0].attr("src")
+                }
+            }
+            return "https://static.hdrezka.ac/i/nopersonphoto.png"
+        }
 
     }
 }

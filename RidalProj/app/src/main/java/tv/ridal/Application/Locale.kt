@@ -41,6 +41,10 @@ class Locale
 
                     texts[text_filters] = "Фильтры"
 
+                    texts[text_inLists] = "Входит в списки"
+                    texts[text_country] = "Страна"
+                    texts[text_actors] = "Актеры"
+
                     /*
                         Жанры
                      */
@@ -158,6 +162,10 @@ class Locale
         const val text_newFolderName = "text_newFolderName"
 
         const val text_filters = "text_filters"
+
+        const val text_inLists = "text_inLists"
+        const val text_country = "text_country"
+        const val text_actors = "text_actors"
 
         /*
             Жанры
