@@ -22,8 +22,11 @@ import kotlin.math.max
 
 class ActionBar(context: Context) : FrameLayout(context)
 {
-    val actionBarHeightDp: Int = 56
-    val actionBarHeight: Int = Utils.dp(56)
+    companion object {
+        const val actionBarHeightDp: Int = 50
+    }
+
+    val actionBarHeight: Int = Utils.dp(actionBarHeightDp)
 
     var actionButtonIcon: Drawable? = null
         set(value) {
@@ -52,7 +55,7 @@ class ActionBar(context: Context) : FrameLayout(context)
 
             titleView?.typeface = titleTypeface
         }
-    var titleTextSize: Float = 22F
+    var titleTextSize: Float = 20F
         set(value) {
             field = value
 
@@ -98,10 +101,6 @@ class ActionBar(context: Context) : FrameLayout(context)
 //            background = Theme.createCircleSelector(Theme.color_bg)
 
             setOnTouchListener(InstantPressListener(this))
-        }
-
-        val x = TextView(context).apply {
-
         }
 
         this.addView(actionButtonView)

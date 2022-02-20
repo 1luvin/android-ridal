@@ -25,19 +25,13 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
     override val stableTag: String
         get() = "SettingsFragment"
 
-    private val key = "xxx"
-
     companion object
     {
         const val TAG = "SettingsFragment"
-        //const val KEY_N = "key_n";
 
         fun newInstance(): SettingsFragment
         {
-            //val args = Bundle()
-            //args.putInt(KEY_N, n)
             val fragment = SettingsFragment()
-            //fragment.arguments = args
             return fragment
         }
     }
@@ -174,23 +168,14 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
 
     private fun switchTheme(isDark: Boolean)
     {
-//        val views = rootLayout.getAllViews()
-//        for (view in views)
-//        {
-//            if (view is TextView)
-//            {
-//                println( view.colorKey )
-//            }
-//        }
-
         val fromColors = Theme.activeColors
         val toTheme = if (isDark) 1 else 0
         val toColors = Theme.colorsList[toTheme]
 
         ValueAnimator.ofFloat(0F, 1F).apply {
+            duration = 300
 
             addUpdateListener {
-
                 val animRatio = it.animatedValue as Float
 
                 rootLayout.apply {
@@ -203,10 +188,20 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
             }
 
             addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animation: Animator?) {
+                    super.onAnimationStart(animation)
+
+                    darkThemeSwitch.isEnabled = false
+
+                    Utils.enableDarkStatusBar(requireActivity().window, Theme.isDarkTheme())
+                }
+
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
 
-                    Theme.setTheme( toTheme )
+                    darkThemeSwitch.isEnabled = true
+
+                    Theme.setTheme(toTheme)
                 }
             })
 

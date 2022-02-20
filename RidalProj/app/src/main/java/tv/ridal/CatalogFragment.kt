@@ -106,14 +106,16 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
 //            statusBarColor = Theme.COLOR_TRANSPARENT
 //        }
 
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+//        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+
+
     }
 
     override fun onStop()
     {
         super.onStop()
 
-        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+//        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }
 
     private fun createActionBar()

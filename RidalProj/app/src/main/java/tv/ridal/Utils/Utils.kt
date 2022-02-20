@@ -3,6 +3,10 @@ package tv.ridal.Utils
 import android.app.Activity
 import android.content.Context
 import android.util.DisplayMetrics
+import android.view.Window
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import tv.ridal.Application.ApplicationLoader
 import kotlin.math.ceil
 
@@ -46,6 +50,17 @@ class Utils
                 return 0
             }
             return ceil(value / density).toInt()
+        }
+
+
+        fun enableDarkStatusBar(window: Window, enable: Boolean)
+        {
+            WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = enable
+        }
+
+        fun hideStatusBar(activity: Activity)
+        {
+            WindowInsetsControllerCompat(activity.window, activity.window.decorView).hide(WindowInsetsCompat.Type.statusBars())
         }
     }
 }

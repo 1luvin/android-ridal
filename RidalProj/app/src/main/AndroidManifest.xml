@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Ridal">
 
+<!--        Полноэкранное приложение-->
+        <meta-data android:name="android.max_aspect" android:value="100.0" />
+
         <activity
             android:name=".ApplicationActivity"
             android:windowSoftInputMode="adjustPan"

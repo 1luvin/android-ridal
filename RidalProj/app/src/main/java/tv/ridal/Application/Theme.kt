@@ -56,6 +56,11 @@ class Theme
         const val LIGHT: Int = 0
         const val DARK: Int = 1
 
+        fun isDarkTheme() : Boolean
+        {
+            return activeColors == darkColors
+        }
+
         fun setTheme(theme: Int)
         {
             activeColors = colorsList[theme]

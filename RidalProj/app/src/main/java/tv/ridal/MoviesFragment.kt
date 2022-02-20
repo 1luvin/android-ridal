@@ -186,7 +186,7 @@ class MoviesFragment : BaseFragment()
         rootFrame.addView(moviesFrame, LayoutHelper.createFrame(
             LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
             Gravity.TOP,
-            0, 56 + 25, 0, 0
+            0, ActionBar.actionBarHeightDp + 25, 0, 0
         ))
 
         createMoviesView()

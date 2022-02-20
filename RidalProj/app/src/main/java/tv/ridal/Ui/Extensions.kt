@@ -1,10 +1,17 @@
 package tv.ridal.Ui
 
+import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import tv.ridal.Application.Theme
+
+// Activity
+
+
 
 // View
 
