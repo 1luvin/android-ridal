@@ -82,7 +82,8 @@ class MovieView(context: Context) : FrameLayout(context)
             movieNameView.text = movieName
         }
 
-    init {
+    init
+    {
         isClickable = true
         setOnTouchListener(InstantPressListener(this))
 
@@ -108,7 +109,7 @@ class MovieView(context: Context) : FrameLayout(context)
             )
 
             setTextColor(Theme.COLOR_WHITE)
-            textSize = 13.3F
+            textSize = 13F
             typeface = Theme.typeface(Theme.tf_bold)
             setLines(1)
             maxLines = 1
@@ -141,8 +142,7 @@ class MovieView(context: Context) : FrameLayout(context)
         addView(
             movieNameView, LayoutHelper.createFrame(
                 LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-                Gravity.START or Gravity.BOTTOM,
-                7, 0, 7, 5
+                Gravity.START or Gravity.BOTTOM
             )
         )
     }
@@ -161,10 +161,9 @@ class MovieView(context: Context) : FrameLayout(context)
             posterWidthPx = width
         }
 
-
         super.onMeasure(
             MeasureSpec.makeMeasureSpec(posterWidthPx, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(Utils.dp(Utils.px(posterHeightPx) + 5 + 15 + 5), MeasureSpec.EXACTLY)
+            MeasureSpec.makeMeasureSpec(posterHeightPx + Utils.dp( 30), MeasureSpec.EXACTLY)
         )
     }
 

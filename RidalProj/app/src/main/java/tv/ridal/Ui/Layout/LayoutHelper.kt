@@ -33,6 +33,13 @@ class LayoutHelper
             return FrameLayout.LayoutParams(size(width), size(height))
         }
 
+        fun createFrame2(width: Int, height: Int, gravity: Int, leftMargin: Int, topMargin: Int, rightMargin: Int, bottomMargin: Int): FrameLayout.LayoutParams
+        {
+            return FrameLayout.LayoutParams(width, height, gravity).apply {
+                setMargins(leftMargin, topMargin, rightMargin, bottomMargin)
+            }
+        }
+
         /*
             Linear
          */

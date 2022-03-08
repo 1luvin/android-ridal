@@ -59,12 +59,12 @@ class CheckCell(context: Context) : FrameLayout(context)
         addView(checkView, LayoutHelper.createFrame(
             24, 24,
             Gravity.START or Gravity.CENTER_VERTICAL,
-            20, 0, 0, 0
+            15, 0, 0, 0
         ))
 
         textView = TextView(context).apply {
             setTextColor(textColor)
-            textSize = 16F
+            textSize = 15.5F
             typeface = Theme.typeface(Theme.tf_normal)
             setLines(1)
             maxLines = 1
@@ -76,7 +76,7 @@ class CheckCell(context: Context) : FrameLayout(context)
         addView(textView, LayoutHelper.createFrame(
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.CENTER_VERTICAL,
-            25 + 19 + 10, 0, 15, 0
+            20 + 19 + 10, 0, 15, 0
         ))
     }
 
@@ -86,7 +86,7 @@ class CheckCell(context: Context) : FrameLayout(context)
 
         setMeasuredDimension(
             MeasureSpec.getSize(widthMeasureSpec),
-            Utils.dp(50)
+            Utils.dp(43)
         )
     }
 

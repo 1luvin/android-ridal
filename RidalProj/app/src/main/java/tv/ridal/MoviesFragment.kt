@@ -6,6 +6,7 @@ import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.*
 import android.view.animation.DecelerateInterpolator
 import android.widget.*
@@ -361,6 +362,9 @@ class MoviesFragment : BaseFragment()
         private lateinit var sortingView: SortingView
         private var sectionView: SectionView? = null
 
+        private lateinit var bottomLayout: FrameLayout
+        private lateinit var showResultsButton: TextView
+
         private lateinit var currentView: View
 
         init
@@ -388,11 +392,12 @@ class MoviesFragment : BaseFragment()
                     ))
             }
             // добавление кнопки <Показать результаты>
-            popupView.addView(createShowResultsButton(), LayoutHelper.createFrame(
-                LayoutHelper.MATCH_PARENT, 50,
+            createBottomLayout()
+            popupView.addView(bottomLayout, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
                 Gravity.BOTTOM,
-                20, 15, 20, 15
             ))
+
             // если имеются Жанры или Секции (Фильмы, Сериалы, ...)
             // добавляем FiltersView
             if (hasGenres() || hasSections())
@@ -402,10 +407,10 @@ class MoviesFragment : BaseFragment()
                         navigate(filtersView!!, sortingView)
                     }
                 }
-                popupView.addView(filtersView, LayoutHelper.createFrame(
+                popupView.addView(filtersView, LayoutHelper.createFrame2(
                     LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
                     Gravity.TOP,
-                    0, 0, 0, 15 + 50 + 15
+                    0, 0, 0, bottomLayout.measuredHeight
                 ))
 
                 currentView = filtersView!!
@@ -422,10 +427,10 @@ class MoviesFragment : BaseFragment()
                 genreView = GenreView().apply {
                     visibility = View.GONE
                 }
-                popupView.addView(genreView, LayoutHelper.createFrame(
+                popupView.addView(genreView, LayoutHelper.createFrame2(
                     LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
                     Gravity.TOP,
-                    0, 0, 0, 15 + 50 + 15
+                    0, 0, 0, bottomLayout.measuredHeight
                 ))
             }
 
@@ -440,10 +445,10 @@ class MoviesFragment : BaseFragment()
                 genreView = GenreView().apply {
                     visibility = View.GONE
                 }
-                popupView.addView(genreView, LayoutHelper.createFrame(
+                popupView.addView(genreView, LayoutHelper.createFrame2(
                     LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
                     Gravity.TOP,
-                    0, 0, 0, 15 + 50 + 15
+                    0, 0, 0, bottomLayout.measuredHeight
                 ))
             }
 
@@ -454,10 +459,10 @@ class MoviesFragment : BaseFragment()
                     currentView = this
                 }
             }
-            popupView.addView(sortingView, LayoutHelper.createFrame(
+            popupView.addView(sortingView, LayoutHelper.createFrame2(
                 LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
                 Gravity.TOP,
-                0, 0, 0, 15 + 50 + 15
+                0, 0, 0, bottomLayout.measuredHeight
             ))
 
             setContentView(popupView)
@@ -481,8 +486,9 @@ class MoviesFragment : BaseFragment()
                     visibility = View.VISIBLE
                 }
 
+                showResultsButton.measure(0, 0)
                 popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                    height = endHeight + Utils.dp(15 + 50 + 15)
+                    height = endHeight + bottomLayout.measuredHeight
                 }
 
                 return
@@ -503,7 +509,7 @@ class MoviesFragment : BaseFragment()
                 addUpdateListener {
                     val animatedHeight = it.animatedValue as Int
                     popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                        height = animatedHeight + Utils.dp(15 + 50 + 15)
+                        height = animatedHeight + bottomLayout.measuredHeight
                     }
                 }
             }
@@ -517,7 +523,7 @@ class MoviesFragment : BaseFragment()
                         super.onAnimationStart(animation)
 
                         popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                            height = fromView.measuredHeight + Utils.dp(15 + 50 + 15)
+                            height = fromView.measuredHeight + showResultsButton.measuredHeight
                         }
 
                         toView.apply {
@@ -548,9 +554,9 @@ class MoviesFragment : BaseFragment()
             }
         }
 
-        private fun createShowResultsButton() : TextView
+        private fun createBottomLayout()
         {
-            return TextView(context).apply {
+            showResultsButton = Button(context).apply {
                 gravity = Gravity.CENTER
                 setOnTouchListener( InstantPressListener(this) )
 
@@ -563,7 +569,8 @@ class MoviesFragment : BaseFragment()
 
                 this.text = Locale.text(Locale.text_showResults)
 
-                textSize = 16F
+                setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16F)
+                isAllCaps = false
                 typeface = Theme.typeface(Theme.tf_bold)
                 setTextColor(Theme.COLOR_WHITE)
 
@@ -576,6 +583,20 @@ class MoviesFragment : BaseFragment()
                     this@FiltersPopup.dismiss()
                 }
             }
+
+            bottomLayout = FrameLayout(context).apply {
+                layoutParams = LayoutHelper.createFrame(
+                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
+                )
+
+                addView(showResultsButton, LayoutHelper.createFrame(
+                    LayoutHelper.MATCH_PARENT, 46,
+                    Gravity.BOTTOM,
+                    20, 10, 20, 10
+                ))
+            }
+
+            bottomLayout.measure(0, 0)
         }
 
         private fun applyNewFilters(): Boolean
@@ -628,7 +649,8 @@ class MoviesFragment : BaseFragment()
         }
 
         private var newFiltersListener: (() -> Unit)? = null
-        fun onNewFilters(l: () -> Unit) {
+        fun onNewFilters(l: () -> Unit)
+        {
             newFiltersListener = l
         }
 
@@ -713,7 +735,7 @@ class MoviesFragment : BaseFragment()
             var singleCheckGroup: SingleCheckGroup
             private lateinit var doneButton: FloatingActionButton
 
-            private lateinit var scroll: NestedScrollView
+            private var scroll: NestedScrollView
 
             init
             {
@@ -731,18 +753,18 @@ class MoviesFragment : BaseFragment()
                 scroll = NestedScrollView(context).apply {
                     addView(singleCheckGroup)
                 }
-
-                val availableHeight = (Utils.displayHeight * 0.7).toInt() - Utils.dp(56 + 15 + 50 + 15)
+                println( Utils.px(showResultsButton.measuredHeight) )
+                val availableHeight = (Utils.displayHeight * 0.7).toInt() - (actionBar.measuredHeight + bottomLayout.measuredHeight)
                 val scrollHeight = if (singleCheckGroup.measuredHeight < availableHeight) {
                     LayoutHelper.WRAP_CONTENT
                 } else {
-                    Utils.px( availableHeight )
+                    availableHeight
                 }
 
-                addView(scroll, LayoutHelper.createFrame(
+                addView(scroll, LayoutHelper.createFrame2(
                     LayoutHelper.MATCH_PARENT, scrollHeight,
                     Gravity.START or Gravity.TOP,
-                    0, 56, 0, 0
+                    0, actionBar.measuredHeight, 0, 0
                 ))
 
                 createDoneButton()
@@ -753,7 +775,8 @@ class MoviesFragment : BaseFragment()
                 ))
             }
 
-            override fun onVisibilityChanged(changedView: View, visibility: Int) {
+            override fun onVisibilityChanged(changedView: View, visibility: Int)
+            {
                 super.onVisibilityChanged(changedView, visibility)
                 // открытие жанров
                 if (visibility == View.VISIBLE)
@@ -775,6 +798,8 @@ class MoviesFragment : BaseFragment()
                         navigate(genreView!!, filtersView!!)
                     }
                 }
+
+                actionBar.measure(0, 0)
             }
 
             private fun createDoneButton()
@@ -793,20 +818,23 @@ class MoviesFragment : BaseFragment()
                 }
             }
 
-            fun currentGenre(): String {
+            fun currentGenre(): String
+            {
                 return singleCheckGroup.currentChecked()
             }
         }
 
         inner class SortingView : LinearLayout(ApplicationActivity.instance())
         {
+            private lateinit var actionBar: ActionBar
             var singleCheckGroup: SingleCheckGroup
 
             init
             {
                 orientation = LinearLayout.VERTICAL
 
-                addView(createActionBar())
+                createActionBar()
+                addView(actionBar)
 
                 singleCheckGroup = SingleCheckGroup(context).apply {
                     for (sorting in sortings)
@@ -821,7 +849,7 @@ class MoviesFragment : BaseFragment()
                     addView(singleCheckGroup)
                 }
 
-                val availableHeight = (Utils.displayHeight * 0.7).toInt() - Utils.dp(56 + 15 + 50 + 15)
+                val availableHeight = (Utils.displayHeight * 0.7).toInt() - (actionBar.measuredHeight + bottomLayout.measuredHeight)
                 val scrollHeight = if (singleCheckGroup.measuredHeight < availableHeight) {
                     LayoutHelper.WRAP_CONTENT
                 } else {
@@ -833,11 +861,12 @@ class MoviesFragment : BaseFragment()
                 ))
             }
 
-            private fun createActionBar() : ActionBar
+            private fun createActionBar()
             {
-                val actionBar = ActionBar(context).apply {
+                actionBar = ActionBar(context).apply {
                     title = Locale.text(Locale.text_sorting)
                 }
+                actionBar.measure(0, 0)
 
                 if (filtersView != null)
                 {
@@ -849,8 +878,6 @@ class MoviesFragment : BaseFragment()
                         }
                     }
                 }
-
-                return actionBar
             }
 
             fun currentSorting(): String {
@@ -862,7 +889,6 @@ class MoviesFragment : BaseFragment()
         {
 
         }
-
 
     }
 
