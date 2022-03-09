@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.ScrollView
@@ -13,13 +12,13 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import com.tunjid.androidx.navigation.Navigator
-import tv.ridal.Ui.Adapters.MoviesAdapter
+import tv.ridal.UI.Adapters.MoviesAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
-import tv.ridal.Ui.Layout.LayoutHelper
-import tv.ridal.Ui.ActionBar.BigActionBar
-import tv.ridal.Ui.View.SectionView
+import tv.ridal.UI.Layout.LayoutHelper
+import tv.ridal.UI.ActionBar.BigActionBar
+import tv.ridal.UI.View.SectionView
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Parser
 
@@ -52,7 +51,7 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
     {
         super.onCreate(savedInstanceState)
 
-        rootLayout = RelativeLayout(requireContext()).apply {
+        rootLayout = RelativeLayout(context).apply {
             layoutParams = RelativeLayout.LayoutParams(
                 LayoutHelper.MATCH_PARENT,
                 LayoutHelper.MATCH_PARENT
@@ -61,14 +60,14 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
             setBackgroundColor(Theme.color(Theme.color_bg))
         }
 
-        scroll = ScrollView(requireContext()).apply {
+        scroll = ScrollView(context).apply {
             layoutParams = ViewGroup.LayoutParams(
                 LayoutHelper.MATCH_PARENT,
                 LayoutHelper.MATCH_PARENT
             )
         }
 
-        containerLayout = LinearLayout(requireContext()).apply {
+        containerLayout = LinearLayout(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LayoutHelper.MATCH_PARENT,
                 LayoutHelper.MATCH_PARENT
@@ -84,7 +83,7 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
 
         for (i in HDRezka.SECTION_URLS.indices)
         {
-            sectionViews.add( SectionView(requireContext()) )
+            sectionViews.add( SectionView(context) )
             containerLayout.addView(sectionViews[i])
         }
 

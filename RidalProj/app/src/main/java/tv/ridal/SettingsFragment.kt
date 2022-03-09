@@ -16,8 +16,8 @@ import com.tunjid.androidx.navigation.Navigator
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.Application.UserData.USER
-import tv.ridal.Ui.Layout.LayoutHelper
-import tv.ridal.Ui.ActionBar.BigActionBar
+import tv.ridal.UI.Layout.LayoutHelper
+import tv.ridal.UI.ActionBar.BigActionBar
 import tv.ridal.Utils.Utils
 
 class SettingsFragment : BaseFragment(), Navigator.TagProvider

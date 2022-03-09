@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import androidx.fragment.app.FragmentContainerView
-import tv.ridal.Ui.Layout.LayoutHelper
+import tv.ridal.UI.Layout.LayoutHelper
 
 class SettingsActivity : BaseActivity()
 {

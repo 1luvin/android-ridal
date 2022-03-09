@@ -23,14 +23,14 @@ import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.HDRezka.HDRezka
-import tv.ridal.Ui.Layout.LayoutHelper
+import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Parser
 import tv.ridal.HDRezka.Streams.StreamData
-import tv.ridal.Ui.ActionBar.ActionBar
-import tv.ridal.Ui.Adapters.PeopleAdapter
-import tv.ridal.Ui.Cells.PointerCell
-import tv.ridal.Ui.SpacingItemDecoration
+import tv.ridal.UI.ActionBar.ActionBar
+import tv.ridal.UI.Adapters.PeopleAdapter
+import tv.ridal.UI.Cells.PointerCell
+import tv.ridal.UI.SpacingItemDecoration
 import tv.ridal.Utils.Utils
 import kotlin.random.Random
 
