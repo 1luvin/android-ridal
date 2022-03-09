@@ -62,7 +62,7 @@ class BigActionBar(context: Context) : FrameLayout(context)
         addView(titleView, LayoutHelper.createFrame(
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.CENTER_VERTICAL,
-            30, 0, 25, 0
+            25, 0, 25, 0
         ))
     }
 
@@ -76,7 +76,7 @@ class BigActionBar(context: Context) : FrameLayout(context)
             titleView.layoutParams = LayoutHelper.createFrame(
                 LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
                 Gravity.START or Gravity.CENTER_VERTICAL,
-                30, 0, Utils.px(menuWidth), 0
+                25, 0, Utils.px(menuWidth), 0
             )
         }
 

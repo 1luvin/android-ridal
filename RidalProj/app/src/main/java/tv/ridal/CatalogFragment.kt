@@ -33,8 +33,7 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
 
         fun newInstance(): CatalogFragment
         {
-            val fragment = CatalogFragment()
-            return fragment
+            return CatalogFragment()
         }
     }
 
@@ -65,6 +64,12 @@ class CatalogFragment : BaseFragment(), Navigator.TagProvider
                 LayoutHelper.MATCH_PARENT,
                 LayoutHelper.MATCH_PARENT
             )
+
+            isVerticalScrollBarEnabled = false
+        }
+
+        ApplicationActivity.instance().reselectListener.addListener {
+            scroll.smoothScrollTo(0, 0)
         }
 
         containerLayout = LinearLayout(context).apply {

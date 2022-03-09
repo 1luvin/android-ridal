@@ -2,6 +2,7 @@ package tv.ridal.UI.ActionBar
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
@@ -12,6 +13,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.updateLayoutParams
 import tv.ridal.Application.Theme
 import tv.ridal.UI.Animators.StateValueAnimator
 import tv.ridal.UI.Drawables.MultiDrawable
@@ -27,6 +29,34 @@ class ActionBar(context: Context) : FrameLayout(context)
     }
 
     val actionBarHeight: Int = Utils.dp(actionBarHeightDp)
+
+    var divider: View? = null
+        private set
+
+    fun setDivider(color: Int, height: Int = Utils.dp(1), hide: Boolean = false)
+    {
+        if (divider == null)
+        {
+            divider = View(context).apply {
+                background = Theme.createRect(color)
+            }
+            addView(divider, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, height,
+                Gravity.BOTTOM
+            ))
+        }
+        else
+        {
+            divider.apply {
+                updateLayoutParams<FrameLayout.LayoutParams> {
+                    this.height = height
+                }
+                background = Theme.createRect(color)
+            }
+        }
+
+        if (hide) divider!!.visibility = View.GONE
+    }
 
     var actionButtonIcon: Drawable? = null
         set(value) {
@@ -267,6 +297,53 @@ class ActionBar(context: Context) : FrameLayout(context)
         }
     }
 
+    fun hideDivider()
+    {
+        if (divider == null) return
+        if (divider!!.visibility == View.GONE) return
+
+        ValueAnimator.ofFloat(divider!!.alpha, 0F).apply {
+            duration = 170
+
+            addUpdateListener {
+                divider!!.alpha = it.animatedValue as Float
+            }
+
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+
+                    divider!!.visibility = View.GONE
+                }
+            })
+
+            start()
+        }
+    }
+
+    fun showDivider()
+    {
+        if (divider == null) return
+        if (divider!!.visibility == View.VISIBLE) return
+
+        ValueAnimator.ofFloat(divider!!.alpha, 1F).apply {
+            duration = 170
+
+            addUpdateListener {
+                divider!!.alpha = it.animatedValue as Float
+            }
+
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animation: Animator?) {
+                    super.onAnimationStart(animation)
+
+                    divider!!.visibility = View.VISIBLE
+                }
+            })
+
+            start()
+        }
+    }
 
     init
     {

@@ -22,7 +22,7 @@ class Theme
         {
             mainColor = COLOR_TWITCH
 
-            var colorBg = 0xFF201B4E.toInt()
+            var colorBg = 0xFF1A1640.toInt()
             var colorText = 0xFFFFFFFF.toInt()
             var colorText2 = mixColors(colorBg, colorText, 0.7F)
             var colorBottomNavIconInactive = mixColors(colorBg, mainColor, 0.5F)
@@ -176,6 +176,26 @@ class Theme
             Color
          */
 
+        fun lightenColor(color: Int, value: Float = 0.02F) : Int
+        {
+            val hsv = FloatArray(3)
+            val outHsv = FloatArray(3)
+            Color.colorToHSV(color, hsv)
+            outHsv[0] = hsv[0]
+            outHsv[1] = hsv[1]
+            if (hsv[2] + value <= 1) {
+                outHsv[2] = hsv[2] + value
+            } else {
+                outHsv[2] = 1F
+            }
+
+            return Color.HSVToColor(outHsv)
+        }
+        fun lightenColor(colorKey: String, value: Float = 0.02F) : Int
+        {
+            return lightenColor( color(colorKey), value )
+        }
+
         // alpha: от 0 до 1
         fun alphaColor(color: Int, alpha: Float) : Int
         {
@@ -195,12 +215,11 @@ class Theme
             outHsv[1] = hsv[1]
             if (hsv[2] >= 0.5F) {
                 outHsv[2] = hsv[2] - 0.05F
-                return Color.HSVToColor(outHsv)
-            }
-            else {
+            } else {
                 outHsv[2] = hsv[2] + 0.05F
-                return Color.HSVToColor(outHsv)
             }
+
+            return Color.HSVToColor(outHsv)
         }
         fun ripplizeColor(colorKey: String) : Int
         {

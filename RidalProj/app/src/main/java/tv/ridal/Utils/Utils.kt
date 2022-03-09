@@ -9,6 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import tv.ridal.Application.ApplicationLoader
 import kotlin.math.ceil
+import kotlin.math.floor
 
 class Utils
 {
@@ -33,7 +34,7 @@ class Utils
             if (value == 0) {
                 return 0
             }
-            return ceil(density * value).toInt()
+            return floor(density * value).toInt()
         }
 
         fun dp(value: Float) : Float

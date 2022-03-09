@@ -18,6 +18,7 @@ import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.multiStackNavigationController
 import tv.ridal.Application.UserData.USER
 import tv.ridal.Application.Theme
+import tv.ridal.Utils.MultiListener
 import tv.ridal.Utils.Utils
 
 class ApplicationActivity : BaseActivity()
@@ -61,6 +62,8 @@ class ApplicationActivity : BaseActivity()
 
     lateinit var bottomNavigationView: BottomNavigationView
 
+    var reselectListener = MultiListener()
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -99,11 +102,15 @@ class ApplicationActivity : BaseActivity()
 
             setOnApplyWindowInsetsListener { v, insets -> insets }
             setOnNavigationItemSelectedListener { multiStackNavigator.show(tabs.indexOf(it.itemId)).let { true } }
-            setOnNavigationItemReselectedListener { multiStackNavigator.activeNavigator.clear() }
+            setOnNavigationItemReselectedListener {
+                multiStackNavigator.activeNavigator.clear() // возврат к начальному экрану активной вкладки
+
+                reselectListener.invokeAll()
+            }
         }
 
         bottomNavigationView.apply {
-            setBackgroundColor(Theme.color(Theme.color_bg))
+            setBackgroundColor( Theme.lightenColor(Theme.color_bg) )
 
             itemIconTintList = ColorStateList(
                 arrayOf(

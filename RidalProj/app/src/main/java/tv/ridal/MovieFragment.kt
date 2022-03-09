@@ -132,7 +132,7 @@ class MovieFragment : BaseFragment()
                     Theme.createRect(
                         Theme.Fill( intArrayOf(Theme.alphaColor(Theme.COLOR_BLACK, 0.5F), Theme.COLOR_TRANSPARENT), GradientDrawable.Orientation.TOP_BOTTOM )
                     ),
-                    Theme.createRect( Theme.color_bg ),
+                    Theme.createRect( Theme.lightenColor(Theme.color_bg) )
                 )
             )
 
@@ -151,7 +151,7 @@ class MovieFragment : BaseFragment()
         scroll = NestedScrollView(context).apply {
             setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
 
-                val limitHeight = headerView.height - actionBar.height
+                val limitHeight = headerView.movieNameHeightIndicator
 
                 if (scrollY > limitHeight && oldScrollY <= limitHeight) {
                     actionBar.apply {
@@ -214,7 +214,11 @@ class MovieFragment : BaseFragment()
             context.imageLoader.enqueue(request)
         }
 
-        headerView.setData(movieInfo.releaseDate, movieInfo.countries, movieInfo.genres)
+        headerView.apply {
+            setData(movieInfo.releaseDate, movieInfo.countries, movieInfo.genres)
+            setActors(movieInfo.actors)
+            setDuration(movieInfo.duration)
+        }
 
         // рейтинги
         if ( movieInfo.hasRatings() )
@@ -310,6 +314,7 @@ class MovieFragment : BaseFragment()
             }
         }
 
+        // актеры
         if ( movieInfo.hasActors() )
         {
             scrollLayout.addView( createSectionNameView(Locale.text(Locale.text_actors)) )
@@ -321,15 +326,17 @@ class MovieFragment : BaseFragment()
     private fun createActorsView()
     {
         actorsView = RecyclerView(context).apply {
+            setPadding(Utils.dp(8), 0, Utils.dp(8), 0)
+            clipToPadding = false
+
             edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
                 override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
                     return EdgeEffect(view.context).apply { color = Theme.color(Theme.color_main) }
                 }
             }
-            clipToPadding = false
 
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            addItemDecoration( SpacingItemDecoration(Utils.dp(13), Utils.dp(5), Utils.dp(10)) )
+            addItemDecoration( SpacingItemDecoration(Utils.dp(12), Utils.dp(5), Utils.dp(10)) )
 
             adapter = PeopleAdapter( movieInfo.actors!! )
         }
@@ -343,6 +350,11 @@ class MovieFragment : BaseFragment()
         private var nameView: TextView
         private var ratingsLayout: LinearLayout? = null
         private var dataText: TextView? = null
+        private var actorsText: TextView? = null
+        private var durationView: LinearLayout? = null
+
+        var movieNameHeightIndicator: Int = 0 // !
+
 
         fun setPoster(drawable: Drawable)
         {
@@ -391,8 +403,6 @@ class MovieFragment : BaseFragment()
             }
 
             dataText = TextView(context).apply {
-                setPadding(Utils.dp(20), 0, Utils.dp(15), Utils.dp(15))
-
                 setTextColor( Theme.color(Theme.color_text2) )
                 typeface = Theme.typeface(Theme.tf_normal)
                 textSize = 16F
@@ -405,6 +415,50 @@ class MovieFragment : BaseFragment()
             }
             addView(dataText, LayoutHelper.createFrame(
                 LayoutHelper.WRAP_CONTENT,  LayoutHelper.WRAP_CONTENT,
+                Gravity.START or Gravity.BOTTOM
+            ))
+        }
+
+        fun setActors(actors: ArrayList<Movie.Person>?)
+        {
+            if (actors == null) return
+
+            var str = "${Locale.text(Locale.text_actors)}: "
+
+            for (i in actors.indices)
+            {
+                if (i == 3) break
+
+                str += actors[i].name
+                if (i != actors.lastIndex) {
+                    str += ", "
+                }
+            }
+
+            actorsText = TextView(context).apply {
+                setTextColor( Theme.color(Theme.color_text2) )
+                typeface = Theme.typeface(Theme.tf_normal)
+                textSize = 16F
+                setLines(1)
+                maxLines = 1
+                isSingleLine = true
+                ellipsize = TextUtils.TruncateAt.END
+
+                text = str
+            }
+            addView(actorsText, LayoutHelper.createFrame(
+                LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+                Gravity.START or Gravity.BOTTOM
+            ))
+        }
+
+        fun setDuration(duration: String?)
+        {
+            if (duration == null) return
+
+            durationView = DurationView(context, duration)
+            addView(durationView, LayoutHelper.createFrame(
+                LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
                 Gravity.START or Gravity.BOTTOM
             ))
         }
@@ -477,18 +531,43 @@ class MovieFragment : BaseFragment()
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
         {
             val wms = MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY)
-
             super.onMeasure(wms, wms)
 
             var bottomPadding = 0
             if (ratingsLayout != null)
             {
-                ratingsLayout?.measure(0, 0)
+                ratingsLayout!!.measure(0, 0)
                 bottomPadding = ratingsLayout!!.measuredHeight
+            }
+
+            if (durationView != null)
+            {
+                durationView!!.updateLayoutParams<FrameLayout.LayoutParams> {
+                    setMargins(0, 0, 0, bottomPadding)
+                }
+                durationView!!.measure(0, 0)
+                bottomPadding += durationView!!.measuredHeight
+            }
+
+            if (actorsText != null)
+            {
+                var padding = Utils.dp(15)
+                if (durationView != null) padding = Utils.dp(10)
+
+                actorsText!!.setPadding(Utils.dp(20), 0, Utils.dp(15), padding)
+                actorsText!!.updateLayoutParams<FrameLayout.LayoutParams> {
+                    setMargins(0, 0, 0, bottomPadding)
+                }
+                actorsText!!.measure(0, 0)
+                bottomPadding += actorsText!!.measuredHeight
             }
 
             if (dataText != null)
             {
+                var padding = Utils.dp(15)
+                if (actorsText != null) padding = Utils.dp(5)
+
+                dataText!!.setPadding(Utils.dp(20), 0, Utils.dp(15), padding)
                 dataText!!.updateLayoutParams<FrameLayout.LayoutParams> {
                     setMargins(0, 0, 0, bottomPadding)
                 }
@@ -497,13 +576,17 @@ class MovieFragment : BaseFragment()
                 bottomPadding += dataText!!.measuredHeight
             }
 
+            bottomPadding += Utils.dp(3)
             nameView.updateLayoutParams<FrameLayout.LayoutParams> {
-                setMargins(Utils.dp(20), 0, 0, bottomPadding + Utils.dp(3))
+                setMargins(Utils.dp(20), 0, 0, bottomPadding)
             }
 
             gradientView.updateLayoutParams<FrameLayout.LayoutParams> {
                 height = this@HeaderView.measuredHeight - Utils.dp(25 + 56)
             }
+
+            actionBar.measure(0, 0)
+            movieNameHeightIndicator = measuredHeight - bottomPadding - actionBar.measuredHeight
         }
 
         inner class RatingView(context: Context, private val rating: Movie.Rating) : LinearLayout(context)
@@ -563,6 +646,42 @@ class MovieFragment : BaseFragment()
                 ))
             }
 
+        }
+
+        inner class DurationView(context: Context, private val duration: String) : LinearLayout(context)
+        {
+            init
+            {
+                createUI()
+            }
+
+            private fun createUI()
+            {
+                setPadding(Utils.dp(20), 0, Utils.dp(7), Utils.dp(10))
+
+                val drawable = Theme.drawable(R.drawable.time, Theme.COLOR_WHITE)
+                val iv = ImageView(context).apply {
+                    setImageDrawable(drawable)
+                }
+                addView(iv, LayoutHelper.createLinear(
+                    LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT
+                ))
+
+                val tv = TextView(context).apply {
+                    setTextColor( Theme.COLOR_WHITE )
+                    textSize = 17F
+                    typeface = Theme.typeface(Theme.tf_bold)
+
+                    gravity = Gravity.CENTER_VERTICAL
+
+                    text = duration
+                }
+                addView(tv, LayoutHelper.createLinear(
+                    LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+                    Gravity.CENTER_VERTICAL,
+                    5, 0, 0, 0
+                ))
+            }
         }
 
     }
