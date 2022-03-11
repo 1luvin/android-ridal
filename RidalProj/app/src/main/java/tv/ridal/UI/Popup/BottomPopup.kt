@@ -2,10 +2,12 @@ package tv.ridal.UI.Popup
 
 import android.content.Context
 import android.graphics.drawable.ShapeDrawable
+import android.transition.Explode
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.transition.Fade
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import tv.ridal.Application.Theme
@@ -26,7 +28,11 @@ open class BottomPopup(context: Context) : BottomSheetDialog(context, R.style.Bo
 
     init
     {
-        this.window?.setDimAmount(DIM_EXPANDED)
+        this.window?.apply {
+            setDimAmount(DIM_EXPANDED)
+
+            attributes.windowAnimations = R.style.BottomPopupAnimations
+        }
 
         this.behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {

@@ -20,12 +20,12 @@ class Theme
 
         private fun createColors()
         {
-            mainColor = COLOR_TWITCH
+            mainColor = COLOR_LIGHT_CHERRY
 
             var colorBg = 0xFF1A1640.toInt()
             var colorText = 0xFFFFFFFF.toInt()
             var colorText2 = mixColors(colorBg, colorText, 0.7F)
-            var colorBottomNavIconInactive = mixColors(colorBg, mainColor, 0.5F)
+            var colorBottomNavIconInactive = mixColors(colorBg, 0xFFFFFFFF.toInt(), 0.5F)
             var colorSearchResultBest = 0xFF00FF00.toInt()
             var colorSearchResultMiddle = mixColors(colorBg, colorText, 0.5F)
             var colorSearchResultWorst = 0xFFFF0000.toInt()
@@ -36,6 +36,7 @@ class Theme
                 put(color_text, colorText)
                 put(color_text2, colorText2)
                 put(color_bottomNavIcon_inactive, colorBottomNavIconInactive)
+                put(color_bottomNavIcon_active, 0xFFFFFFFF.toInt())
                 put(color_searchResult_best, colorSearchResultBest)
                 put(color_searchResult_middle, colorSearchResultMiddle)
                 put(color_searchResult_worst, colorSearchResultWorst)
@@ -140,7 +141,6 @@ class Theme
             when (colorKey)
             {
                 color_main -> return mainColor
-                color_bottomNavIcon_active -> return mainColor
             }
             return activeColors[colorKey] ?: 0x0
         }

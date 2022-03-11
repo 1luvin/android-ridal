@@ -9,6 +9,7 @@ import android.view.View
 class InstantPressListener(private val ofView: View) : View.OnTouchListener
 {
     private val ALPHA_PRESSED: Float = 0.6F
+    private val SCALE_PRESSED: Float = 0.99F
 
     private val alphaAnimator: ValueAnimator = ValueAnimator().apply {
         duration = 100
@@ -43,7 +44,7 @@ class InstantPressListener(private val ofView: View) : View.OnTouchListener
 
         scaleAnimator.apply {
             cancel()
-            setFloatValues(ofView.scaleX, 0.98F, 1F)
+            setFloatValues(ofView.scaleX, SCALE_PRESSED, 1F)
             start()
         }
     }
@@ -66,7 +67,7 @@ class InstantPressListener(private val ofView: View) : View.OnTouchListener
 
                 scaleAnimator.apply {
                     cancel()
-                    setFloatValues(1F, 0.98F)
+                    setFloatValues(1F, SCALE_PRESSED)
                     start()
                 }
                 return true

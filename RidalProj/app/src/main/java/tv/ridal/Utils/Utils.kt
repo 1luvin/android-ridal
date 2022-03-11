@@ -17,6 +17,7 @@ class Utils
     {
         var density: Float = 1F //
 
+        var displayWidth: Int = 0 //
         var displayHeight: Int = 0 //
 
         fun checkDisplaySize(context: Context)
@@ -26,6 +27,7 @@ class Utils
 
             density = metrics.density
 
+            displayWidth = metrics.widthPixels
             displayHeight = metrics.heightPixels
         }
 

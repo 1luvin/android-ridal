@@ -19,6 +19,7 @@ import tv.ridal.UI.Animators.StateValueAnimator
 import tv.ridal.UI.Drawables.MultiDrawable
 import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.LayoutHelper
+import tv.ridal.UI.View.RTextView
 import tv.ridal.Utils.Utils
 import kotlin.math.max
 
@@ -119,8 +120,8 @@ class ActionBar(context: Context) : FrameLayout(context)
 
     private var actionButtonView: ImageView? = null
     private var titleFrame: FrameLayout? = null
-    private var titleView: TextView? = null
-    private var subtitleView: TextView? = null
+    private var titleView: RTextView? = null
+    private var subtitleView: RTextView? = null
 
     private fun createActionButtonView()
     {
@@ -145,7 +146,7 @@ class ActionBar(context: Context) : FrameLayout(context)
             )
         }
 
-        titleView = TextView(context).apply {
+        titleView = RTextView(context).apply {
             setTextColor(Theme.color(Theme.color_text))
             setLines(1)
             maxLines = 1
@@ -167,9 +168,9 @@ class ActionBar(context: Context) : FrameLayout(context)
 
     private fun createSubtitleView()
     {
-        subtitleView = TextView(context).apply {
+        subtitleView = RTextView(context).apply {
             setTextColor(Theme.color(Theme.color_text2))
-            textSize = 16F
+            textSize = 15F
             typeface = Theme.typeface(Theme.tf_normal)
             setLines(1)
             maxLines = 1
@@ -177,17 +178,20 @@ class ActionBar(context: Context) : FrameLayout(context)
             ellipsize = TextUtils.TruncateAt.END
         }
 
+        titleView!!.apply {
+            textSize = 19F
+        }
         titleView!!.layoutParams = LayoutHelper.createFrame(
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.TOP or Gravity.CENTER_HORIZONTAL,
-            0, 7, 0, 0
+            0, 4, 0, 0
 
         )
 
         titleFrame!!.addView(subtitleView, LayoutHelper.createFrame(
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.TOP or Gravity.CENTER_HORIZONTAL,
-            0, 7 + 22 + 2, 0, 0
+            0, 4 + titleTextSize.toInt() + 2, 0, 0
         ))
     }
 
