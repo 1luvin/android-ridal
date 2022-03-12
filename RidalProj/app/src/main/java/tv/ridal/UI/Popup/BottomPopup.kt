@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.transition.Fade
+import android.view.WindowManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import tv.ridal.Application.Theme
@@ -31,7 +32,7 @@ open class BottomPopup(context: Context) : BottomSheetDialog(context, R.style.Bo
         this.window?.apply {
             setDimAmount(DIM_EXPANDED)
 
-            attributes.windowAnimations = R.style.BottomPopupAnimations
+//            attributes.windowAnimations = R.style.BottomPopupAnimations
         }
 
         this.behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {

@@ -41,9 +41,13 @@ class Locale
 
                     texts[text_filters] = "Фильтры"
 
+                    texts[text_watch] = "Смотреть"
+
                     texts[text_inLists] = "Входит в списки"
+                    texts[text_inCollections] = "Входит в коллекции"
                     texts[text_country] = "Страна"
                     texts[text_actors] = "Актеры"
+                    texts[text_producers] = "Режиссеры"
 
                     /*
                         Жанры
@@ -163,9 +167,13 @@ class Locale
 
         const val text_filters = "text_filters"
 
+        const val text_watch = "text_watch"
+
         const val text_inLists = "text_inLists"
+        const val text_inCollections = "text_inCollections"
         const val text_country = "text_country"
         const val text_actors = "text_actors"
+        const val text_producers = "text_producers"
 
         /*
             Жанры

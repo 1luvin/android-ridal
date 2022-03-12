@@ -68,6 +68,8 @@ dependencies {
     // exo player
 //    implementation 'com.google.android.exoplayer:exoplayer-core:2.16.1'
 //    implementation 'com.google.android.exoplayer:exoplayer-ui:2.16.1'
+    // progressbar
+    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
 
 }
 

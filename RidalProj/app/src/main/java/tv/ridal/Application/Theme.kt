@@ -20,7 +20,7 @@ class Theme
 
         private fun createColors()
         {
-            mainColor = COLOR_LIGHT_CHERRY
+            mainColor = COLOR_TELEGRAM
 
             var colorBg = 0xFF1A1640.toInt()
             var colorText = 0xFFFFFFFF.toInt()
@@ -53,6 +53,7 @@ class Theme
 
         const val COLOR_TWITCH = 0xFF7C24FF.toInt()
         const val COLOR_LIGHT_CHERRY = 0xFFFF005F.toInt()
+        const val COLOR_TELEGRAM = 0xFF34ABDF.toInt()
 
         const val LIGHT: Int = 0
         const val DARK: Int = 1
@@ -194,6 +195,26 @@ class Theme
         fun lightenColor(colorKey: String, value: Float = 0.02F) : Int
         {
             return lightenColor( color(colorKey), value )
+        }
+
+        fun darkenColor(color: Int, value: Float = 0.02F) : Int
+        {
+            val hsv = FloatArray(3)
+            val outHsv = FloatArray(3)
+            Color.colorToHSV(color, hsv)
+            outHsv[0] = hsv[0]
+            outHsv[1] = hsv[1]
+            if (hsv[2] - value >= 0) {
+                outHsv[2] = hsv[2] - value
+            } else {
+                outHsv[2] = 0F
+            }
+
+            return Color.HSVToColor(outHsv)
+        }
+        fun darkenColor(colorKey: String, value: Float = 0.02F) : Int
+        {
+            return darkenColor( color(colorKey), value )
         }
 
         // alpha: от 0 до 1

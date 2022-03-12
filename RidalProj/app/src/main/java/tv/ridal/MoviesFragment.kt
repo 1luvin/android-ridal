@@ -10,6 +10,7 @@ import android.util.TypedValue
 import android.view.*
 import android.view.animation.DecelerateInterpolator
 import android.widget.*
+import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.GridLayoutManager
@@ -364,13 +365,13 @@ class MoviesFragment : BaseFragment()
 
         init
         {
-            this.createUi()
+            createUi()
 
-            this.setOnShowListener {
+            setOnShowListener {
                 onFiltersOpen()
             }
 
-            this.isDraggable = false
+            isDraggable = false
         }
 
         private fun createUi()
@@ -418,11 +419,11 @@ class MoviesFragment : BaseFragment()
                 genreView = GenreView().apply {
                     visibility = View.GONE
                 }
-                popupView.addView(genreView, LayoutHelper.createFrame2(
-                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-                    Gravity.TOP,
-                    0, 0, 0, bottomLayout.measuredHeight
-                ))
+//                popupView.addView(genreView, LayoutHelper.createFrame2(
+//                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+//                    Gravity.TOP,
+//                    0, 0, 0, bottomLayout.measuredHeight
+//                ))
             }
 
             if (hasSections())
@@ -436,11 +437,6 @@ class MoviesFragment : BaseFragment()
                 genreView = GenreView().apply {
                     visibility = View.GONE
                 }
-                popupView.addView(genreView, LayoutHelper.createFrame2(
-                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-                    Gravity.TOP,
-                    0, 0, 0, bottomLayout.measuredHeight
-                ))
             }
 
             sortingView = SortingView().apply {
@@ -450,11 +446,6 @@ class MoviesFragment : BaseFragment()
                     currentView = this
                 }
             }
-            popupView.addView(sortingView, LayoutHelper.createFrame2(
-                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-                Gravity.TOP,
-                0, 0, 0, bottomLayout.measuredHeight
-            ))
 
             val w = Utils.displayWidth - Utils.dp(12) * 2
             setContentView(popupView, FrameLayout.LayoutParams(
@@ -483,9 +474,17 @@ class MoviesFragment : BaseFragment()
                     visibility = View.VISIBLE
                 }
 
-                showResultsButton.measure(0, 0)
-                popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                    height = endHeight + bottomLayout.measuredHeight
+                popupView.apply {
+                    updateLayoutParams<FrameLayout.LayoutParams> {
+                        height = endHeight + bottomLayout.measuredHeight
+                    }
+
+                    removeView(fromView)
+                    popupView.addView(toView, LayoutHelper.createFrame2(
+                        LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                        Gravity.TOP,
+                        0, 0, 0, bottomLayout.measuredHeight
+                    ))
                 }
 
                 return
@@ -527,6 +526,12 @@ class MoviesFragment : BaseFragment()
                             alpha = 0F
                             visibility = View.VISIBLE
                         }
+
+                        popupView.addView(toView, LayoutHelper.createFrame2(
+                            LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                            Gravity.TOP,
+                            0, 0, 0, bottomLayout.measuredHeight
+                        ))
                     }
 
                     override fun onAnimationEnd(animation: Animator?) {
@@ -539,6 +544,8 @@ class MoviesFragment : BaseFragment()
                         fromView.apply {
                             visibility = View.GONE
                         }
+
+                        popupView.removeView(fromView)
                     }
                 })
 
@@ -651,7 +658,7 @@ class MoviesFragment : BaseFragment()
             newFiltersListener = l
         }
 
-        inner class FiltersView : LinearLayout(ApplicationActivity.instance())
+        inner class FiltersView : LinearLayout(context)
         {
             var genreCell: FilterCell? = null
             lateinit var sortingCell: FilterCell
@@ -727,7 +734,7 @@ class MoviesFragment : BaseFragment()
             }
         }
 
-        inner class GenreView : FrameLayout(ApplicationActivity.instance())
+        inner class GenreView : FrameLayout(context)
         {
             private lateinit var actionBar: ActionBar
             private var scroll: NestedScrollView
@@ -822,7 +829,7 @@ class MoviesFragment : BaseFragment()
             }
         }
 
-        inner class SortingView : FrameLayout(ApplicationActivity.instance())
+        inner class SortingView : FrameLayout(context)
         {
             private lateinit var actionBar: ActionBar
             private var scroll: NestedScrollView
@@ -922,11 +929,10 @@ class MoviesFragment : BaseFragment()
             }
         }
 
-        inner class SectionView : LinearLayout(ApplicationActivity.instance())
+        inner class SectionView : LinearLayout(context)
         {
 
         }
-
 
 
     }

@@ -1,6 +1,7 @@
 package tv.ridal
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
@@ -19,6 +20,8 @@ import coil.transition.TransitionTarget
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
@@ -30,7 +33,11 @@ import tv.ridal.HDRezka.Streams.StreamData
 import tv.ridal.UI.ActionBar.ActionBar
 import tv.ridal.UI.Adapters.PeopleAdapter
 import tv.ridal.UI.Cells.PointerCell
+import tv.ridal.UI.InstantPressListener
+import tv.ridal.UI.Layout.VLinearLayout
+import tv.ridal.UI.Popup.LoadingPopup
 import tv.ridal.UI.SpacingItemDecoration
+import tv.ridal.UI.View.RTextView
 import tv.ridal.Utils.Utils
 import kotlin.random.Random
 
@@ -86,6 +93,12 @@ class MovieFragment : BaseFragment()
 
     private lateinit var headerView: HeaderView
     private var actorsView: RecyclerView? = null
+    private var producersView: RecyclerView? = null
+
+    private lateinit var watchButton: Button
+    private lateinit var watchFab: FloatingActionButton
+
+    private val loadingPopup: LoadingPopup = LoadingPopup(context)
 
     private fun createUi()
     {
@@ -99,14 +112,18 @@ class MovieFragment : BaseFragment()
         }
 
         createScroll()
-        scrollLayout = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-        }
+        scrollLayout = VLinearLayout(context)
         scroll.addView(scrollLayout)
 
         headerView = HeaderView()
+        createWatchButtons()
         scrollLayout.apply {
             addView(headerView)
+            addView(watchButton, LayoutHelper.createLinear(
+                LayoutHelper.MATCH_PARENT, 46,
+                Gravity.CENTER_HORIZONTAL,
+                20, 10, 20, 15
+            ))
         }
 
         createActionBar()
@@ -118,6 +135,12 @@ class MovieFragment : BaseFragment()
 
             addView(actionBar, LayoutHelper.createFrame(
                 LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
+            ))
+
+            addView(watchFab, LayoutHelper.createFrame(
+                LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+                Gravity.BOTTOM or Gravity.END,
+                0, 0, 12, 12
             ))
         }
     }
@@ -153,18 +176,70 @@ class MovieFragment : BaseFragment()
 
                 val limitHeight = headerView.movieNameHeightIndicator
 
-                if (scrollY > limitHeight && oldScrollY <= limitHeight) {
+                if (limitHeight in oldScrollY until scrollY) {
                     actionBar.apply {
                         showBackground(1)
                         showTitle()
                     }
-                } else if (scrollY <= limitHeight && oldScrollY > limitHeight) {
+                } else if (limitHeight in scrollY until oldScrollY) {
                     actionBar.apply {
                         showBackground(0)
                         hideTitle()
                     }
                 }
+
+                val watchBtnHeight = headerView.measuredHeight + watchButton.measuredHeight - actionBar.measuredHeight
+                if (watchBtnHeight in oldScrollY until scrollY) {
+                    watchFab.show()
+                } else if (watchBtnHeight in scrollY until oldScrollY) {
+                    watchFab.hide()
+                }
             }
+        }
+    }
+
+    private fun createWatchButtons()
+    {
+        watchButton = MaterialButton(context).apply {
+            gravity = Gravity.CENTER
+            setOnTouchListener( InstantPressListener(this) )
+
+            backgroundTintList = null
+            background = Theme.createRect(
+                Theme.color_main,
+                radii = FloatArray(4).apply {
+                    fill(Utils.dp(7F))
+                }
+            )
+
+            icon = Theme.drawable(R.drawable.play)
+            iconTint = ColorStateList.valueOf(Theme.COLOR_WHITE)
+            iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
+
+            letterSpacing = 0.0F
+            setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16F)
+            isAllCaps = false
+            typeface = Theme.typeface(Theme.tf_bold)
+            setTextColor(Theme.COLOR_WHITE)
+            text = Locale.text(Locale.text_watch)
+
+            setOnClickListener {
+                loadingPopup.show()
+            }
+        }
+
+        watchFab = FloatingActionButton(context).apply {
+            backgroundTintList = ColorStateList.valueOf(Theme.color(Theme.color_main))
+            rippleColor = Theme.ripplizeColor(Theme.color_main)
+
+            setImageDrawable(Theme.drawable(R.drawable.play))
+            imageTintList = ColorStateList.valueOf(Theme.COLOR_WHITE)
+
+            setOnClickListener {
+                //
+            }
+
+            hide()
         }
     }
 
@@ -234,22 +309,48 @@ class MovieFragment : BaseFragment()
 
                 setTextColor( Theme.color(Theme.color_text) )
                 typeface = Theme.typeface(Theme.tf_normal)
-                textSize = 16F
+                textSize = 16.5F
 
                 text = movieInfo.description!!.text!!
             }
             scrollLayout.addView(tv)
         }
 
+        // актеры
+        if ( movieInfo.hasActors() )
+        {
+            actorsView = createPeopleView(movieInfo.actors!!)
+
+            val actorsSection = SectionView( Locale.text(Locale.text_actors) ).apply {
+                setLayout(
+                    actorsView!!
+                )
+            }
+
+            scrollLayout.addView(actorsSection)
+        }
+
+        if ( movieInfo.hasProducers() )
+        {
+            producersView = createPeopleView(movieInfo.producers!!)
+
+            val producersSection = SectionView( Locale.text(Locale.text_producers) ).apply {
+                setLayout(
+                    producersView!!
+                )
+            }
+
+            scrollLayout.addView(producersSection)
+        }
+
         // входит в списки
         if ( movieInfo.hasInLists() )
         {
-            scrollLayout.addView( createSectionNameView(Locale.text(Locale.text_inLists)) )
-
+            val layout = VLinearLayout(context)
             val lists = movieInfo.inLists!!
             for (list in lists)
             {
-                val listCell = PointerCell(context).apply {
+                val cell = PointerCell(context).apply {
                     text = list.name!!
 
                     setOnClickListener {
@@ -262,15 +363,54 @@ class MovieFragment : BaseFragment()
                         startFragment( MoviesFragment.newInstance(args) )
                     }
                 }
-                scrollLayout.addView(listCell)
+                layout.addView(cell)
             }
+
+            val section = SectionView( Locale.text(Locale.text_inLists) ).apply {
+                setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.05F) )
+
+                setLayout(layout)
+            }
+
+            scrollLayout.addView(section)
+        }
+
+        // входит в коллекции
+        if ( movieInfo.hasInCollections() )
+        {
+            val layout = VLinearLayout(context)
+            val collections = movieInfo.inCollections!!
+            for (collection in collections)
+            {
+                val cell = PointerCell(context).apply {
+                    text = collection.name!!
+
+                    setOnClickListener {
+                        val args = MoviesFragment.Arguments().apply {
+                            title = collection.name!!
+                            url = collection.url!!
+
+                            hasSorting = false
+                        }
+                        startFragment( MoviesFragment.newInstance(args) )
+                    }
+                }
+                layout.addView(cell)
+            }
+
+            val section = SectionView( Locale.text(Locale.text_inCollections) ).apply {
+                setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.05F) )
+
+                setLayout(layout)
+            }
+
+            scrollLayout.addView(section)
         }
 
         // страна
         if ( movieInfo.hasCountries() )
         {
-            scrollLayout.addView( createSectionNameView(Locale.text(Locale.text_country)) )
-
+            val layout = VLinearLayout(context)
             val countries = movieInfo.countries!!
             for (country in countries)
             {
@@ -285,15 +425,24 @@ class MovieFragment : BaseFragment()
                         startFragment( MoviesFragment.newInstance(args) )
                     }
                 }
-                scrollLayout.addView(countryCell)
+                layout.addView(countryCell)
             }
+
+            val countriesSection = SectionView( Locale.text(Locale.text_country) ).apply {
+                setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.05F) )
+
+                setLayout(layout)
+            }
+
+            scrollLayout.addView(countriesSection)
         }
 
         // жанры
         if ( movieInfo.hasGenres() )
         {
-            scrollLayout.addView( createSectionNameView(Locale.text(Locale.text_genre)) )
-
+            val layout = VLinearLayout(context).apply {
+                setPadding(0, 0, 0, Utils.dp(40))
+            }
             val genres = movieInfo.genres!!
             for (genre in genres)
             {
@@ -310,22 +459,22 @@ class MovieFragment : BaseFragment()
                         startFragment( MoviesFragment.newInstance(args) )
                     }
                 }
-                scrollLayout.addView(genreCell)
+                layout.addView(genreCell)
             }
-        }
 
-        // актеры
-        if ( movieInfo.hasActors() )
-        {
-            scrollLayout.addView( createSectionNameView(Locale.text(Locale.text_actors)) )
-            createActorsView()
-            scrollLayout.addView(actorsView)
+            val genresSection = SectionView( Locale.text(Locale.text_genre) ).apply {
+                setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.04F) )
+
+                setLayout(layout)
+            }
+
+            scrollLayout.addView(genresSection)
         }
     }
 
-    private fun createActorsView()
+    private fun createPeopleView(people: ArrayList<Movie.Person>) : RecyclerView
     {
-        actorsView = RecyclerView(context).apply {
+        return RecyclerView(context).apply {
             setPadding(Utils.dp(8), 0, Utils.dp(8), 0)
             clipToPadding = false
 
@@ -338,12 +487,12 @@ class MovieFragment : BaseFragment()
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             addItemDecoration( SpacingItemDecoration(Utils.dp(12), Utils.dp(5), Utils.dp(10)) )
 
-            adapter = PeopleAdapter( movieInfo.actors!! )
+            adapter = PeopleAdapter( people )
         }
     }
 
 
-    inner class HeaderView : FrameLayout(ApplicationActivity.instance())
+    inner class HeaderView : FrameLayout(context)
     {
         var posterView: ImageView
         private var gradientView: View
@@ -686,9 +835,34 @@ class MovieFragment : BaseFragment()
 
     }
 
-    private fun createSectionNameView(text: String) : TextView
+    inner class SectionView(sectionName: String) : LinearLayout(context)
     {
-        return TextView(context).apply {
+        private var sectionNameView: TextView
+        private var container: FrameLayout
+
+        init
+        {
+            orientation = LinearLayout.VERTICAL
+
+            sectionNameView = createSectionNameView(sectionName)
+            addView(sectionNameView)
+
+            container = FrameLayout(context)
+            addView(container, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
+            ))
+        }
+
+        fun setLayout(layout: View)
+        {
+            if (container.childCount > 0) container.removeAllViews()
+            container.addView(layout)
+        }
+    }
+
+    private fun createSectionNameView(text: String) : RTextView
+    {
+        return RTextView(context).apply {
             setPadding(Utils.dp(20), Utils.dp(15), Utils.dp(20), Utils.dp(5))
 
             this.text = text
