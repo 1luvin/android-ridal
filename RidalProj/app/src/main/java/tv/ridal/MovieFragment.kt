@@ -120,7 +120,7 @@ class MovieFragment : BaseFragment()
         scrollLayout.apply {
             addView(headerView)
             addView(watchButton, LayoutHelper.createLinear(
-                LayoutHelper.MATCH_PARENT, 46,
+                LayoutHelper.MATCH_PARENT, 40,
                 Gravity.CENTER_HORIZONTAL,
                 20, 10, 20, 15
             ))
@@ -367,7 +367,7 @@ class MovieFragment : BaseFragment()
             }
 
             val section = SectionView( Locale.text(Locale.text_inLists) ).apply {
-                setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.05F) )
+                setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.04F) )
 
                 setLayout(layout)
             }
@@ -399,7 +399,7 @@ class MovieFragment : BaseFragment()
             }
 
             val section = SectionView( Locale.text(Locale.text_inCollections) ).apply {
-                setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.05F) )
+                setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.04F) )
 
                 setLayout(layout)
             }
@@ -429,7 +429,7 @@ class MovieFragment : BaseFragment()
             }
 
             val countriesSection = SectionView( Locale.text(Locale.text_country) ).apply {
-                setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.05F) )
+                setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.04F) )
 
                 setLayout(layout)
             }
