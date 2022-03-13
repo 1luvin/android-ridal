@@ -33,6 +33,7 @@ import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.UI.Layout.SingleCheckGroup
 import tv.ridal.UI.Popup.BottomPopup
 import tv.ridal.HDRezka.*
+import tv.ridal.UI.Layout.VLinearLayout
 import tv.ridal.Utils.Utils
 import kotlin.math.abs
 
@@ -657,7 +658,7 @@ class MoviesFragment : BaseFragment()
             newFiltersListener = l
         }
 
-        inner class FiltersView : LinearLayout(context)
+        inner class FiltersView : VLinearLayout(context)
         {
             var genreCell: FilterCell? = null
             lateinit var sortingCell: FilterCell
@@ -667,8 +668,6 @@ class MoviesFragment : BaseFragment()
 
             init
             {
-                orientation = LinearLayout.VERTICAL
-
                 createUi()
             }
 

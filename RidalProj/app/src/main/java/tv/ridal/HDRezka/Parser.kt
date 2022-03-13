@@ -396,14 +396,15 @@ class Parser
             Стримы
          */
 
-        fun parseTranslators(doc: Document) : ArrayList<Stream.FilmTranslator>
+        fun parseFilmTranslators(doc: Document) : ArrayList<Stream.FilmTranslator>
         {
             val translators = ArrayList<Stream.FilmTranslator>()
 
             val ul = doc.getElementById("translators-list")
             val lis = ul.getElementsByClass("b-translator__item")
             var li: Element
-            for (i in 0 until lis.size) {
+            for (i in 0 until lis.size)
+            {
                 li = lis[i]
                 val name = li.attr("title")
                 val data_id = li.attr("data-id")
@@ -411,6 +412,7 @@ class Parser
                 val data_camrip = li.attr("data-camrip")
                 val data_ads = li.attr("data-ads")
                 val data_director = li.attr("data-director")
+
                 val filmTranslator = Stream.FilmTranslator(
                     name,
                     data_id,
@@ -419,11 +421,80 @@ class Parser
                     data_ads,
                     data_director
                 )
+
                 translators.add(filmTranslator)
             }
 
             return translators
         }
+
+        fun parseSeriesTranslators(doc: Document) : ArrayList<Stream.SeriesTranslator>
+        {
+            val translators = ArrayList<Stream.SeriesTranslator>()
+
+            val ul = doc.getElementById("translators-list")
+            val lis: Elements = ul.getElementsByClass("b-translator__item")
+            var title: String
+            var li: Element
+            for (i in 0 until lis.size)
+            {
+                li = lis[i]
+
+                title = li.attr("title")
+                val imgs = li.getElementsByTag("img")
+                if (imgs.size > 0)
+                {
+                    title += "(${imgs[0].attr("title")})"
+                }
+
+                val translator = Stream.SeriesTranslator().apply {
+                    name = title
+                    translatorId = li.attr("data-translator_id")
+                }
+
+                translators.add(translator)
+            }
+
+            return translators
+        }
+
+        fun parseSeasons(doc: Document) : ArrayList<Stream.Season>
+        {
+            val seasons = ArrayList<Stream.Season>()
+
+            val ul = doc.getElementById("simple-seasons-tabs")
+            val lis = ul.getElementsByTag("li")
+            for (li in lis)
+            {
+                val season = Stream.Season().apply {
+                    title = li.text()
+                    id = li.attr("data-tab_id")
+                }
+
+                seasons.add(season)
+            }
+
+            return seasons
+        }
+
+        fun parseTranslatorId(html: String) : String
+        {
+            var id = ""
+            for (i in 0 until html.length - 23)
+            {
+                if (html[i] == 'C' && html[i + 1] == 'D' && html[i + 2] == 'N') {
+                    var k = i + 23
+                    while (html[k] != ',') {
+                        id += html[k]
+                        k++
+                    }
+                    break
+                }
+            }
+
+            return id
+        }
+
 
         fun parseStreams(html: String) : ArrayList<Stream>
         {

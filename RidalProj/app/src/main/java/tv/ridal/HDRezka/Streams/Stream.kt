@@ -15,4 +15,17 @@ data class Stream(val quality: String, val url: String)
             this.director = director
         }
     }
+
+    class SeriesTranslator
+    {
+        lateinit var name: String
+        lateinit var translatorId: String
+    }
+
+    class Season
+    {
+        lateinit var title: String
+        lateinit var id: String
+    }
+
 }

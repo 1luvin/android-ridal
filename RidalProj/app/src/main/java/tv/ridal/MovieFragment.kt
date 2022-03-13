@@ -1,5 +1,9 @@
 package tv.ridal
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
@@ -10,6 +14,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.*
+import android.view.animation.DecelerateInterpolator
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -28,6 +33,8 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
+import org.jsoup.select.Elements
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
@@ -36,7 +43,8 @@ import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Pager
 import tv.ridal.HDRezka.Parser
-import tv.ridal.HDRezka.Streams.Stream
+import tv.ridal.HDRezka.Streams.FilmStreamData
+import tv.ridal.HDRezka.Streams.SeriesStreamData
 import tv.ridal.HDRezka.Streams.StreamData
 import tv.ridal.UI.ActionBar.ActionBar
 import tv.ridal.UI.Adapters.PeopleAdapter
@@ -48,8 +56,8 @@ import tv.ridal.UI.Popup.LoadingPopup
 import tv.ridal.UI.SpacingItemDecoration
 import tv.ridal.UI.View.RTextView
 import tv.ridal.Utils.Utils
+import kotlin.math.abs
 import kotlin.random.Random
-
 
 class MovieFragment : BaseFragment()
 {
@@ -64,7 +72,6 @@ class MovieFragment : BaseFragment()
 
     private lateinit var movie: Movie
     private lateinit var movieInfo: Movie.Info
-    private var streamData: StreamData? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -267,6 +274,7 @@ class MovieFragment : BaseFragment()
     }
 
     private lateinit var webView: WebView
+    private lateinit var webViewInterface: JSInterface
     private var document: Document? = null
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -274,9 +282,19 @@ class MovieFragment : BaseFragment()
     {
         loadingPopup.show()
 
+        webViewInterface = JSInterface().apply {
+            onLoaded {
+                document = Jsoup.parse(it)
+                (context as ApplicationActivity).runOnUiThread {
+                    loadingPopup.dismiss()
+                    onWatch()
+                }
+            }
+        }
+
         webView = WebView(context).apply {
             settings.javaScriptEnabled = true
-            addJavascriptInterface(JSInterface(), "HTMLOUT")
+            addJavascriptInterface(webViewInterface, "HTMLOUT")
 
             webViewClient = object : WebViewClient() {
                 override fun onPageFinished(view: WebView?, url: String?) {
@@ -293,11 +311,13 @@ class MovieFragment : BaseFragment()
         @JavascriptInterface
         fun processHTML(html: String)
         {
-            document = Jsoup.parse(html)
-            (context as ApplicationActivity).runOnUiThread {
-                loadingPopup.dismiss()
-                onWatch()
-            }
+            onLoadListener?.invoke(html)
+        }
+
+        private var onLoadListener: ((html: String) -> Unit)? = null
+        fun onLoaded(l: (html: String) -> Unit)
+        {
+            onLoadListener = l
         }
     }
 
@@ -306,24 +326,44 @@ class MovieFragment : BaseFragment()
     {
         private lateinit var popupView: FrameLayout
 
-        private lateinit var translationView: VLinearLayout
+        private var translationView: TranslationView? = null
+        private fun hasTranslation() : Boolean = translationView != null
+
+        private var parsingDocument: Document
+
+        private lateinit var streamData: StreamData
 
         init
         {
+            isDraggable = false
+
+            parsingDocument = document!!.clone()
+
+            createStreamData()
             createUI()
+        }
+
+        private fun createStreamData()
+        {
+            streamData = if ( ! movie.type.isSerial) {
+                FilmStreamData()
+            } else SeriesStreamData()
         }
 
         private fun createUI()
         {
             popupView = FrameLayout(context).apply {
-                setPadding(0, 0, 0, Utils.dp(12))
                 background = Theme.createRect(
                     Theme.color_bg, radii = floatArrayOf(
                         Utils.dp(12F), Utils.dp(12F), Utils.dp(12F), Utils.dp(12F)
                     ))
             }
-            // если фильм
-            if (movie.type.ruType == HDRezka.FILM)
+            // Фильм, Мультфильм (односерийный), Аниме (односерийное)
+            if (
+                movie.type.ruType == HDRezka.FILM ||
+                (movie.type.ruType == HDRezka.CARTOON && ! movie.type.isSerial) ||
+                (movie.type.ruType == HDRezka.ANIME && ! movie.type.isSerial)
+            )
             {
                 // если есть озвучки
                 if ( Pager.isTranslatorsExist(document!!) )
@@ -336,6 +376,19 @@ class MovieFragment : BaseFragment()
 
                 }
             }
+            else // Сериал, Мультфильм (многосерийный), Аниме (многосерийное)
+            {
+                // если есть озвучки
+                if (Pager.isTranslatorsExist(document!!))
+                {
+                    translationView = TranslationView()
+                    popupView.addView(translationView)
+                }
+                else // если нет озвучек
+                {
+                    goToSeasons()
+                }
+            }
 
             val w = Utils.displayWidth - Utils.dp(12) * 2
             setContentView(popupView, FrameLayout.LayoutParams(
@@ -344,6 +397,138 @@ class MovieFragment : BaseFragment()
             ).apply {
                 setMargins(0, 0, 0, Utils.dp(12))
             })
+        }
+
+        private fun goToSeasons()
+        {
+            // если Сериал без озвучек, ищем id озвучки самостоятельно
+            if ( ! Pager.isTranslatorsExist(document!!) )
+            {
+                val translatorId = Parser.parseTranslatorId(document!!.html())
+                streamData.translatorId = translatorId
+            }
+
+            // имея id озвучки создаем соответствующий url и отправляем запрос
+            // после успешного ответа создаем SeasonView
+            // если имеются озвучки -> переходим от экрана TranslationView к SeasonView используя анимацию
+            // в противном случае -> просто добавляем SeasonView
+
+            webView.apply {
+
+                webViewInterface.apply {
+                    onLoaded {
+                        parsingDocument = Jsoup.parse(it)
+
+                        (context as ApplicationActivity).runOnUiThread {
+                            val seasonView = SeasonView()
+                            if (translationView != null) {
+                                navigate(translationView!!, seasonView)
+                            } else {
+                                popupView.addView(seasonView)
+                            }
+                        }
+                    }
+                }
+                loadUrl("javascript:(function(){document.querySelectorAll('[data-translator_id=\"${streamData.translatorId}\"]')[0].click();})()")
+            }
+        }
+
+        private fun navigate(fromView: View, toView: View, animated: Boolean = true)
+        {
+            toView.measure(0, 0)
+            val endHeight = toView.measuredHeight
+
+            if ( ! animated)
+            {
+                fromView.apply {
+                    alpha = 0F
+                    visibility = View.GONE
+                }
+                toView.apply {
+                    alpha = 1F
+                    visibility = View.VISIBLE
+                }
+
+                popupView.apply {
+                    updateLayoutParams<FrameLayout.LayoutParams> {
+                        height = endHeight
+                    }
+
+                    removeView(fromView)
+                    popupView.addView(toView, LayoutHelper.createFrame(
+                        LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                        Gravity.TOP
+                    ))
+                }
+
+                return
+            }
+
+            fromView.measure(0 ,0)
+            val startHeight = fromView.measuredHeight
+
+            val alphaAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
+                addUpdateListener {
+                    val animatedAlpha = it.animatedValue as Float
+                    toView.alpha = animatedAlpha
+                    fromView.alpha = 1F - animatedAlpha
+                }
+            }
+
+            val heightAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
+                addUpdateListener {
+                    val animatedHeight = it.animatedValue as Int
+                    popupView.updateLayoutParams<FrameLayout.LayoutParams> {
+                        height = animatedHeight
+                    }
+                }
+            }
+
+            AnimatorSet().apply {
+                duration = 320L + abs(endHeight - startHeight) / 40
+                interpolator = DecelerateInterpolator(1.1F)
+
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator?) {
+                        super.onAnimationStart(animation)
+
+                        popupView.updateLayoutParams<FrameLayout.LayoutParams> {
+                            height = fromView.measuredHeight
+                        }
+
+                        toView.apply {
+                            alpha = 0F
+                            visibility = View.VISIBLE
+                        }
+
+                        popupView.addView(toView, LayoutHelper.createFrame(
+                            LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                            Gravity.TOP
+                        ))
+                    }
+
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+
+                        popupView.updateLayoutParams<FrameLayout.LayoutParams> {
+                            height = LayoutHelper.WRAP_CONTENT
+                        }
+
+                        fromView.apply {
+                            visibility = View.GONE
+                        }
+
+                        popupView.removeView(fromView)
+                    }
+                })
+
+                playTogether(
+                    alphaAnimator,
+                    heightAnimator
+                )
+
+                start()
+            }
         }
 
         inner class TranslationView() : VLinearLayout(context)
@@ -357,40 +542,109 @@ class MovieFragment : BaseFragment()
 
             private fun createUI()
             {
+                setPadding(0, 0, 0, Utils.dp(12))
+                clipToPadding = false
+
                 actionBar = ActionBar(context).apply {
                     title = Locale.text(Locale.text_translation)
                 }
                 addView(actionBar)
 
                 val layout = VLinearLayout(context)
-                val translators = Parser.parseTranslators(document!!)
-                for (translator in translators)
+
+                // Фильм, Мультфильм (односерийный), Аниме (односерийное)
+                if (
+                    movie.type.ruType == HDRezka.FILM ||
+                    (movie.type.ruType == HDRezka.CARTOON && ! movie.type.isSerial) ||
+                    (movie.type.ruType == HDRezka.ANIME && ! movie.type.isSerial)
+                )
+                {
+                    val translators = Parser.parseFilmTranslators(document!!)
+                    for (translator in translators)
+                    {
+                        val cell = PointerCell(context).apply {
+                            text = translator.name
+
+                            setOnClickListener {
+                                println(text)
+                            }
+                        }
+                        layout.addView(cell, LayoutHelper.createLinear(
+                            LayoutHelper.MATCH_PARENT, 50
+                        ))
+                    }
+                }
+                else // Сериал, Мультфильм (многосерийный), Аниме (многосерийное)
+                {
+                    val translators = Parser.parseSeriesTranslators(document!!)
+                    for (translator in translators)
+                    {
+                        val cell = PointerCell(context).apply {
+                            text = translator.name
+
+                            setOnClickListener {
+                                println(text)
+
+                                streamData.translatorId = translator.translatorId
+                                goToSeasons()
+                            }
+                        }
+                        layout.addView(cell, LayoutHelper.createLinear(
+                            LayoutHelper.MATCH_PARENT, 50
+                        ))
+                    }
+                }
+
+                addView(layout)
+            }
+        }
+
+        inner class SeasonView() : VLinearLayout(context)
+        {
+            private lateinit var actionBar: ActionBar
+
+            init
+            {
+                createUI()
+            }
+
+            private fun createUI()
+            {
+                setPadding(0, 0, 0, Utils.dp(12))
+                clipToPadding = false
+
+                createActionBar()
+                addView(actionBar)
+
+                val seasons = Parser.parseSeasons(parsingDocument)
+                for (season in seasons)
                 {
                     val cell = PointerCell(context).apply {
-                        text = translator.name
+                        text = season.title
 
                         setOnClickListener {
                             println(text)
                         }
                     }
-                    layout.addView(cell, LayoutHelper.createLinear(
+                    addView(cell, LayoutHelper.createLinear(
                         LayoutHelper.MATCH_PARENT, 50
                     ))
                 }
-                addView(layout)
-            }
-        }
-
-        inner class SeasonView : LinearLayout(context)
-        {
-            init
-            {
-
             }
 
             private fun createActionBar()
             {
+                actionBar = ActionBar(context).apply {
+                    title = Locale.text(Locale.text_season)
 
+                    if ( hasTranslation() )
+                    {
+                        actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
+                        onActionButtonClick {
+                            navigate(this@SeasonView, translationView!!)
+                        }
+                    }
+                }
             }
         }
 
@@ -406,6 +660,25 @@ class MovieFragment : BaseFragment()
 
             }
         }
+
+        private fun updateUrl() : String
+        {
+            val data = streamData as SeriesStreamData
+            var url = movie.url
+            url += "#t:"
+            url += streamData.translatorId
+
+            url += "-s:"
+            if (data.season != "") url += data.season
+            else url += "1"
+
+            url += "-e:"
+            if (data.episode != "") url += data.episode
+            else url += "1"
+
+            return url
+        }
+
     }
 
 
