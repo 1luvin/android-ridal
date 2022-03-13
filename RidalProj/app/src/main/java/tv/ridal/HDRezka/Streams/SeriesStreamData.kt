@@ -2,6 +2,6 @@ package tv.ridal.HDRezka.Streams
 
 class SeriesStreamData : StreamData()
 {
-    var season: String? = null
-    var episode: String? = null
+    lateinit var season: String
+    lateinit var episode: String
 }

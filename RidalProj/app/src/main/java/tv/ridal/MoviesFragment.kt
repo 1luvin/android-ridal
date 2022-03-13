@@ -10,7 +10,6 @@ import android.util.TypedValue
 import android.view.*
 import android.view.animation.DecelerateInterpolator
 import android.widget.*
-import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.GridLayoutManager
@@ -307,8 +306,8 @@ class MoviesFragment : BaseFragment()
             }
         }
         else {
-            if (Navigator.isNextPageExist(document!!)) {
-                url = Navigator.nextPageUrl(document!!)
+            if (Pager.isNextPageExist(document!!)) {
+                url = Pager.nextPageUrl(document!!)
             } else {
                 loading = false
                 return
@@ -349,7 +348,7 @@ class MoviesFragment : BaseFragment()
         moviesView.adapter!!.notifyDataSetChanged()
     }
 
-    inner class FiltersPopup() : BottomPopup(ApplicationActivity.instance())
+    inner class FiltersPopup() : BottomPopup(context)
     {
         private lateinit var popupView: FrameLayout
 

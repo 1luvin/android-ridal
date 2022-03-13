@@ -1,5 +1,6 @@
 package tv.ridal
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Animatable
@@ -9,6 +10,9 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.*
+import android.webkit.JavascriptInterface
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.*
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
@@ -22,19 +26,24 @@ import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.HDRezka.Movie
+import tv.ridal.HDRezka.Pager
 import tv.ridal.HDRezka.Parser
+import tv.ridal.HDRezka.Streams.Stream
 import tv.ridal.HDRezka.Streams.StreamData
 import tv.ridal.UI.ActionBar.ActionBar
 import tv.ridal.UI.Adapters.PeopleAdapter
 import tv.ridal.UI.Cells.PointerCell
 import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.VLinearLayout
+import tv.ridal.UI.Popup.BottomPopup
 import tv.ridal.UI.Popup.LoadingPopup
 import tv.ridal.UI.SpacingItemDecoration
 import tv.ridal.UI.View.RTextView
@@ -64,7 +73,7 @@ class MovieFragment : BaseFragment()
 
         loadMovieInfo()
 
-        createUi()
+        createUI()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -100,14 +109,9 @@ class MovieFragment : BaseFragment()
 
     private val loadingPopup: LoadingPopup = LoadingPopup(context)
 
-    private fun createUi()
+    private fun createUI()
     {
         rootFrame = FrameLayout(context).apply {
-            layoutParams = LayoutHelper.createFrame(
-                LayoutHelper.MATCH_PARENT,
-                LayoutHelper.MATCH_PARENT
-            )
-
             setBackgroundColor(Theme.color(Theme.color_bg))
         }
 
@@ -224,7 +228,7 @@ class MovieFragment : BaseFragment()
             text = Locale.text(Locale.text_watch)
 
             setOnClickListener {
-                loadingPopup.show()
+                onWatch()
             }
         }
 
@@ -242,6 +246,169 @@ class MovieFragment : BaseFragment()
             hide()
         }
     }
+
+
+    private var watchSettingsPopup: WatchSettingsPopup? = null
+
+    private fun onWatch()
+    {
+        if (document == null)
+        {
+            createWebView()
+            return
+        }
+
+        if (watchSettingsPopup == null)
+        {
+            watchSettingsPopup = WatchSettingsPopup()
+        }
+
+        watchSettingsPopup!!.show()
+    }
+
+    private lateinit var webView: WebView
+    private var document: Document? = null
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun createWebView()
+    {
+        loadingPopup.show()
+
+        webView = WebView(context).apply {
+            settings.javaScriptEnabled = true
+            addJavascriptInterface(JSInterface(), "HTMLOUT")
+
+            webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    webView.loadUrl("javascript:window.HTMLOUT.processHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');")
+                }
+            }
+
+            loadUrl(movie.url)
+        }
+    }
+
+    inner class JSInterface
+    {
+        @JavascriptInterface
+        fun processHTML(html: String)
+        {
+            document = Jsoup.parse(html)
+            (context as ApplicationActivity).runOnUiThread {
+                loadingPopup.dismiss()
+                onWatch()
+            }
+        }
+    }
+
+
+    inner class WatchSettingsPopup : BottomPopup(context)
+    {
+        private lateinit var popupView: FrameLayout
+
+        private lateinit var translationView: VLinearLayout
+
+        init
+        {
+            createUI()
+        }
+
+        private fun createUI()
+        {
+            popupView = FrameLayout(context).apply {
+                setPadding(0, 0, 0, Utils.dp(12))
+                background = Theme.createRect(
+                    Theme.color_bg, radii = floatArrayOf(
+                        Utils.dp(12F), Utils.dp(12F), Utils.dp(12F), Utils.dp(12F)
+                    ))
+            }
+            // если фильм
+            if (movie.type.ruType == HDRezka.FILM)
+            {
+                // если есть озвучки
+                if ( Pager.isTranslatorsExist(document!!) )
+                {
+                    translationView = TranslationView()
+                    popupView.addView(translationView)
+                }
+                else // если нет озвучек
+                {
+
+                }
+            }
+
+            val w = Utils.displayWidth - Utils.dp(12) * 2
+            setContentView(popupView, FrameLayout.LayoutParams(
+                w, LayoutHelper.WRAP_CONTENT,
+                Gravity.CENTER_HORIZONTAL
+            ).apply {
+                setMargins(0, 0, 0, Utils.dp(12))
+            })
+        }
+
+        inner class TranslationView() : VLinearLayout(context)
+        {
+            private lateinit var actionBar: ActionBar
+
+            init
+            {
+                createUI()
+            }
+
+            private fun createUI()
+            {
+                actionBar = ActionBar(context).apply {
+                    title = Locale.text(Locale.text_translation)
+                }
+                addView(actionBar)
+
+                val layout = VLinearLayout(context)
+                val translators = Parser.parseTranslators(document!!)
+                for (translator in translators)
+                {
+                    val cell = PointerCell(context).apply {
+                        text = translator.name
+
+                        setOnClickListener {
+                            println(text)
+                        }
+                    }
+                    layout.addView(cell, LayoutHelper.createLinear(
+                        LayoutHelper.MATCH_PARENT, 50
+                    ))
+                }
+                addView(layout)
+            }
+        }
+
+        inner class SeasonView : LinearLayout(context)
+        {
+            init
+            {
+
+            }
+
+            private fun createActionBar()
+            {
+
+            }
+        }
+
+        inner class EpisodeView : LinearLayout(context)
+        {
+            init
+            {
+
+            }
+
+            private fun createActionBar()
+            {
+
+            }
+        }
+    }
+
+
 
 
     private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue

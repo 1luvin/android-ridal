@@ -44,7 +44,6 @@ class LoadingPopup(context: Context) : Popup(context)
             indeterminateDrawable = Pulse().apply {
                 color = Theme.color(Theme.color_main)
             }
-            show()
         }
 
         contentView.apply {
@@ -59,6 +58,7 @@ class LoadingPopup(context: Context) : Popup(context)
             Gravity.CENTER
         ))
     }
+
 }
 
 

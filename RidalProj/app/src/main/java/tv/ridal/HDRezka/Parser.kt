@@ -396,6 +396,35 @@ class Parser
             Стримы
          */
 
+        fun parseTranslators(doc: Document) : ArrayList<Stream.FilmTranslator>
+        {
+            val translators = ArrayList<Stream.FilmTranslator>()
+
+            val ul = doc.getElementById("translators-list")
+            val lis = ul.getElementsByClass("b-translator__item")
+            var li: Element
+            for (i in 0 until lis.size) {
+                li = lis[i]
+                val name = li.attr("title")
+                val data_id = li.attr("data-id")
+                val data_translator_id = li.attr("data-translator_id")
+                val data_camrip = li.attr("data-camrip")
+                val data_ads = li.attr("data-ads")
+                val data_director = li.attr("data-director")
+                val filmTranslator = Stream.FilmTranslator(
+                    name,
+                    data_id,
+                    data_translator_id,
+                    data_camrip,
+                    data_ads,
+                    data_director
+                )
+                translators.add(filmTranslator)
+            }
+
+            return translators
+        }
+
         fun parseStreams(html: String) : ArrayList<Stream>
         {
             val streams = ArrayList<Stream>()

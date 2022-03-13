@@ -3,13 +3,13 @@ package tv.ridal.HDRezka
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-class Navigator
+class Pager
 {
     companion object
     {
-        fun isNextPageExist(document: Document) : Boolean
+        fun isNextPageExist(doc: Document) : Boolean
         {
-            val navigation = document.getElementsByClass("b-navigation")
+            val navigation = doc.getElementsByClass("b-navigation")
             if (navigation.size > 0) {
                 val nav = navigation[0]
                 val spans = nav.getElementsByTag("span")
@@ -17,10 +17,14 @@ class Navigator
             }
             return false
         }
-
         fun isNextPageExist(html: String) : Boolean
         {
             return isNextPageExist(Jsoup.parse(html))
+        }
+
+        fun isTranslatorsExist(doc: Document) : Boolean
+        {
+            return doc.getElementById("translators-list") != null
         }
 
         fun nextPageUrl(document: Document) : String

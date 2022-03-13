@@ -2,6 +2,6 @@ package tv.ridal.HDRezka.Streams
 
 open class StreamData
 {
-    var id: String? = null
-    var translatorId: String? = null
+    lateinit var id: String
+    lateinit var translatorId: String
 }

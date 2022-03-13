@@ -84,7 +84,6 @@ class LoadingTextView(context: Context) : TextView(context)
                     right = 1F
                 }
 
-
                 val shader = LinearGradient(
                     0F, 0F, this@LoadingTextView.measuredWidth + 0F, this@LoadingTextView.measuredHeight + 0F,
                     intArrayOf(color, loadColor, color),

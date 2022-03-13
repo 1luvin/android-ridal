@@ -1,8 +1,8 @@
 package tv.ridal.HDRezka.Streams
 
-class FilmStreamData : StreamData()
+open class FilmStreamData : StreamData()
 {
-    var camrip: String? = null
-    var ads: String? = null
-    var director: String? = null
+    lateinit var camrip: String
+    lateinit var ads: String
+    lateinit var director: String
 }

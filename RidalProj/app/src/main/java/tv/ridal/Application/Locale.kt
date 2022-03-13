@@ -49,6 +49,8 @@ class Locale
                     texts[text_actors] = "Актеры"
                     texts[text_producers] = "Режиссеры"
 
+                    texts[text_translation] = "Озвучка"
+
                     /*
                         Жанры
                      */
@@ -174,6 +176,8 @@ class Locale
         const val text_country = "text_country"
         const val text_actors = "text_actors"
         const val text_producers = "text_producers"
+
+        const val text_translation = "text_translation"
 
         /*
             Жанры
