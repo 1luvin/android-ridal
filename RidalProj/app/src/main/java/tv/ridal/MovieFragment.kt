@@ -132,9 +132,7 @@ class MovieFragment : BaseFragment()
         createActionBar()
 
         rootFrame.apply {
-            addView(scroll, LayoutHelper.createFrame(
-                LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
-            ))
+            addView(scroll)
 
             addView(actionBar, LayoutHelper.createFrame(
                 LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
@@ -152,7 +150,11 @@ class MovieFragment : BaseFragment()
     {
         actionBar = ActionBar(context).apply {
             setPadding(0, Utils.dp(25), 0, 0)
-
+            /*
+            2 background служат для того чтобы менять их в зависимости от положения на экране
+            для того чтобы ActionBar не закрывал постер, background делаем прозрачным
+            когда пользователь проскролливает постер, background делаем цветным
+             */
             setBackgrounds(
                 arrayOf(
                     Theme.createRect(
@@ -161,13 +163,19 @@ class MovieFragment : BaseFragment()
                     Theme.createRect( Theme.lightenColor(Theme.color_bg) )
                 )
             )
-
+            /*
+            изначально кнопка "Назад" белого цвета в независимости от выбранной темы
+             */
             actionButtonIcon = Theme.drawable(R.drawable.back, Theme.COLOR_WHITE)
             onActionButtonClick {
                 finish()
             }
 
             title = movie.name
+            /*
+            сразу прячем title, так как его нужно показывать только тогда,
+            когда пользователь проскролит постер
+             */
             hideTitle(false)
         }
     }
@@ -1042,8 +1050,6 @@ class MovieFragment : BaseFragment()
             adapter = PeopleAdapter(people)
         }
     }
-
-    // pause
 
     inner class HeaderView : FrameLayout(context)
     {

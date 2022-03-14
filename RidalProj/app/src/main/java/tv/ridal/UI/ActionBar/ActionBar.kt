@@ -23,7 +23,8 @@ import kotlin.math.max
 
 class ActionBar(context: Context) : FrameLayout(context)
 {
-    companion object {
+    companion object
+    {
         const val actionBarHeightDp: Int = 50
     }
 
@@ -125,14 +126,22 @@ class ActionBar(context: Context) : FrameLayout(context)
     {
         actionButtonView = ImageView(context).apply {
             isClickable = true
+            setOnTouchListener(InstantPressListener(this))
+
             scaleType = ImageView.ScaleType.CENTER
 
-//            background = Theme.createCircleSelector(Theme.color_bg)
-
-            setOnTouchListener(InstantPressListener(this))
+            setOnClickListener {
+                actionButtonListener?.invoke()
+            }
         }
 
-        this.addView(actionButtonView)
+        addView(actionButtonView)
+    }
+
+    private var actionButtonListener: (() -> Unit)? = null
+    fun onActionButtonClick(l: () -> Unit)
+    {
+        actionButtonListener = l
     }
 
     private fun createTitleView()
@@ -212,29 +221,13 @@ class ActionBar(context: Context) : FrameLayout(context)
 
 
 
-    fun onActionButtonClick(l: () -> Unit)
-    {
-        actionButtonView?.setOnClickListener {
-            l.invoke()
-        }
-    }
-
-
-
     fun hideTitle(animated: Boolean = true)
     {
         if (titleView!!.visibility == View.GONE) return
 
         if (animated)
         {
-            if (titleAnimator.isRunning && titleAnimator.currentState == "hiding") return
-
-            titleAnimator.apply {
-                cancel()
-                removeAllListeners()
-
-                setFloatValues(titleView!!.alpha, 0F)
-
+            ValueAnimator.ofFloat(titleView!!.alpha, 0F).apply {
                 addUpdateListener {
                     titleView!!.alpha = it.animatedValue as Float
                 }
@@ -247,7 +240,6 @@ class ActionBar(context: Context) : FrameLayout(context)
                     }
                 })
 
-                currentState = "hiding"
                 start()
             }
         }
@@ -266,14 +258,7 @@ class ActionBar(context: Context) : FrameLayout(context)
 
         if (animated)
         {
-            if (titleAnimator.isRunning && titleAnimator.currentState == "showing") return
-
-            titleAnimator.apply {
-                cancel()
-                removeAllListeners()
-
-                setFloatValues(titleView!!.alpha, 1F)
-
+            ValueAnimator.ofFloat(titleView!!.alpha, 1F).apply {
                 addUpdateListener {
                     titleView!!.alpha = it.animatedValue as Float
                 }
@@ -286,7 +271,6 @@ class ActionBar(context: Context) : FrameLayout(context)
                     }
                 })
 
-                currentState = "showing"
                 start()
             }
         }
