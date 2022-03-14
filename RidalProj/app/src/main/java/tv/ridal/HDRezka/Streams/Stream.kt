@@ -1,7 +1,16 @@
 package tv.ridal.HDRezka.Streams
 
-data class Stream(val quality: String, val url: String)
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+data class Stream(val quality: String, val url: String) : Parcelable
 {
+    companion object
+    {
+        const val REQUEST_URL = "https://rezka.ag/ajax/get_cdn_series/"
+    }
+
     class FilmTranslator() : FilmStreamData()
     {
         lateinit var name: String
@@ -28,4 +37,5 @@ data class Stream(val quality: String, val url: String)
         lateinit var id: String
     }
 
+    data class Episode(val title: String, val number: String, val id: String)
 }

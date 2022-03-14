@@ -51,6 +51,7 @@ class Locale
 
                     texts[text_translation] = "Озвучка"
                     texts[text_season] = "Сезон"
+                    texts[text_episode] = "Серия"
 
                     /*
                         Жанры
@@ -180,6 +181,7 @@ class Locale
 
         const val text_translation = "text_translation"
         const val text_season = "text_season"
+        const val text_episode = "text_episode"
 
         /*
             Жанры

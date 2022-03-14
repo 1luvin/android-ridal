@@ -9,11 +9,9 @@ import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.core.view.updateLayoutParams
+import com.github.ybq.android.spinkit.style.Pulse
 import tv.ridal.Application.Theme
 import tv.ridal.UI.Animators.StateValueAnimator
 import tv.ridal.UI.Drawables.MultiDrawable
@@ -392,12 +390,11 @@ class ActionBar(context: Context) : FrameLayout(context)
             MeasureSpec.makeMeasureSpec(paddingTop + actionBarHeight + paddingBottom, MeasureSpec.EXACTLY))
     }
 
-    class Menu(context: Context) : LinearLayout(context)
-    {
 
+    open class Menu(context: Context) : LinearLayout(context)
+    {
         init
         {
-            orientation = LinearLayout.HORIZONTAL
             setPadding(Utils.dp(15), 0, Utils.dp(6), 0)
         }
 
@@ -407,6 +404,8 @@ class ActionBar(context: Context) : FrameLayout(context)
                 setImageDrawable(drawable)
 
                 if (onClick != null) {
+                    isClickable = true
+                    setOnTouchListener(InstantPressListener(this))
                     setOnClickListener {
                         onClick.invoke()
                     }
@@ -422,11 +421,6 @@ class ActionBar(context: Context) : FrameLayout(context)
         private fun createItemView() : ImageView
         {
             return ImageView(context).apply {
-                isClickable = true
-                setOnTouchListener(InstantPressListener(this))
-
-                background = Theme.createCircleSelector(Theme.color_bigActionBar_item_bg)
-
                 scaleType = ImageView.ScaleType.CENTER
             }
         }
@@ -449,7 +443,56 @@ class ActionBar(context: Context) : FrameLayout(context)
                 MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec), MeasureSpec.UNSPECIFIED)
             )
         }
+    }
 
+    class LoadingMenu(context: Context) : Menu(context)
+    {
+        private var loadingView: ProgressBar
+
+        init
+        {
+            setPadding(Utils.dp(15), 0, 0, 0)
+
+            loadingView = ProgressBar(context).apply {
+                indeterminateDrawable = Pulse().apply {
+                    color = Theme.color(Theme.color_main)
+                }
+
+                visibility = View.GONE // загрузка скрыта по умолчанию
+            }
+
+            addView(loadingView, LayoutHelper.createLinear(
+                24, 24
+            ))
+        }
+
+        fun showLoading()
+        {
+            loadingView.apply {
+                visibility = View.VISIBLE
+            }
+        }
+
+        fun stopLoading()
+        {
+            loadingView.apply {
+                visibility = View.GONE
+            }
+        }
+    }
+
+    fun showLoading()
+    {
+        if (menu == null || menu !is LoadingMenu) return
+
+        (menu as LoadingMenu).showLoading()
+    }
+
+    fun hideLoading()
+    {
+        if (menu == null || menu !is LoadingMenu) return
+
+        (menu as LoadingMenu).stopLoading()
     }
 
 }

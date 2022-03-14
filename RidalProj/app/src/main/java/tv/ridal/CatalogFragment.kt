@@ -22,7 +22,7 @@ import tv.ridal.UI.View.SectionView
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Parser
 
-class CatalogFragment : BaseFragment(), Navigator.TagProvider
+class CatalogFragment : BaseFragment()
 {
     override val stableTag: String
         get() = "CatalogFragment${View.generateViewId()}"

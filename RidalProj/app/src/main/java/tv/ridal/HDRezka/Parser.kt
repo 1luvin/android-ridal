@@ -477,6 +477,32 @@ class Parser
             return seasons
         }
 
+        fun parseEpisodes(doc: Document) : ArrayList<Stream.Episode>
+        {
+            val episodes = ArrayList<Stream.Episode>()
+
+            val div = doc.getElementById("simple-episodes-tabs")
+            val uls = div.getElementsByTag("ul")
+            for (i in uls.indices)
+            {
+                if (uls[i].attr("style") != "display: none;") {
+                    val lis = uls[i].getElementsByTag("li")
+                    for (j in lis.indices) {
+                        val li = lis[j]
+
+                        val title = li.text()
+                        val number = Regex("[0-9]+").findAll(title)
+                            .map(MatchResult::value)
+                            .toList()[0]
+
+                        episodes.add( Stream.Episode(title, number, li.attr("data-id")) )
+                    }
+                }
+            }
+
+            return episodes
+        }
+
         fun parseTranslatorId(html: String) : String
         {
             var id = ""
