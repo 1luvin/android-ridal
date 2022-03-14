@@ -5,41 +5,36 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.ScrollView
+import androidx.core.widget.NestedScrollView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
-import com.tunjid.androidx.navigation.Navigator
 import tv.ridal.UI.Adapters.MoviesAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
-import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.UI.ActionBar.BigActionBar
 import tv.ridal.UI.View.SectionView
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Parser
+import tv.ridal.UI.Layout.VLinearLayout
+import kotlin.random.Random
 
 class CatalogFragment : BaseFragment()
 {
     override val stableTag: String
-        get() = "CatalogFragment${View.generateViewId()}"
+        get() = "CatalogFragment${Random.nextInt()}"
 
     companion object
     {
-        const val TAG = "CatalogFragment"
-
-        fun newInstance(): CatalogFragment
-        {
-            return CatalogFragment()
-        }
+        fun newInstance() = CatalogFragment()
     }
 
-    private lateinit var rootLayout: RelativeLayout
-    private lateinit var scroll: ScrollView
-    private lateinit var containerLayout: LinearLayout
+    private lateinit var rootLayout: FrameLayout
+    private lateinit var scroll: NestedScrollView
+    private lateinit var scrollLayout: LinearLayout
     private lateinit var actionBar: BigActionBar
 
     private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
@@ -50,46 +45,30 @@ class CatalogFragment : BaseFragment()
     {
         super.onCreate(savedInstanceState)
 
-        rootLayout = RelativeLayout(context).apply {
-            layoutParams = RelativeLayout.LayoutParams(
-                LayoutHelper.MATCH_PARENT,
-                LayoutHelper.MATCH_PARENT
-            )
-
+        rootLayout = FrameLayout(context).apply {
             setBackgroundColor(Theme.color(Theme.color_bg))
         }
 
-        scroll = ScrollView(context).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                LayoutHelper.MATCH_PARENT,
-                LayoutHelper.MATCH_PARENT
-            )
-
+        scroll = NestedScrollView(context).apply {
             isVerticalScrollBarEnabled = false
         }
+        scrollLayout = VLinearLayout(context)
+        scroll.addView(scrollLayout)
 
         ApplicationActivity.instance().reselectListener.addListener {
             scroll.smoothScrollTo(0, 0)
         }
 
-        containerLayout = LinearLayout(context).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LayoutHelper.MATCH_PARENT,
-                LayoutHelper.MATCH_PARENT
-            )
-            orientation = LinearLayout.VERTICAL
-        }
-
-        scroll.addView(containerLayout)
         rootLayout.addView(scroll)
 
         createActionBar()
-        containerLayout.addView(actionBar)
+        scrollLayout.addView(actionBar)
 
         for (i in HDRezka.SECTION_URLS.indices)
         {
-            sectionViews.add( SectionView(context) )
-            containerLayout.addView(sectionViews[i])
+            val view = SectionView(context)
+            sectionViews.add(view)
+            scrollLayout.addView(view)
         }
 
         loadSections()
@@ -100,32 +79,10 @@ class CatalogFragment : BaseFragment()
         return rootLayout
     }
 
-    override fun onResume()
-    {
-        super.onResume()
-
-//        requireActivity().window.apply {
-//            decorView.systemUiVisibility =
-//                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-//            statusBarColor = Theme.COLOR_TRANSPARENT
-//        }
-
-//        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-
-
-    }
-
-    override fun onStop()
-    {
-        super.onStop()
-
-//        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-    }
-
     private fun createActionBar()
     {
-        val menu = BigActionBar.Menu(requireContext()).apply {
-            addItem(Theme.drawable(R.drawable.invite, Theme.color_text)) {
+        val menu = BigActionBar.Menu(context).apply {
+            addItem(Theme.drawable(R.drawable.invite, Theme.color_actionBar_menuItem)) {
                 val sendIntent = Intent().apply {
                     action = Intent.ACTION_SEND
                     putExtra(Intent.EXTRA_TEXT, Locale.text(Locale.share_application))
@@ -134,23 +91,14 @@ class CatalogFragment : BaseFragment()
                 val shareIntent = Intent.createChooser(sendIntent, "")
                 startActivity(shareIntent)
             }
-            addItem(Theme.drawable(R.drawable.sett, Theme.color_text)) {
-
-//                requireActivity().supportFragmentManager.beginTransaction().add(
-//                    SettingsFragment.newInstance(), SettingsFragment.TAG
-//                ).commit()
-
-                requireActivity().startActivity(
-                    Intent(requireActivity(), SettingsActivity::class.java)
+            addItem(Theme.drawable(R.drawable.sett, Theme.color_actionBar_menuItem)) {
+                context.startActivity(
+                    Intent(context, SettingsActivity::class.java)
                 )
-
-//                startFragment(
-//                    SettingsFragment.newInstance()
-//                )
             }
         }
 
-        actionBar = BigActionBar(requireContext()).apply {
+        actionBar = BigActionBar(context).apply {
             title = ApplicationLoader.APP_NAME
 
             this.menu = menu
@@ -170,7 +118,7 @@ class CatalogFragment : BaseFragment()
 
         for (i in urls.indices)
         {
-            val stringRequest = StringRequest(Request.Method.GET, urls[i],
+            val request = StringRequest(Request.Method.GET, urls[i],
                 { response ->
                     val sectionView = sectionViews[i]
 
@@ -182,8 +130,7 @@ class CatalogFragment : BaseFragment()
 
                         adapter = MoviesAdapter(movies).apply {
                             onMovieClick {
-                                val movieFragment = MovieFragment.newInstance(it)
-                                startFragment(movieFragment)
+                                startFragment( MovieFragment.newInstance(it) )
                             }
                         }
 
@@ -202,7 +149,7 @@ class CatalogFragment : BaseFragment()
                     println("ERROR!")
                 }
             )
-            requestQueue.add(stringRequest)
+            requestQueue.add(request)
         }
     }
 

@@ -9,7 +9,6 @@ class ApplicationLoader : Application()
     companion object
     {
         const val APP_NAME = "Ridal"
-
         const val WEBSITE = "https://ridal.tv"
 
         @Volatile
@@ -20,10 +19,11 @@ class ApplicationLoader : Application()
                     INSTANCE = it
                 }
             }
+
+        operator fun invoke() : ApplicationLoader = instance()
     }
 
-    // volley
-
+    // Volley's RequestQueue
     val requestQueue: RequestQueue by lazy {
         Volley.newRequestQueue(applicationContext)
     }

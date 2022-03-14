@@ -1,28 +1,26 @@
 package tv.ridal.UI
 
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
-import androidx.core.view.children
-import tv.ridal.Application.Theme
+import androidx.fragment.app.FragmentTransaction
+import tv.ridal.R
 
-// Activity
+// FragmentTransaction
 
-
-
-// View
-
-fun View.getAllViews(): List<View>
+fun FragmentTransaction.zoom()
 {
-    if (this !is ViewGroup || childCount == 0) return listOf(this)
-
-    return children
-        .toList()
-        .flatMap { it.getAllViews() }
-        .plus(this as View)
+    this.setCustomAnimations(
+        R.anim.zoom_in,
+        R.anim.zoom_out,
+        R.anim.zoom_pop_in,
+        R.anim.zoom_pop_out
+    )
 }
 
-// TextView
-
-val TextView.colorKey: String
-    get() = Theme.color_text
+fun FragmentTransaction.fade()
+{
+    this.setCustomAnimations(
+        R.anim.fade_in,
+        R.anim.fade_out,
+        R.anim.fade_out,
+        R.anim.fade_in
+    )
+}

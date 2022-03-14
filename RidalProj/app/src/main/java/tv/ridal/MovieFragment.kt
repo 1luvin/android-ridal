@@ -69,7 +69,8 @@ class MovieFragment : BaseFragment()
     override val stableTag: String
         get() = "Movie${Random.nextInt()}"
 
-    companion object {
+    companion object
+    {
         fun newInstance(movie: Movie) = MovieFragment().apply {
             this.movie = movie
         }
@@ -91,20 +92,6 @@ class MovieFragment : BaseFragment()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         return rootFrame
-    }
-
-    override fun onResume()
-    {
-        super.onResume()
-
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-    }
-
-    override fun onStop()
-    {
-        super.onStop()
-
-        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }
 
     private lateinit var rootFrame: FrameLayout
@@ -793,15 +780,12 @@ class MovieFragment : BaseFragment()
                     .data("translator_id", data.translatorId)
                     .data("season", data.season)
                     .data("episode", data.episode)
-                    .data("favs", "02c692f5-3645-45dc-a20e-8616c54b1160")
                     .data("action", "get_stream")
                     .post()
 
-//                println(doc.html())
-                println(parsingDocument.html())
+                println(doc.html())
 
                 val streams = Parser.parseStreams(doc.html())
-                println("ASKJSGKJDSGBSDKGBSDGKJSDBGSDG " + streams.size)
                 val intent = Intent(context, PlayerActivity::class.java)
                 val bundle = Bundle().apply {
                     putParcelableArrayList("key", streams)
@@ -809,45 +793,10 @@ class MovieFragment : BaseFragment()
                 intent.putExtras(bundle)
                 context.startActivity(intent)
             }
-
-//            val request = object : StringRequest(Method.POST, Stream.REQUEST_URL,
-//                { response ->
-//                    println(response)
-//                    val streams = Parser.parseStreams(response)
-//                    println("ASKJSGKJDSGBSDKGBSDGKJSDBGSDG " + streams.size)
-//                    val intent = Intent(context, PlayerActivity::class.java)
-//                    val bundle = Bundle().apply {
-//                        putParcelableArrayList("key", streams)
-//                    }
-//                    intent.putExtras(bundle)
-//                    context.startActivity(intent)
-//                },
-//                {
-//                    println("ERROR!")
-//                }
-//            )
-//            {
-//                override fun getParams(): MutableMap<String, String>
-//                {
-//                    val params = HashMap<String, String>().apply {
-//                        put("id", data.id)
-//                        put("translator_id", data.translatorId)
-//                        put("season", data.season)
-//                        put("episode", data.episode)
-//                        put("action", "get_stream")
-//                    }
-//
-//                    return params
-//                }
-//            }
-//
-//            requestQueue.add(request)
         }
     }
 
-
-
-    private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
+    private val requestQueue: RequestQueue = ApplicationLoader().requestQueue
     private val requestTag: String = "requestTag"
 
     private fun loadMovieInfo()
@@ -1090,10 +1039,11 @@ class MovieFragment : BaseFragment()
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             addItemDecoration( SpacingItemDecoration(Utils.dp(12), Utils.dp(5), Utils.dp(10)) )
 
-            adapter = PeopleAdapter( people )
+            adapter = PeopleAdapter(people)
         }
     }
 
+    // pause
 
     inner class HeaderView : FrameLayout(context)
     {
