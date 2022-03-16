@@ -6,11 +6,11 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
 import android.widget.*
+import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import com.github.ybq.android.spinkit.style.Pulse
 import tv.ridal.Application.Theme
@@ -106,17 +106,17 @@ class ActionBar(context: Context) : FrameLayout(context)
             value ?: return
             field = value
 
-            this.addView(menu!!, LayoutHelper.createFrame(
+            // если меню уже имеется
+            if ( children.contains(menu as View) )
+            {
+                removeView(menu)
+            }
+
+            addView(menu!!, LayoutHelper.frame(
                 LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
                 Gravity.END or Gravity.CENTER_VERTICAL
             ))
         }
-
-    // animators
-    private var titleAnimator: StateValueAnimator = StateValueAnimator().apply {
-        duration = 170
-    }
-
 
     private var actionButtonView: ImageView? = null
     private var titleFrame: FrameLayout? = null
@@ -339,34 +339,27 @@ class ActionBar(context: Context) : FrameLayout(context)
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
     {
-        var actionButtonViewWidth = 0
-        if (actionButtonView != null)
-        {
-            actionButtonView!!.layoutParams = LayoutHelper.createFrame(
-                actionBarHeightDp, actionBarHeightDp,
+        var width1 = 0
+        actionButtonView?.apply {
+            layoutParams = LayoutHelper.frame(
+                actionBarHeight, actionBarHeight,
                 Gravity.START
             )
-            actionButtonViewWidth = actionBarHeightDp
+            width1 = actionBarHeight
         }
 
-        var menuWidth = 0
-        if (menu != null)
-        {
-            menu!!.layoutParams = LayoutHelper.createFrame(
-                LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-                Gravity.END or Gravity.CENTER_VERTICAL
-            )
-            menu!!.measure(0, 0)
-
-            menuWidth = Utils.px(menu!!.measuredWidth)
+        var width2 = 0
+        menu?.apply {
+            measure(0, 0)
+            width2 = measuredWidth
         }
 
-        if (titleFrame != null)
-        {
-            titleFrame!!.layoutParams = LayoutHelper.createFrame(
+        val busyWidth = max(width1, width2)
+        titleFrame?.apply {
+            layoutParams = LayoutHelper.frame(
                 LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
                 Gravity.START,
-                max(actionButtonViewWidth, menuWidth), 0, max(actionButtonViewWidth, menuWidth), 0
+                busyWidth, 0, busyWidth, 0
             )
         }
 
@@ -374,7 +367,6 @@ class ActionBar(context: Context) : FrameLayout(context)
             MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(paddingTop + actionBarHeight + paddingBottom, MeasureSpec.EXACTLY))
     }
-
 
     open class Menu(context: Context) : LinearLayout(context)
     {

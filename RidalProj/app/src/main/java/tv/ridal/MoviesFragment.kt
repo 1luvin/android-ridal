@@ -399,7 +399,7 @@ class MoviesFragment : BaseFragment()
                         navigate(filtersView!!, sortingView)
                     }
                 }
-                popupView.addView(filtersView, LayoutHelper.createFrame2(
+                popupView.addView(filtersView, LayoutHelper.frame(
                     LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
                     Gravity.TOP,
                     0, 0, 0, bottomLayout.measuredHeight
@@ -480,7 +480,7 @@ class MoviesFragment : BaseFragment()
                     }
 
                     removeView(fromView)
-                    popupView.addView(toView, LayoutHelper.createFrame2(
+                    popupView.addView(toView, LayoutHelper.frame(
                         LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
                         Gravity.TOP,
                         0, 0, 0, bottomLayout.measuredHeight
@@ -527,7 +527,7 @@ class MoviesFragment : BaseFragment()
                             visibility = View.VISIBLE
                         }
 
-                        popupView.addView(toView, LayoutHelper.createFrame2(
+                        popupView.addView(toView, LayoutHelper.frame(
                             LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
                             Gravity.TOP,
                             0, 0, 0, bottomLayout.measuredHeight
@@ -762,7 +762,7 @@ class MoviesFragment : BaseFragment()
                     availableHeight
                 }
 
-                addView(scroll, LayoutHelper.createFrame2(
+                addView(scroll, LayoutHelper.frame(
                     LayoutHelper.MATCH_PARENT, scrollHeight,
                     Gravity.START or Gravity.TOP,
                     0, actionBar.measuredHeight, 0, 0
@@ -857,7 +857,7 @@ class MoviesFragment : BaseFragment()
                     Utils.px( availableHeight )
                 }
 
-                addView(scroll, LayoutHelper.createFrame2(
+                addView(scroll, LayoutHelper.frame(
                     LayoutHelper.MATCH_PARENT, scrollHeight,
                     Gravity.START or Gravity.TOP,
                     0, actionBar.measuredHeight, 0, 0

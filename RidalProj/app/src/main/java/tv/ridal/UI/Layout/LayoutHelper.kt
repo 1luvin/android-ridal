@@ -1,6 +1,5 @@
 package tv.ridal.UI.Layout
 
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import tv.ridal.Utils.Utils
@@ -32,12 +31,21 @@ class LayoutHelper
             return FrameLayout.LayoutParams(size(width), size(height))
         }
 
-        fun createFrame2(width: Int, height: Int, gravity: Int, leftMargin: Int, topMargin: Int, rightMargin: Int, bottomMargin: Int): FrameLayout.LayoutParams
+        fun frame(width: Int, height: Int, gravity: Int, leftMargin: Int, topMargin: Int, rightMargin: Int, bottomMargin: Int): FrameLayout.LayoutParams
         {
             return FrameLayout.LayoutParams(width, height, gravity).apply {
                 setMargins(leftMargin, topMargin, rightMargin, bottomMargin)
             }
         }
+        fun frame(width: Int, height: Int, gravity: Int) : FrameLayout.LayoutParams
+        {
+            return FrameLayout.LayoutParams(width, height, gravity)
+        }
+        fun frame(width: Int, height: Int) : FrameLayout.LayoutParams
+        {
+            return FrameLayout.LayoutParams(width, height)
+        }
+
 
         /*
             Linear
@@ -60,16 +68,6 @@ class LayoutHelper
                 setMargins(size(leftMargin), size(topMargin), size(rightMargin), size(bottomMargin))
             }
         }
-
-        /*
-            Scroll
-         */
-
-        fun createScroll(width: Int, height: Int) : ViewGroup.LayoutParams
-        {
-            return ViewGroup.LayoutParams(size(width), size(height))
-        }
-
 
     }
 }
