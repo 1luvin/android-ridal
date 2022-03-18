@@ -167,7 +167,7 @@ class Theme
 
         fun typeface(tfKey: String) : Typeface
         {
-            return Typeface.createFromAsset(ApplicationLoader().assets, tfKey)
+            return Typeface.createFromAsset(ApplicationLoader.instance().assets, tfKey)
         }
 
         /*
@@ -235,7 +235,7 @@ class Theme
 
         fun drawable(drawableId: Int): Drawable
         {
-            return ContextCompat.getDrawable(ApplicationLoader().applicationContext, drawableId)!!
+            return ContextCompat.getDrawable(ApplicationLoader.instance().applicationContext, drawableId)!!
         }
         fun drawable(drawableId: Int, color: Int): Drawable
         {
@@ -252,21 +252,21 @@ class Theme
             Rect
          */
 
-        fun createRect(color: Int, outline: Outline? = null, radii: FloatArray? = null) : GradientDrawable
+        fun rect(color: Int, outline: Outline? = null, radii: FloatArray? = null) : GradientDrawable
         {
-            return createRect(
+            return rect(
                 Fill( intArrayOf(color, color) ),
                 outline,
                 radii
             )
         }
 
-        fun createRect(colorKey: String, outline: Outline? = null, radii: FloatArray? = null) : GradientDrawable
+        fun rect(colorKey: String, outline: Outline? = null, radii: FloatArray? = null) : GradientDrawable
         {
-            return createRect( color(colorKey), outline, radii )
+            return rect( color(colorKey), outline, radii )
         }
 
-        fun createRect(fill: Fill? = null, outline: Outline? = null, radii: FloatArray? = null) : GradientDrawable
+        fun rect(fill: Fill? = null, outline: Outline? = null, radii: FloatArray? = null) : GradientDrawable
         {
             val radiiArray = FloatArray(8)
             if (radii != null) {

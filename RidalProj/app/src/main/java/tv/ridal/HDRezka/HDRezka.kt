@@ -64,7 +64,7 @@ class HDRezka
         const val sorting_popular = "popular"
         const val sorting_watching = "watching"
 
-        fun createUrl(section: String, genre: String = "", sorting: String = "") : String
+        fun createUrl(section: String = "", genre: String = "", sorting: String = "") : String
         {
             var url = url_base + section + genre
             if (sorting != "")

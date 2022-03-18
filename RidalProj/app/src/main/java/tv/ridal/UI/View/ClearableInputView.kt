@@ -12,6 +12,7 @@ import android.widget.ImageView
 import tv.ridal.Application.Theme
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.R
+import tv.ridal.UI.InstantPressListener
 
 class ClearableInputView(context: Context) : FrameLayout(context)
 {
@@ -68,7 +69,7 @@ class ClearableInputView(context: Context) : FrameLayout(context)
 
         val clearDrawable = Theme.drawable(R.drawable.close, Theme.color_actionBar_back)
         clearButton = ImageView(context).apply {
-            background = Theme.createCircleSelector(Theme.color(Theme.color_actionBar_back))
+            setOnTouchListener( InstantPressListener(this) )
 
             setImageDrawable(clearDrawable)
 

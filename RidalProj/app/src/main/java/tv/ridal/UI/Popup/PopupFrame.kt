@@ -39,7 +39,7 @@ class PopupFrame(context: Context) : FrameLayout(context)
             dismiss()
         }
 
-        background = Theme.createRect(Theme.alphaColor(Theme.COLOR_BLACK, 0.3F))
+        background = Theme.rect(Theme.alphaColor(Theme.COLOR_BLACK, 0.3F))
 
         animator = ObjectAnimator().apply {
             duration = 200

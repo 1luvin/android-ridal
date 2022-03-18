@@ -12,7 +12,6 @@ import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.os.Parcelable
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.*
@@ -36,7 +35,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import tv.ridal.Application.ApplicationLoader
@@ -157,10 +155,10 @@ class MovieFragment : BaseFragment()
              */
             setBackgrounds(
                 arrayOf(
-                    Theme.createRect(
+                    Theme.rect(
                         Theme.Fill( intArrayOf(Theme.alphaColor(Theme.COLOR_BLACK, 0.5F), Theme.COLOR_TRANSPARENT), GradientDrawable.Orientation.TOP_BOTTOM )
                     ),
-                    Theme.createRect( Theme.lightenColor(Theme.color_bg) )
+                    Theme.rect( Theme.lightenColor(Theme.color_bg, 0.03F) )
                 )
             )
             /*
@@ -216,7 +214,7 @@ class MovieFragment : BaseFragment()
             setOnTouchListener( InstantPressListener(this) )
 
             backgroundTintList = null
-            background = Theme.createRect(
+            background = Theme.rect(
                 Theme.color_main,
                 radii = FloatArray(4).apply {
                     fill(Utils.dp(7F))
@@ -375,7 +373,7 @@ class MovieFragment : BaseFragment()
         private fun createUI()
         {
             popupView = FrameLayout(context).apply {
-                background = Theme.createRect(
+                background = Theme.rect(
                     Theme.color_bg, radii = floatArrayOf(
                         Utils.dp(12F), Utils.dp(12F), Utils.dp(12F), Utils.dp(12F)
                     ))
@@ -804,7 +802,7 @@ class MovieFragment : BaseFragment()
         }
     }
 
-    private val requestQueue: RequestQueue = ApplicationLoader().requestQueue
+    private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
     private val requestTag: String = "requestTag"
 
     private fun loadMovieInfo()
@@ -1197,7 +1195,7 @@ class MovieFragment : BaseFragment()
 
         init
         {
-            background = Theme.createRect(Theme.color_main)
+            background = Theme.rect(Theme.color_main)
 
             posterView = ImageView(context).apply {
                 scaleType = ImageView.ScaleType.CENTER_CROP
@@ -1207,7 +1205,7 @@ class MovieFragment : BaseFragment()
             ))
 
             gradientView = View(context).apply {
-                background = Theme.createRect(
+                background = Theme.rect(
                     Theme.Fill(
                         intArrayOf( Theme.color(Theme.color_bg), Theme.COLOR_TRANSPARENT ),
                         GradientDrawable.Orientation.BOTTOM_TOP
@@ -1314,7 +1312,7 @@ class MovieFragment : BaseFragment()
                 var drawable: Drawable? = null
                 if (rating.whose!! == HDRezka.IMDB)
                 {
-                    background = Theme.createRect(COLOR_IMDB, radii = FloatArray(4).apply {
+                    background = Theme.rect(COLOR_IMDB, radii = FloatArray(4).apply {
                         fill(Utils.dp(19F))
                     })
 
@@ -1322,7 +1320,7 @@ class MovieFragment : BaseFragment()
                 }
                 else if (rating.whose!! == HDRezka.KP)
                 {
-                    background = Theme.createRect(COLOR_KP, radii = FloatArray(4).apply {
+                    background = Theme.rect(COLOR_KP, radii = FloatArray(4).apply {
                         fill(Utils.dp(19F))
                     })
 

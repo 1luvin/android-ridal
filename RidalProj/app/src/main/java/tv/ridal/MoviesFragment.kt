@@ -277,9 +277,10 @@ class MoviesFragment : BaseFragment()
 
     private fun createFiltersButton()
     {
-        filtersButton = FloatingActionButton(requireContext()).apply {
+        filtersButton = FloatingActionButton(context).apply {
+            setOnTouchListener( InstantPressListener(this) )
+
             backgroundTintList = ColorStateList.valueOf(Theme.color(Theme.color_main))
-            rippleColor = Theme.ripplizeColor(Theme.color_main)
 
             setImageDrawable(Theme.drawable(R.drawable.sett))
             imageTintList = ColorStateList.valueOf(Theme.COLOR_WHITE)
@@ -378,7 +379,7 @@ class MoviesFragment : BaseFragment()
         {
             // создание контейнера для View с фильтрами
             popupView = FrameLayout(context).apply {
-                background = Theme.createRect(
+                background = Theme.rect(
                     Theme.color_bg, radii = floatArrayOf(
                         Utils.dp(12F), Utils.dp(12F), Utils.dp(12F), Utils.dp(12F)
                     ))
@@ -564,7 +565,7 @@ class MoviesFragment : BaseFragment()
                 gravity = Gravity.CENTER
                 setOnTouchListener( InstantPressListener(this) )
 
-                background = Theme.createRect(
+                background = Theme.rect(
                     Theme.color_main,
                     radii = FloatArray(4).apply {
                         fill(Utils.dp(7F))
@@ -638,7 +639,7 @@ class MoviesFragment : BaseFragment()
                 if (hasGenres()) {
                     filtersView!!.genreCell!!.filterValue = activeGenre!!
 
-                    genreView!!.singleCheckGroup.check(activeGenre!!)
+                    genreView!!.genresCheckGroup.check(activeGenre!!)
                 }
                 if (hasSections()) {
                     filtersView!!.sectionCell!!.filterValue = activeSection!!
@@ -649,7 +650,7 @@ class MoviesFragment : BaseFragment()
                 filtersView!!.sortingCell.filterValue = activeSorting
             }
 
-            sortingView.singleCheckGroup.check(activeSorting)
+            sortingView.sortingCheckGroup.check(activeSorting)
         }
 
         private var newFiltersListener: (() -> Unit)? = null
@@ -660,6 +661,8 @@ class MoviesFragment : BaseFragment()
 
         inner class FiltersView : VLinearLayout(context)
         {
+            private lateinit var actionBar: ActionBar
+
             var genreCell: FilterCell? = null
             lateinit var sortingCell: FilterCell
             var sectionCell: FilterCell? = null
@@ -673,7 +676,8 @@ class MoviesFragment : BaseFragment()
 
             private fun createUi()
             {
-                addView(createActionBar())
+                createActionBar()
+                addView(actionBar)
                 // Фильтры могут содержать либо Жанры либо Секции, вместе не может быть
                 if (hasGenres())
                 {
@@ -708,9 +712,9 @@ class MoviesFragment : BaseFragment()
                 ))
             }
 
-            private fun createActionBar() : ActionBar
+            private fun createActionBar()
             {
-                return ActionBar(context).apply {
+                actionBar = ActionBar(context).apply {
                     title = Locale.text(Locale.text_filters)
 
                     menu = ActionBar.Menu(context).apply {
@@ -735,40 +739,29 @@ class MoviesFragment : BaseFragment()
         inner class GenreView : FrameLayout(context)
         {
             private lateinit var actionBar: ActionBar
-            private var scroll: NestedScrollView
-            var singleCheckGroup: SingleCheckGroup
-            private lateinit var doneButton: FloatingActionButton
+
+            private lateinit var scroll: NestedScrollView
+            private var scrollHeight: Int = 0 // !
+            lateinit var genresCheckGroup: SingleCheckGroup
+
+            private var doneButton: FloatingActionButton
 
             init
             {
                 createActionBar()
                 addView(actionBar)
 
-                singleCheckGroup = SingleCheckGroup(context).apply {
-                    for (genre in genres!!)
-                    {
-                        addCheck(genre)
-                    }
-                    check(activeGenre!!)
-                }
-                singleCheckGroup.measure(0, 0)
-                scroll = NestedScrollView(context).apply {
-                    addView(singleCheckGroup)
-                }
-                val availableHeight = (Utils.displayHeight * 0.65).toInt() - (actionBar.measuredHeight + bottomLayout.measuredHeight)
-                val scrollHeight = if (singleCheckGroup.measuredHeight < availableHeight) {
-                    LayoutHelper.WRAP_CONTENT
-                } else {
-                    availableHeight
-                }
-
+                createScroll()
                 addView(scroll, LayoutHelper.frame(
                     LayoutHelper.MATCH_PARENT, scrollHeight,
                     Gravity.START or Gravity.TOP,
                     0, actionBar.measuredHeight, 0, 0
                 ))
 
-                createDoneButton()
+                doneButton = createDoneButton {
+                    filtersView!!.genreCell!!.filterValue = genresCheckGroup.currentChecked()
+                    navigate(genreView!!, filtersView!!)
+                }
                 addView(doneButton, LayoutHelper.createFrame(
                     LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
                     Gravity.END or Gravity.BOTTOM,
@@ -782,8 +775,8 @@ class MoviesFragment : BaseFragment()
                 // открытие жанров
                 if (visibility == View.VISIBLE)
                 {
-                    singleCheckGroup.check( filtersView!!.genreCell!!.filterValue, false )
-                    singleCheckGroup.moveCheckedOnTop()
+                    genresCheckGroup.check( filtersView!!.genreCell!!.filterValue, false )
+                    genresCheckGroup.moveCheckedOnTop()
 
                     scroll.scrollTo(0, 0)
                 }
@@ -803,67 +796,59 @@ class MoviesFragment : BaseFragment()
                 actionBar.measure(0, 0)
             }
 
-            private fun createDoneButton()
+            private fun createScroll()
             {
-                doneButton = FloatingActionButton(requireContext()).apply {
-                    customSize = Utils.dp(50)
-
-                    backgroundTintList = ColorStateList.valueOf(Theme.color(Theme.color_main))
-                    rippleColor = Theme.ripplizeColor(Theme.color_main)
-
-                    setImageDrawable(Theme.drawable(R.drawable.done_bold))
-                    imageTintList = ColorStateList.valueOf(Theme.COLOR_WHITE)
-
-                    setOnClickListener {
-                        filtersView!!.genreCell!!.filterValue = singleCheckGroup.currentChecked()
-                        navigate(genreView!!, filtersView!!)
+                genresCheckGroup = SingleCheckGroup(context).apply {
+                    genres!!.forEach {
+                        addCheck(it)
                     }
+                    check(activeGenre!!)
+
+                    measure(0, 0)
+                }
+                scroll = NestedScrollView(context).apply {
+                    addView(genresCheckGroup)
+                }
+                val availableHeight = (Utils.displayHeight * 0.65).toInt() - (actionBar.measuredHeight + bottomLayout.measuredHeight)
+                scrollHeight = if (genresCheckGroup.measuredHeight < availableHeight) {
+                    LayoutHelper.WRAP_CONTENT
+                } else {
+                    availableHeight
                 }
             }
 
             fun currentGenre(): String
             {
-                return singleCheckGroup.currentChecked()
+                return genresCheckGroup.currentChecked()
             }
         }
 
         inner class SortingView : FrameLayout(context)
         {
             private lateinit var actionBar: ActionBar
-            private var scroll: NestedScrollView
-            var singleCheckGroup: SingleCheckGroup
-            private lateinit var doneButton: FloatingActionButton
+
+            private lateinit var scroll: NestedScrollView
+            private var scrollHeight: Int = 0 // !
+            lateinit var sortingCheckGroup: SingleCheckGroup
+
+            private var doneButton: FloatingActionButton
 
             init
             {
                 createActionBar()
                 addView(actionBar)
 
-                singleCheckGroup = SingleCheckGroup(context).apply {
-                    for (sorting in sortings)
-                    {
-                        addCheck(sorting)
-                    }
-                    check(activeSorting)
-                }
-                singleCheckGroup.measure(0, 0)
-                scroll = NestedScrollView(context).apply {
-                    addView(singleCheckGroup)
-                }
-                val availableHeight = (Utils.displayHeight * 0.65).toInt() - (actionBar.measuredHeight + bottomLayout.measuredHeight)
-                val scrollHeight = if (singleCheckGroup.measuredHeight < availableHeight) {
-                    LayoutHelper.WRAP_CONTENT
-                } else {
-                    Utils.px( availableHeight )
-                }
-
+                createScroll()
                 addView(scroll, LayoutHelper.frame(
                     LayoutHelper.MATCH_PARENT, scrollHeight,
                     Gravity.START or Gravity.TOP,
                     0, actionBar.measuredHeight, 0, 0
                 ))
 
-                createDoneButton()
+                doneButton = createDoneButton {
+                    filtersView!!.sortingCell.filterValue = sortingCheckGroup.currentChecked()
+                    navigate(sortingView, filtersView!!)
+                }
                 addView(doneButton, LayoutHelper.createFrame(
                     LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
                     Gravity.END or Gravity.BOTTOM,
@@ -878,8 +863,8 @@ class MoviesFragment : BaseFragment()
                 if (visibility == View.VISIBLE)
                 {
                     // проверить на нулл !!
-                    singleCheckGroup.check( filtersView!!.sortingCell.filterValue, false )
-                    singleCheckGroup.moveCheckedOnTop()
+                    sortingCheckGroup.check( filtersView!!.sortingCell.filterValue, false )
+                    sortingCheckGroup.moveCheckedOnTop()
 
                     scroll.scrollTo(0, 0)
                 }
@@ -903,27 +888,30 @@ class MoviesFragment : BaseFragment()
                 }
             }
 
-            private fun createDoneButton()
+            private fun createScroll()
             {
-                doneButton = FloatingActionButton(requireContext()).apply {
-                    customSize = Utils.dp(50)
-
-                    backgroundTintList = ColorStateList.valueOf(Theme.color(Theme.color_main))
-                    rippleColor = Theme.ripplizeColor(Theme.color_main)
-
-                    setImageDrawable(Theme.drawable(R.drawable.done_bold))
-                    imageTintList = ColorStateList.valueOf(Theme.COLOR_WHITE)
-
-                    setOnClickListener {
-                        filtersView!!.sortingCell.filterValue = singleCheckGroup.currentChecked()
-                        navigate(sortingView, filtersView!!)
+                sortingCheckGroup = SingleCheckGroup(context).apply {
+                    sortings.forEach {
+                        addCheck(it)
                     }
+                    check(activeSorting)
+
+                    measure(0, 0)
+                }
+                scroll = NestedScrollView(context).apply {
+                    addView(sortingCheckGroup)
+                }
+                val availableHeight = (Utils.displayHeight * 0.65).toInt() - (actionBar.measuredHeight + bottomLayout.measuredHeight)
+                scrollHeight = if (sortingCheckGroup.measuredHeight < availableHeight) {
+                    LayoutHelper.WRAP_CONTENT
+                } else {
+                    availableHeight
                 }
             }
 
             fun currentSorting(): String
             {
-                return singleCheckGroup.currentChecked()
+                return sortingCheckGroup.currentChecked()
             }
         }
 
@@ -932,6 +920,24 @@ class MoviesFragment : BaseFragment()
 
         }
 
+
+        private fun createDoneButton(onClick: () -> Unit) : FloatingActionButton
+        {
+            return FloatingActionButton(context).apply {
+                setOnTouchListener( InstantPressListener(this) )
+
+                customSize = Utils.dp(50)
+
+                backgroundTintList = ColorStateList.valueOf(Theme.color(Theme.color_main))
+
+                setImageDrawable(Theme.drawable(R.drawable.done_bold))
+                imageTintList = ColorStateList.valueOf(Theme.COLOR_WHITE)
+
+                setOnClickListener {
+                    onClick.invoke()
+                }
+            }
+        }
 
     }
 

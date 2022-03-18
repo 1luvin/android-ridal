@@ -1,34 +1,31 @@
 package tv.ridal
 
-import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.*
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
+import com.github.nitrico.stickyscrollview.StickyScrollView
 import tv.ridal.UI.Adapters.MoviesAdapter
-import tv.ridal.UI.Adapters.SearchAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.UI.GridSpacingItemDecoration
 import tv.ridal.UI.Layout.LayoutHelper
-import tv.ridal.UI.Popup.PopupFrame
 import tv.ridal.UI.ActionBar.BigActionBar
 import tv.ridal.UI.View.SearchView
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Parser
-import tv.ridal.HDRezka.SearchResult
+import tv.ridal.UI.Layout.VLinearLayout
 import tv.ridal.Utils.Utils
-import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
-import kotlin.concurrent.schedule
 
 
 class SearchFragment : BaseFragment()
@@ -45,83 +42,63 @@ class SearchFragment : BaseFragment()
 
     private lateinit var rootFrame: FrameLayout
 
+    private lateinit var scroll: StickyScrollView
+
     private lateinit var rootLayout: LinearLayout
     // children
-    private lateinit var bigActionBar: BigActionBar
+    private lateinit var actionBar: BigActionBar
     private lateinit var searchView: SearchView
-    private lateinit var resultsFrame: FrameLayout
     // подсказки
     private lateinit var movieSuggestionsView: RecyclerView
-    // список результатов поиска
-    private lateinit var resultsListView: ListView
-    // результаты поиска
-    private var searchResults: ArrayList<SearchResult> = ArrayList()
 
     private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
 
-    private lateinit var resultsPopupFrame: PopupFrame
-
-    override fun getContext(): Context {
-        return ApplicationActivity.instance()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
 
         rootFrame = FrameLayout(context).apply {
-            layoutParams = LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT)
-
+            setPadding(0, Utils.dp(30), 0, 0)
+            clipToPadding = true
             setBackgroundColor(Theme.color(Theme.color_bg))
         }
 
-        rootLayout = LinearLayout(context).apply {
-            layoutParams = LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT)
-            orientation = LinearLayout.VERTICAL
-        }
+        rootLayout = VLinearLayout(context)
         // rootLayout's children creation
-        createBigActionBar()
+        createActionBar()
         createSearchView()
-        resultsFrame = FrameLayout(context).apply {
-            layoutParams = LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT)
-        }
-        // resultsFrame's children creation
         createMovieSuggestionsView()
-        resultsPopupFrame = PopupFrame(context)
-        // resultsPopupFrame's ListView child
-        resultsListView = ListView(context).apply {
-            background = Theme.createRect(Theme.color_bg)
 
-            adapter = SearchAdapter(searchResults)
-        }
-        resultsPopupFrame.apply {
-            addView(resultsListView, LayoutHelper.createFrame(
+        rootLayout.apply {
+            addView(actionBar)
+            addView(searchView, LayoutHelper.createLinear(
+                LayoutHelper.MATCH_PARENT, 50
+            ))
+            addView(movieSuggestionsView, LayoutHelper.createLinear(
                 LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
             ))
         }
 
-        resultsFrame.apply {
-            addView( createMovieSuggestionsText(), LayoutHelper.createFrame(
-                LayoutHelper.MATCH_PARENT, 40
-            ) )
-            addView(movieSuggestionsView, LayoutHelper.createFrame(
-                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-                Gravity.TOP,
-                0, 40, 0, 0
-            ))
+        scroll = StickyScrollView(context).apply {
+            this.addOnStickyScrollViewListener(object : StickyScrollView.OnStickyScrollViewListener {
+                override fun onScrollChanged(x: Int, y: Int, oldX: Int, oldY: Int) {
+                    val limit = Utils.dp(90)
+                    if (limit in oldY until y)
+                    {
+                        searchView.background = Theme.rect(Theme.color_main)
+                    }
+                    else if (limit in y until oldY)
+                    {
+                        searchView.background = Theme.rect(Theme.color_bg)
+                    }
+                }
+            })
+            isVerticalScrollBarEnabled = false
+            addView(rootLayout)
         }
 
-        rootLayout.apply {
-            addView(bigActionBar)
-            addView(searchView, LayoutHelper.createFrame(
-                LayoutHelper.MATCH_PARENT, 50,
-                Gravity.CENTER,
-                25, 0, 25, 10
-            ))
-            addView(resultsFrame)
-        }
-
-        rootFrame.addView(rootLayout)
+        rootFrame.addView(scroll)
 
         loadMovieSuggestions()
     }
@@ -131,200 +108,62 @@ class SearchFragment : BaseFragment()
         return rootFrame
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-    }
-
 
     private val movies: ArrayList<Movie> = ArrayList()
 
 
-    private fun createBigActionBar()
+    private fun createActionBar()
     {
-        bigActionBar = BigActionBar(requireContext()).apply {
+        actionBar = BigActionBar(context).apply {
             title = Locale.text(Locale.text_search)
         }
     }
 
-    private fun createMovieSuggestionsText() : TextView
+    private fun createSearchView()
     {
-        return TextView(context).apply {
-            setPadding(Utils.dp(15), 0, Utils.dp(15), 0)
-            gravity = Gravity.CENTER_VERTICAL
+        searchView = SearchView(context).apply {
+            setPadding(Utils.dp(20), 0, Utils.dp(20), 0)
 
-            setTextColor(Theme.color(Theme.color_text))
-            textSize = 16F
-            typeface = Theme.typeface(Theme.tf_normal)
-
-            text = Locale.text(Locale.sorting_watching)
+            background = Theme.rect(
+                Theme.color_bg
+            )
+            tag = "sticky"
         }
     }
 
     private fun createMovieSuggestionsView()
     {
-        movieSuggestionsView = RecyclerView(requireContext()).apply {
+        movieSuggestionsView = RecyclerView(context).apply {
             edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
                 override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
                     return EdgeEffect(view.context).apply { color = Theme.color(Theme.color_main) }
                 }
             }
-            clipToPadding = false
 
-            layoutManager = GridLayoutManager(requireContext(), 3)
-            addItemDecoration(GridSpacingItemDecoration(3, Utils.dp(15)))
+            layoutManager = GridLayoutManager(context, 3)
+            addItemDecoration( GridSpacingItemDecoration(3, Utils.dp(15)) )
 
             adapter = MoviesAdapter(movies)
         }
     }
 
-    var updateResultsTimer: Timer? = null
-
-
-    private fun createSearchView()
-    {
-        searchView = SearchView(requireContext()).apply {
-            maxLength = 20
-
-            searchListener = object : SearchView.SearchListener() {
-                override fun onTextChanged(text: CharSequence) {
-                    if (updateResultsTimer != null)
-                    {
-                        try {
-                            updateResultsTimer!!.cancel()
-                            updateResultsTimer!!.purge()
-                            updateResultsTimer = null
-                        } catch (e: IllegalStateException) {
-                            println("FDF")
-                        }
-
-                        //updateResultsTimer!!.purge()
-                        //updateResultsTimer = null
-                    }
-
-                    if (searchView.text == "")
-                    {
-                        clearResults()
-                        return
-                    }
-                    else
-                    {
-                        updateResultsTimer = Timer()
-                        updateResultsTimer!!.schedule(300) {
-                            requireActivity().runOnUiThread {
-                                loadResults()
-                            }
-                        }
-                    }
-                }
-
-                override fun onSearch(text: CharSequence) {
-                    super.onSearch(text)
-
-                    println("SEARCH IS CLICKED")
-                }
-
-                override fun onFocusChange(focus: Boolean) {
-                    super.onFocusChange(focus)
-
-                    if (focus)
-                    {
-                        resultsPopupFrame.show(resultsFrame)
-                    }
-                    else
-                    {
-                        resultsPopupFrame.dismiss()
-                    }
-                }
-            }
-        }
-    }
-
-
-    private fun loadResults()
-    {
-        println(searchView.text)
-
-        showLoading()
-
-        val url = "https://rezka.ag/engine/ajax/search.php"
-
-        val request = object : StringRequest(Request.Method.POST, url, object : Response.Listener<String>
-        {
-            override fun onResponse(response: String?)
-            {
-                if (response == null || response == "") return
-
-                searchResults.clear()
-                searchResults.addAll(Parser.parseSearchResults(response)!!)
-                (resultsListView.adapter as SearchAdapter).notifyDataSetChanged()
-
-                hideLoading()
-            }
-        }, Response.ErrorListener {
-            println("ERROR")
-        }
-        ) {
-            override fun getParams(): MutableMap<String, String>
-            {
-                val params = HashMap<String, String>().apply {
-                    put("q", searchView.text)
-                }
-
-                return params
-            }
-        }
-
-        requestQueue.add(request)
-    }
-    private fun clearResults()
-    {
-        searchResults.clear()
-        (resultsListView.adapter as SearchAdapter).notifyDataSetChanged()
-    }
-
-    private fun showLoading() {
-        resultsListView.visibility = View.GONE
-    }
-    private fun hideLoading() {
-        resultsListView.visibility = View.VISIBLE
-    }
-
 
     private fun loadMovieSuggestions()
     {
-        val urls = listOf(
-            HDRezka.createUrl(HDRezka.url_films, sorting = HDRezka.sorting_watching),
-            HDRezka.createUrl(HDRezka.url_series, sorting = HDRezka.sorting_watching),
-            HDRezka.createUrl(HDRezka.url_cartoons, sorting = HDRezka.sorting_watching),
-            HDRezka.createUrl(HDRezka.url_anime, sorting = HDRezka.sorting_watching),
+        val url = HDRezka.createUrl(sorting = HDRezka.sorting_watching)
+        val request = StringRequest(Request.Method.GET, url,
+            { response ->
+                movies.addAll( Parser.parseMovies(response)!! )
+
+                (movieSuggestionsView.adapter as MoviesAdapter).notifyItemRangeInserted(
+                    movies.size, HDRezka.PAGE_CAPACITY
+                )
+            },
+            {
+                println("ERROR!")
+            }
         )
-
-        for (i in urls.indices)
-        {
-            val stringRequest = StringRequest(Request.Method.GET, urls[i],
-                { response ->
-                    val moviesN = 5
-
-                    movies.addAll( Parser.parseMovies(response, moviesN)!! )
-
-                    (movieSuggestionsView.adapter as MoviesAdapter).notifyItemRangeInserted(
-                        movies.size, moviesN
-                    )
-                },
-                {
-                    println("ERROR!")
-                }
-            )
-            requestQueue.add(stringRequest)
-        }
+        requestQueue.add(request)
     }
 
 }

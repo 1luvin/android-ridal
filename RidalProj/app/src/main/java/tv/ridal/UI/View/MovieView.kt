@@ -9,6 +9,7 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import tv.ridal.Application.Theme
 import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.LayoutHelper
@@ -36,11 +37,14 @@ class MovieView(context: Context) : FrameLayout(context)
 
         val resizedBitmap = Bitmap.createScaledBitmap(rawBitmap, posterWidthPx, posterHeightPx, false)
 
-        posterDrawable = BitmapDrawable(resources, resizedBitmap)
+        posterDrawable = RoundedBitmapDrawableFactory.create(resources, resizedBitmap).apply {
+            cornerRadius = Utils.dp(6F)
+        }
+
         posterView.setImageDrawable(posterDrawable)
     }
 
-    private var posterDrawable: BitmapDrawable? = null
+    private var posterDrawable: Drawable? = null
     var posterWidthPx = Utils.dp(113)
         set(value) {
             field = value
@@ -87,7 +91,7 @@ class MovieView(context: Context) : FrameLayout(context)
         isClickable = true
         setOnTouchListener(InstantPressListener(this))
 
-        background = Theme.createRect(Theme.color_bg)
+        background = Theme.rect(Theme.color_bg)
 
         posterView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.FIT_XY
@@ -102,9 +106,9 @@ class MovieView(context: Context) : FrameLayout(context)
         movieTypeView = TextView(context).apply {
             setPadding(Utils.dp(5), Utils.dp(2), Utils.dp(5), Utils.dp(2))
 
-            background = Theme.createRect(
+            background = Theme.rect(
                 Theme.alphaColor(Theme.COLOR_LIGHT_CHERRY, 0.7F), radii = floatArrayOf(
-                    0F, 0F, 0F, Utils.dp(7F)
+                    0F, Utils.dp(6F), 0F, Utils.dp(7F)
                 )
             )
 
@@ -183,7 +187,7 @@ class MovieView(context: Context) : FrameLayout(context)
             isClickable = true
             setOnTouchListener( InstantPressListener(this) )
 
-            background = Theme.createRect(
+            background = Theme.rect(
                 Theme.color_main
             )
 

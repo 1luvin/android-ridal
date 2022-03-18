@@ -10,10 +10,12 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.ImageView
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.R
+import tv.ridal.UI.InstantPressListener
 import tv.ridal.Utils.Utils
 
 class SearchView(context: Context) : FrameLayout(context)
@@ -38,12 +40,13 @@ class SearchView(context: Context) : FrameLayout(context)
             editText.filters = arrayOf(inputFilter)
         }
 
+    private var searchIconView: ImageView
     private lateinit var editText: EditText
 
     val text: String
         get() = editText.text.toString()
 
-    private var clearButton: ImageButton
+    private var clearButton: ImageView
     private var clearButtonAnimator = ObjectAnimator().apply {
         duration = 150
     }
@@ -63,13 +66,14 @@ class SearchView(context: Context) : FrameLayout(context)
 
     init
     {
+        searchIconView = ImageView(context).apply {
+            scaleType = ImageView.ScaleType.CENTER
 
-        background = Theme.createRect(
-            outline = Theme.Outline(Theme.alphaColor(Theme.color_main, 0.1F)),
-            radii = FloatArray(4).apply {
-                fill(10F)
-            }
-        )
+            setImageDrawable(Theme.drawable(R.drawable.search, Theme.color_text))
+        }
+        addView(searchIconView, LayoutHelper.createFrame(
+            50, 50
+        ))
 
         editText = EditText(context).apply {
             background = null
@@ -80,6 +84,7 @@ class SearchView(context: Context) : FrameLayout(context)
             setLines(1)
             maxLines = 1
             isSingleLine = true
+            ellipsize = TextUtils.TruncateAt.END
 
             inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD // чтобы текст не подчеркивался при наборе
 
@@ -140,18 +145,21 @@ class SearchView(context: Context) : FrameLayout(context)
             })
         }
         addView(editText, LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+            LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
             Gravity.START or Gravity.CENTER_VERTICAL,
-            15, 0, 15 + 24 + 15, 0
+            50, 0, 50, 0
         ))
 
         val clearDrawable = Theme.drawable(R.drawable.close).apply {
             setTint(Theme.color(Theme.color_text2))
         }
-        clearButton = ImageButton(context).apply {
-            setImageDrawable(clearDrawable)
+        clearButton = ImageView(context).apply {
+            isClickable = true
+            setOnTouchListener( InstantPressListener(this) )
 
-            background = Theme.createCircleSelector(Theme.color(Theme.color_text2))
+            scaleType = ImageView.ScaleType.CENTER
+
+            setImageDrawable(clearDrawable)
 
             setOnClickListener {
                 editText.text.clear()
@@ -175,9 +183,8 @@ class SearchView(context: Context) : FrameLayout(context)
             scaleY = 0F
         }
         addView(clearButton, LayoutHelper.createFrame(
-            24, 24,
-            Gravity.END or Gravity.CENTER_VERTICAL,
-            15, 0, 15, 0
+            50, 50,
+            Gravity.END or Gravity.CENTER_VERTICAL
         ))
 
         clearButtonAnimator.target = clearButton

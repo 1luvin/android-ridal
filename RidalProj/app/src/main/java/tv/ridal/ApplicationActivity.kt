@@ -33,8 +33,6 @@ class ApplicationActivity : BaseActivity()
                 }
             }
 
-        operator fun invoke() : ApplicationActivity = instance()
-
         fun currentFragment() : Fragment = instance().multiStackNavigator.current!!
     }
 
@@ -63,6 +61,9 @@ class ApplicationActivity : BaseActivity()
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+
+        INSTANCE = this
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val contentView = LayoutInflater.from(this).inflate(R.layout.activity_application, null)
@@ -70,7 +71,7 @@ class ApplicationActivity : BaseActivity()
 
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, windowInsets ->
 
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            val insets = windowInsets.getInsets( WindowInsetsCompat.Type.navigationBars() )
 
             contentView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 topMargin = insets.top
@@ -79,8 +80,6 @@ class ApplicationActivity : BaseActivity()
 
             WindowInsetsCompat.CONSUMED
         }
-
-        INSTANCE = this
 
         Utils.checkDisplaySize(this)
         Utils.enableDarkStatusBar(window, false)

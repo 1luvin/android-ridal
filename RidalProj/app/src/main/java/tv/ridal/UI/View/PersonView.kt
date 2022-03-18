@@ -9,6 +9,7 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import tv.ridal.Application.ApplicationLoader
@@ -57,7 +58,10 @@ class PersonView(context: Context) : FrameLayout(context)
 
         val resizedBitmap = Bitmap.createScaledBitmap(rawBitmap, Utils.dp(imageWidthPx), Utils.dp(imageHeightPx), false)
 
-        photoDrawable = BitmapDrawable(resources, resizedBitmap)
+        photoDrawable = RoundedBitmapDrawableFactory.create(resources, resizedBitmap).apply {
+            cornerRadius = Utils.dp(6F)
+        }
+
         imageView.setImageDrawable(photoDrawable)
     }
 
@@ -73,7 +77,7 @@ class PersonView(context: Context) : FrameLayout(context)
         isClickable = true
         setOnTouchListener(InstantPressListener(this))
 
-        background = Theme.createRect(Theme.color_bg)
+        background = Theme.rect(Theme.color_bg)
 
         imageView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.FIT_XY

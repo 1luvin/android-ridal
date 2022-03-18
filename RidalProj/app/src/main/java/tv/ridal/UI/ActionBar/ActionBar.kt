@@ -14,7 +14,6 @@ import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import com.github.ybq.android.spinkit.style.Pulse
 import tv.ridal.Application.Theme
-import tv.ridal.UI.Animators.StateValueAnimator
 import tv.ridal.UI.Drawables.MultiDrawable
 import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.LayoutHelper
@@ -39,7 +38,7 @@ class ActionBar(context: Context) : FrameLayout(context)
         if (divider == null)
         {
             divider = View(context).apply {
-                background = Theme.createRect(color)
+                background = Theme.rect(color)
             }
             addView(divider, LayoutHelper.createFrame(
                 LayoutHelper.MATCH_PARENT, height,
@@ -52,7 +51,7 @@ class ActionBar(context: Context) : FrameLayout(context)
                 updateLayoutParams<FrameLayout.LayoutParams> {
                     this.height = height
                 }
-                background = Theme.createRect(color)
+                background = Theme.rect(color)
             }
         }
 

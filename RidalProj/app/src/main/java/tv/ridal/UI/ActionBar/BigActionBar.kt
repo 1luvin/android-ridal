@@ -48,8 +48,6 @@ class BigActionBar(context: Context) : FrameLayout(context)
 
     init
     {
-        setPadding(0, Utils.dp(25), 0, 0)
-
         titleView = TextView(context).apply {
             setTextColor(titleColor)
             textSize = 36F
@@ -118,7 +116,7 @@ class BigActionBar(context: Context) : FrameLayout(context)
                 isClickable = true
                 setOnTouchListener(InstantPressListener(this))
 
-                background = Theme.createRect( Theme.ripplizeColor(Theme.color_bg), radii = FloatArray(4).apply {
+                background = Theme.rect( Theme.lightenColor(Theme.color_bg), radii = FloatArray(4).apply {
                     fill( Utils.dp(10F) )
                 } )
 

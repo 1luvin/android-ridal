@@ -20,6 +20,7 @@ import tv.ridal.UI.View.SectionView
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Parser
 import tv.ridal.UI.Layout.VLinearLayout
+import tv.ridal.Utils.Utils
 import kotlin.random.Random
 
 class CatalogFragment : BaseFragment()
@@ -41,18 +42,19 @@ class CatalogFragment : BaseFragment()
 
     private val sectionViews: ArrayList<SectionView> = ArrayList()
 
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
 
-        rootLayout = FrameLayout(context).apply {
+        rootLayout = FrameLayout(requireContext()).apply {
             setBackgroundColor(Theme.color(Theme.color_bg))
         }
 
-        scroll = NestedScrollView(context).apply {
+        scroll = NestedScrollView(requireContext()).apply {
             isVerticalScrollBarEnabled = false
         }
-        scrollLayout = VLinearLayout(context)
+        scrollLayout = VLinearLayout(requireContext())
         scroll.addView(scrollLayout)
 
         ApplicationActivity.instance().reselectListener.addListener {
@@ -66,7 +68,7 @@ class CatalogFragment : BaseFragment()
 
         for (i in HDRezka.SECTION_URLS.indices)
         {
-            val view = SectionView(context)
+            val view = SectionView(requireContext())
             sectionViews.add(view)
             scrollLayout.addView(view)
         }
@@ -99,6 +101,8 @@ class CatalogFragment : BaseFragment()
         }
 
         actionBar = BigActionBar(context).apply {
+            setPadding(0, Utils.dp(25), 0, 0)
+
             title = ApplicationLoader.APP_NAME
 
             this.menu = menu

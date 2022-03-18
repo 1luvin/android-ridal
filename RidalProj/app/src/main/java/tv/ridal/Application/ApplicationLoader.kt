@@ -19,8 +19,6 @@ class ApplicationLoader : Application()
                     INSTANCE = it
                 }
             }
-
-        operator fun invoke() : ApplicationLoader = instance()
     }
 
     // Volley's RequestQueue

@@ -13,11 +13,11 @@ open class BaseFragment : Fragment(), Navigator.TagProvider
     override val stableTag: String
         get() = "${Random.nextInt()}"
 
-    override fun getContext(): Context = ApplicationActivity()
+    override fun getContext(): Context = ApplicationActivity.instance()
 
     // Фрагменты
-    protected fun startFragment(fragment: BaseFragment) = ApplicationActivity().multiStackNavigator.push(fragment)
-    protected fun finish() = ApplicationActivity().multiStackNavigator.pop()
+    protected fun startFragment(fragment: BaseFragment) = ApplicationActivity.instance().multiStackNavigator.push(fragment)
+    protected fun finish() = ApplicationActivity.instance().multiStackNavigator.pop()
 }
 
 

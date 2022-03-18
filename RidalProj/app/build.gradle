@@ -62,7 +62,7 @@ dependencies {
     // Room
     implementation "androidx.room:room-runtime:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
-    // lifecycleScope:
+    // lifecycleScope
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.2.0-alpha04'
     // serialization
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2'
@@ -72,6 +72,11 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.12.0'
     // progressbar
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
+    // sticky scroll view
+    implementation 'com.github.nitrico.stickyscrollview:stickyscrollview:1.0.1'
+//    implementation 'com.github.amarjain07:StickyScrollView:1.0.3'
+    // sticky nested scroll view
+//    implementation 'com.github.didikk:sticky-nestedscrollview:1.0.1'
 
 }
 
