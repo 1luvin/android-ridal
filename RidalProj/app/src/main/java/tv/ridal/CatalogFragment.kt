@@ -101,7 +101,7 @@ class CatalogFragment : BaseFragment()
         }
 
         actionBar = BigActionBar(context).apply {
-            setPadding(0, Utils.dp(25), 0, 0)
+            setPadding(0, Utils.dp(30), 0, 0)
 
             title = ApplicationLoader.APP_NAME
 

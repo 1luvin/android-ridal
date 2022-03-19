@@ -174,29 +174,37 @@ class MoviesFragment : BaseFragment()
             title = arguments.title ?: ""
         }
 
-        rootFrame.addView(actionBar, LayoutHelper.createFrame(
-            LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-            Gravity.TOP
-        ))
+        rootFrame.addView(
+            actionBar, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                Gravity.TOP
+            )
+        )
 
         moviesFrame = FrameLayout(requireContext())
-        rootFrame.addView(moviesFrame, LayoutHelper.createFrame(
-            LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
-            Gravity.TOP,
-            0, ActionBar.actionBarHeightDp + 25, 0, 0
-        ))
+        rootFrame.addView(
+            moviesFrame, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
+                Gravity.TOP,
+                0, ActionBar.actionBarHeightDp + 25, 0, 0
+            )
+        )
 
         createMoviesView()
-        moviesFrame.addView(moviesView, LayoutHelper.createFrame(
-            LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
-        ))
+        moviesFrame.addView(
+            moviesView, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
+            )
+        )
 
         createFiltersButton()
-        moviesFrame.addView(filtersButton, LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-            Gravity.END or Gravity.BOTTOM,
-            0, 0, 12, 12
-        ))
+        moviesFrame.addView(
+            filtersButton, LayoutHelper.createFrame(
+                LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+                Gravity.END or Gravity.BOTTOM,
+                0, 0, 12, 12
+            )
+        )
     }
 
     private fun checkFilters()
