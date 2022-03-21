@@ -48,11 +48,8 @@ class SearchFragment : BaseFragment()
     }
 
     private lateinit var rootFrame: FrameLayout
-
-    private lateinit var scroll: StickyScrollView
-
+    private lateinit var scroll: ScrollView
     private lateinit var rootLayout: LinearLayout
-    // children
     private lateinit var actionBar: BigActionBar
     private lateinit var searchView: SearchView
     // подсказки
@@ -65,11 +62,6 @@ class SearchFragment : BaseFragment()
     {
         super.onCreate(savedInstanceState)
 
-        ApplicationActivity.instance().reselectListener.addListener {
-            movieSuggestionsView.stopScroll()
-            scroll.smoothScrollTo(0, 0)
-        }
-
         rootFrame = FrameLayout(context).apply {
             setPadding(0, Utils.dp(30), 0, 0)
             clipToPadding = true
@@ -78,7 +70,7 @@ class SearchFragment : BaseFragment()
 
         createScroll()
         rootLayout = VLinearLayout(context)
-        // rootLayout's children creation
+
         createActionBar()
         createSearchView()
         createMovieSuggestionsView()
@@ -94,22 +86,18 @@ class SearchFragment : BaseFragment()
             ))
         }
 
-        scroll.apply {
-            addView(rootLayout)
-        }
-
-        rootFrame.apply {
-            addView(scroll)
-        }
+        scroll.addView(rootLayout)
+        rootFrame.addView(scroll, LayoutHelper.createFrame(
+            LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
+        ))
 
         loadMovieSuggestions()
     }
 
-    override fun onResume()
+    override fun onStop()
     {
-        super.onResume()
+        super.onStop()
 
-        println("DSGSDGSDg")
         println(scroll.scrollY)
     }
 
@@ -117,7 +105,6 @@ class SearchFragment : BaseFragment()
     {
         return rootFrame
     }
-
 
     private val movies: ArrayList<Movie> = ArrayList()
 
@@ -131,53 +118,53 @@ class SearchFragment : BaseFragment()
 
     private fun createScroll()
     {
-        scroll = StickyScrollView(context).apply {
+        scroll = ScrollView(context).apply {
 
-            addOnStickyScrollViewListener { x, y, oldX, oldY ->
-                var startV = 0F
-                var endV = 0F
+//            addOnStickyScrollViewListener { x, y, oldX, oldY ->
+//                var startV = 0F
+//                var endV = 0F
+//
+//                val limit = Utils.dp(90)
+//                if (limit in oldY until y)
+//                {
+//                    startV = 1F
+//                    endV = 0F
+//                }
+//                else if (limit in y until oldY)
+//                {
+//                    startV = 0F
+//                    endV = 1F
+//                }
+//
+//                if (startV != 0F || endV != 0F)
+//                {
+//                    ValueAnimator.ofFloat(startV, endV).apply {
+//                        duration = 100
+//
+//                        addUpdateListener {
+//                            val animValue = it.animatedValue as Float
+//                            val animMargin = (Utils.dp(20) * animValue).toInt()
+//
+//                            searchView.apply {
+//                                updateLayoutParams<LinearLayout.LayoutParams> {
+//                                    setMargins(animMargin, 0, animMargin, 0)
+//                                }
+//
+//                                background = Theme.rect(
+//                                    Theme.lightenColor(Theme.color_bg, 0.04F),
+//                                    radii = FloatArray(4).apply {
+//                                        fill( Utils.dp(7F) * animValue )
+//                                    }
+//                                )
+//                            }
+//                        }
+//
+//                        start()
+//                    }
+//                }
+//            }
 
-                val limit = Utils.dp(90)
-                if (limit in oldY until y)
-                {
-                    startV = 1F
-                    endV = 0F
-                }
-                else if (limit in y until oldY)
-                {
-                    startV = 0F
-                    endV = 1F
-                }
-
-                if (startV != 0F || endV != 0F)
-                {
-                    ValueAnimator.ofFloat(startV, endV).apply {
-                        duration = 100
-
-                        addUpdateListener {
-                            val animValue = it.animatedValue as Float
-                            val animMargin = (Utils.dp(20) * animValue).toInt()
-
-                            searchView.apply {
-                                updateLayoutParams<LinearLayout.LayoutParams> {
-                                    setMargins(animMargin, 0, animMargin, 0)
-                                }
-
-                                background = Theme.rect(
-                                    Theme.lightenColor(Theme.color_bg, 0.04F),
-                                    radii = FloatArray(4).apply {
-                                        fill( Utils.dp(7F) * animValue )
-                                    }
-                                )
-                            }
-                        }
-
-                        start()
-                    }
-                }
-            }
-
-            isVerticalScrollBarEnabled = false
+//            isVerticalScrollBarEnabled = false
         }
     }
 

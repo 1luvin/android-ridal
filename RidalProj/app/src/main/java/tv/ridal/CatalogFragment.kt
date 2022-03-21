@@ -57,10 +57,6 @@ class CatalogFragment : BaseFragment()
         scrollLayout = VLinearLayout(requireContext())
         scroll.addView(scrollLayout)
 
-        ApplicationActivity.instance().reselectListener.addListener {
-            scroll.smoothScrollTo(0, 0)
-        }
-
         rootLayout.addView(scroll)
 
         createActionBar()

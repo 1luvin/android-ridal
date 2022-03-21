@@ -127,22 +127,6 @@ class MoviesFragment : BaseFragment()
         loadMovies()
     }
 
-    override fun onResume()
-    {
-        super.onResume()
-
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-    }
-
-    override fun onStop()
-    {
-        super.onStop()
-
-        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-
-        cancelRequests()
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         return rootFrame
@@ -161,7 +145,7 @@ class MoviesFragment : BaseFragment()
             setBackgroundColor(Theme.color(Theme.color_bg))
         }
 
-        actionBar = ActionBar(requireContext()).apply {
+        actionBar = ActionBar(context).apply {
             setPadding(0, Utils.dp(25), 0, 0)
             setBackgroundColor(Theme.alphaColor(Theme.color_bg, 0.9F))
 
@@ -181,7 +165,7 @@ class MoviesFragment : BaseFragment()
             )
         )
 
-        moviesFrame = FrameLayout(requireContext())
+        moviesFrame = FrameLayout(context)
         rootFrame.addView(
             moviesFrame, LayoutHelper.createFrame(
                 LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,

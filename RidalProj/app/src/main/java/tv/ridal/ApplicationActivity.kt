@@ -56,8 +56,6 @@ class ApplicationActivity : BaseActivity()
 
     private lateinit var bottomNavigationView: BottomNavigationView
 
-    var reselectListener = MultiListener()
-
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -107,8 +105,6 @@ class ApplicationActivity : BaseActivity()
             }
             setOnNavigationItemReselectedListener {
                 multiStackNavigator.activeNavigator.clear() // возврат к начальному экрану активной вкладки
-
-                reselectListener.invokeAll()
             }
         }
 
