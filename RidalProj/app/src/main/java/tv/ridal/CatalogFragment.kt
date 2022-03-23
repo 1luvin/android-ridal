@@ -23,7 +23,7 @@ import tv.ridal.UI.Layout.VLinearLayout
 import tv.ridal.Utils.Utils
 import kotlin.random.Random
 
-class CatalogFragment : BaseFragment()
+class CatalogFragment : BaseAppFragment()
 {
     override val stableTag: String
         get() = "CatalogFragment${Random.nextInt()}"

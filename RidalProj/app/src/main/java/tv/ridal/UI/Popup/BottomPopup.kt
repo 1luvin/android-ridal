@@ -58,6 +58,13 @@ open class BottomPopup(context: Context) : BottomSheetDialog(context, R.style.Bo
             this.behavior.isDraggable = value
         }
 
+    var dim: Float = 0.33F // !
+        set(value) {
+            field = value
+
+            window?.setDimAmount(dim)
+        }
+
     class Builder(private val context: Context)
     {
         private val popup: BottomPopup = BottomPopup(context)

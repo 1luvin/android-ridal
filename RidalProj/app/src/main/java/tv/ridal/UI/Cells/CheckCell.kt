@@ -27,8 +27,26 @@ class CheckCell(context: Context) : FrameLayout(context)
 
             textView.text = text
         }
-    private val textColor: Int = Theme.color(Theme.color_radio)
-    private val textColorChecked: Int = Theme.color(Theme.color_text)
+    var textColor: Int = Theme.color(Theme.color_radio)
+        set(value) {
+            field = value
+
+//            if (isChecked) textView.setTextColor(textColor)
+            if (textAnimator != null && ! textAnimator!!.isRunning)
+            {
+                textView.setTextColor(textColor)
+            }
+        }
+    var textColorChecked: Int = Theme.color(Theme.color_text)
+        set(value) {
+            field = value
+
+//            if ( ! isChecked) textView.setTextColor(textColor)
+            if (textAnimator != null && ! textAnimator!!.isRunning)
+            {
+                textView.setTextColor(textColor)
+            }
+        }
 
     var isChecked = false
         private set
@@ -86,8 +104,16 @@ class CheckCell(context: Context) : FrameLayout(context)
 
         setMeasuredDimension(
             MeasureSpec.getSize(widthMeasureSpec),
-            Utils.dp(43)
+            Utils.dp(46)
         )
+    }
+
+    override fun invalidate()
+    {
+        super.invalidate()
+
+        textColor = Theme.color(Theme.color_radio)
+        textColorChecked = Theme.color(Theme.color_text)
     }
 
     fun setChecked(checked: Boolean, animated: Boolean = true)

@@ -11,24 +11,22 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.tunjid.androidx.navigation.MultiStackNavigator
 import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.multiStackNavigationController
-import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Theme
 import tv.ridal.UI.fade
 import tv.ridal.UI.zoom
-import tv.ridal.Utils.MultiListener
 import tv.ridal.Utils.Utils
 
-class ApplicationActivity : BaseActivity()
+class AppActivity : BaseActivity()
 {
     companion object
     {
         val tabs = intArrayOf(R.id.navigation, R.id.search)
 
         @Volatile
-        private var INSTANCE: ApplicationActivity? = null
+        private var INSTANCE: AppActivity? = null
         fun instance() =
             INSTANCE ?: synchronized(this) {
-                INSTANCE ?: ApplicationActivity().also {
+                INSTANCE ?: AppActivity().also {
                     INSTANCE = it
                 }
             }
@@ -62,17 +60,13 @@ class ApplicationActivity : BaseActivity()
 
         INSTANCE = this
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-
         val contentView = LayoutInflater.from(this).inflate(R.layout.activity_application, null)
         setContentView(contentView)
 
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, windowInsets ->
-
             val insets = windowInsets.getInsets( WindowInsetsCompat.Type.navigationBars() )
 
             contentView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = insets.top
                 bottomMargin = insets.bottom
             }
 

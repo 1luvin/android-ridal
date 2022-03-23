@@ -14,7 +14,11 @@ class Locale
                 {
                     texts[text_sett] = "Настройки"
                     texts[text_visualAppearance] = "Внешний вид"
-                    texts[text_darkTheme] = "Темная тема"
+                    texts[text_theme] = "Тема"
+                    texts[text_theme_asInSystem] = "Как в системе"
+                    texts[text_theme_light] = "Светлая"
+                    texts[text_theme_dark] = "Темная"
+                    texts[text_done] = "Готово"
 
                     texts[text_catalog] = "Каталог"
                     texts[text_collections] = "Подборки"
@@ -145,7 +149,11 @@ class Locale
         
         const val text_sett = "text_sett"
         const val text_visualAppearance = "text_visualAppearance"
-        const val text_darkTheme = "text_darkTheme"
+        const val text_theme = "text_theme"
+        const val text_theme_asInSystem = "text_theme_asInSystem"
+        const val text_theme_light = "text_theme_light"
+        const val text_theme_dark = "text_theme_dark"
+        const val text_done = "text_done"
 
         const val text_catalog = "text_catalog"
         const val text_collections = "text_collections"

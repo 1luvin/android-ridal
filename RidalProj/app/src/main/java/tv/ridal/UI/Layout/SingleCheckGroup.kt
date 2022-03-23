@@ -1,19 +1,18 @@
 package tv.ridal.UI.Layout
 
 import android.content.Context
-import android.widget.LinearLayout
 import tv.ridal.UI.Cells.CheckCell
 
-class SingleCheckGroup(context: Context) : LinearLayout(context)
+class SingleCheckGroup(context: Context) : VLinearLayout(context)
 {
     private var checkCells: ArrayList<CheckCell> = ArrayList()
 
     init
     {
-        orientation = VERTICAL
+
     }
 
-    fun addCheck(text: String)
+    fun addCheck(text: String, onCheck: (() -> Unit)? = null)
     {
         val checkCell = CheckCell(context).apply {
             this.text = text
@@ -21,6 +20,7 @@ class SingleCheckGroup(context: Context) : LinearLayout(context)
             setOnClickListener {
                 if (this.isChecked) return@setOnClickListener
 
+                onCheck?.invoke()
                 check(this.text)
             }
         }
@@ -40,6 +40,15 @@ class SingleCheckGroup(context: Context) : LinearLayout(context)
             it.text == text
         }
         toCheck?.setChecked(true, animated)
+    }
+
+    override fun invalidate()
+    {
+        super.invalidate()
+
+        checkCells.forEach {
+            it.invalidate()
+        }
     }
 
     fun moveCheckedOnTop()

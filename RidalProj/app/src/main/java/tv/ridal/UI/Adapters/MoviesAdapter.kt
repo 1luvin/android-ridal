@@ -3,7 +3,7 @@ package tv.ridal.UI.Adapters
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import tv.ridal.ApplicationActivity
+import tv.ridal.AppActivity
 import tv.ridal.CatalogFragment
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.UI.View.MovieView
@@ -47,13 +47,13 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
     {
         val movieView = MovieView(parent.context)
 
-        if (ApplicationActivity.currentFragment() is CatalogFragment)
+        if (AppActivity.currentFragment() is CatalogFragment)
         {
             movieView.layoutParams = RecyclerView.LayoutParams(
                 LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT
             )
         }
-        else if (ApplicationActivity.currentFragment() is SearchFragment)
+        else if (AppActivity.currentFragment() is SearchFragment)
         {
             movieView.layoutParams = RecyclerView.LayoutParams(
                 LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT

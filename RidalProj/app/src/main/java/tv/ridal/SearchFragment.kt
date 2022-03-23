@@ -1,23 +1,13 @@
 package tv.ridal
 
-import android.animation.ValueAnimator
-import android.content.Context
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.*
 import android.widget.*
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.doOnAttach
-import androidx.core.view.updateLayoutParams
-import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
-import com.github.nitrico.stickyscrollview.StickyScrollView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import tv.ridal.UI.Adapters.MoviesAdapter
 import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
@@ -29,13 +19,12 @@ import tv.ridal.UI.View.SearchView
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Parser
-import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.VLinearLayout
 import tv.ridal.Utils.Utils
 import kotlin.collections.ArrayList
 
 
-class SearchFragment : BaseFragment()
+class SearchFragment : BaseAppFragment()
 {
     override val stableTag: String
         get() = "SearchFragment"

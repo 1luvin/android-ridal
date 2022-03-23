@@ -79,6 +79,12 @@ class ActionBar(context: Context) : FrameLayout(context)
             if (titleView == null) createTitleView()
             titleView!!.text = title
         }
+    var titleColor: Int = Theme.color(Theme.color_text)
+        set(value) {
+            field = value
+
+            titleView?.setTextColor(titleColor)
+        }
     var titleTypeface: Typeface = Theme.typeface(Theme.tf_bold)
         set(value) {
             field = value
@@ -365,6 +371,13 @@ class ActionBar(context: Context) : FrameLayout(context)
         super.onMeasure(
             MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(paddingTop + actionBarHeight + paddingBottom, MeasureSpec.EXACTLY))
+    }
+
+    override fun invalidate()
+    {
+        super.invalidate()
+
+        titleColor = Theme.color(Theme.color_text)
     }
 
     open class Menu(context: Context) : LinearLayout(context)

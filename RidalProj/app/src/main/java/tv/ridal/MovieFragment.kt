@@ -62,7 +62,7 @@ import tv.ridal.Utils.Utils
 import kotlin.math.abs
 import kotlin.random.Random
 
-class MovieFragment : BaseFragment()
+class MovieFragment : BaseAppFragment()
 {
     override val stableTag: String
         get() = "Movie${Random.nextInt()}"
@@ -285,7 +285,7 @@ class MovieFragment : BaseFragment()
         webViewInterface = JSInterface().apply {
             onLoaded {
                 document = Jsoup.parse(it)
-                (context as ApplicationActivity).runOnUiThread {
+                (context as AppActivity).runOnUiThread {
                     loadingPopup.dismiss()
                     onWatch()
                 }
@@ -438,7 +438,7 @@ class MovieFragment : BaseFragment()
                     onLoaded {
                         parsingDocument = Jsoup.parse(it)
 
-                        (context as ApplicationActivity).runOnUiThread {
+                        (context as AppActivity).runOnUiThread {
                             seasonView = SeasonView()
                             if (translationView != null) {
                                 navigate(translationView!!, seasonView!!)

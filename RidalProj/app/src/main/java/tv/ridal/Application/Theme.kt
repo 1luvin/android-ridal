@@ -156,6 +156,19 @@ class Theme
             return activeColors[colorKey] ?: 0xFF
         }
 
+        fun color(colorKey: String, theme: Int) : Int
+        {
+            when (colorKey) {
+                color_main -> return mainColor
+            }
+
+            return when (theme) {
+                LIGHT -> lightColors[colorKey] ?: 0xFF
+                DARK -> darkColors[colorKey] ?: 0xFF
+                else -> 0xFF
+            }
+        }
+
         /*
             Шрифты
          */
@@ -260,12 +273,10 @@ class Theme
                 radii
             )
         }
-
         fun rect(colorKey: String, outline: Outline? = null, radii: FloatArray? = null) : GradientDrawable
         {
             return rect( color(colorKey), outline, radii )
         }
-
         fun rect(fill: Fill? = null, outline: Outline? = null, radii: FloatArray? = null) : GradientDrawable
         {
             val radiiArray = FloatArray(8)

@@ -3,28 +3,28 @@ package tv.ridal
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.*
-import androidx.appcompat.widget.SwitchCompat
-import com.tunjid.androidx.navigation.Navigator
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
-import tv.ridal.Application.UserData.USER
-import tv.ridal.UI.Layout.LayoutHelper
+import tv.ridal.UI.ActionBar.ActionBar
 import tv.ridal.UI.ActionBar.BigActionBar
+import tv.ridal.UI.Cells.ValueCell
+import tv.ridal.UI.InstantPressListener
+import tv.ridal.UI.Layout.LayoutHelper
+import tv.ridal.UI.Layout.SingleCheckGroup
+import tv.ridal.UI.Layout.VLinearLayout
+import tv.ridal.UI.Popup.BottomPopup
+import tv.ridal.UI.View.RTextView
 import tv.ridal.Utils.Utils
 
-class SettingsFragment : BaseFragment(), Navigator.TagProvider
+class SettingsFragment : BaseSettingsFragment()
 {
-    override val stableTag: String
-        get() = "SettingsFragment"
-
     companion object
     {
         const val TAG = "SettingsFragment"
@@ -36,42 +36,32 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
         }
     }
 
-    private lateinit var rootLayout: RelativeLayout
+    private lateinit var rootLayout: FrameLayout
     private lateinit var scroll: ScrollView
     private lateinit var containerLayout: LinearLayout
     private lateinit var actionBar: BigActionBar
 
     private lateinit var visualAppearanceSectionView: TextView
+    private lateinit var themeCell: ValueCell
+    private var themePopup: ThemePopup? = null
+    private var activeTheme: String = Locale.text(Locale.text_theme_asInSystem)
+        set(value) {
+            field = value
 
-    private lateinit var darkThemeSwitch: SwitchCompat
+            themeCell.valueText = activeTheme
+        }
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
 
-        rootLayout = RelativeLayout(requireContext()).apply {
-            layoutParams = RelativeLayout.LayoutParams(
-                LayoutHelper.MATCH_PARENT,
-                LayoutHelper.MATCH_PARENT
-            )
-
+        rootLayout = FrameLayout(context).apply {
             setBackgroundColor(Theme.color(Theme.color_bg))
         }
 
-        scroll = ScrollView(requireContext()).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                LayoutHelper.MATCH_PARENT,
-                LayoutHelper.MATCH_PARENT
-            )
-        }
+        scroll = ScrollView(context)
 
-        containerLayout = LinearLayout(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LayoutHelper.MATCH_PARENT,
-                LayoutHelper.MATCH_PARENT
-            )
-            orientation = LinearLayout.VERTICAL
-        }
+        containerLayout = VLinearLayout(context)
 
         scroll.addView(containerLayout)
 
@@ -85,12 +75,10 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
         visualAppearanceSectionView = createSectionView( Locale.text(Locale.text_visualAppearance) )
         containerLayout.addView( visualAppearanceSectionView )
 
-        createDarkThemeSwitch()
-        containerLayout.addView(darkThemeSwitch)
-
-        if (USER.hasSettings()) {
-            darkThemeSwitch.isChecked = USER.settings!!.theme_isDark
-        }
+        createThemeCell()
+        containerLayout.addView(themeCell, LayoutHelper.createFrame(
+            LayoutHelper.MATCH_PARENT, 46
+        ))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -98,70 +86,38 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
         return rootLayout
     }
 
-    override fun onResume()
-    {
-        super.onResume()
-
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-    }
-
-    override fun onStop()
-    {
-        super.onStop()
-
-        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-    }
-
     private fun createActionBar()
     {
         actionBar = BigActionBar(context).apply {
+            setPadding(0, Utils.dp(30), 0, 0)
+
             title = Locale.text(Locale.text_sett)
         }
     }
 
     private fun createSectionView(text: String) : TextView
     {
-        return TextView(requireContext()).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        return RTextView(context).apply {
             setPadding(Utils.dp(20), Utils.dp(15), Utils.dp(20), Utils.dp(5))
-
-            this.text = text
 
             textSize = 18F
             typeface = Theme.typeface(Theme.tf_bold)
             setTextColor(Theme.color(Theme.color_main))
+
+            this.text = text
         }
     }
 
-    private fun createDarkThemeSwitch()
+    private fun createThemeCell()
     {
-        darkThemeSwitch = SwitchCompat(context).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                LayoutHelper.MATCH_PARENT,
-                Utils.dp(46)
-            )
+        themeCell = ValueCell(context).apply {
             setPadding(Utils.dp(20), 0, Utils.dp(20), 0)
 
-            text = Locale.text(Locale.text_darkTheme)
-            textSize = 17F
-            typeface = Theme.typeface(Theme.tf_normal)
+            keyText = Locale.text(Locale.text_theme)
+            valueText = Locale.text(Locale.text_theme_asInSystem)
 
-            setTextColor(ColorStateList(
-                arrayOf(
-                    intArrayOf(android.R.attr.state_checked),
-                    intArrayOf(),
-                ),
-                intArrayOf(
-                    Color.BLACK,
-                    Color.GRAY
-                )
-            ))
-
-            setOnCheckedChangeListener { buttonView, isChecked ->
-                switchTheme(isChecked)
+            setOnClickListener {
+                if (themePopup == null) ThemePopup().show()
             }
         }
     }
@@ -173,7 +129,7 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
         val toColors = Theme.colorsList[toTheme]
 
         ValueAnimator.ofFloat(0F, 1F).apply {
-            duration = 300
+            duration = 250
 
             addUpdateListener {
                 val animRatio = it.animatedValue as Float
@@ -185,13 +141,13 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
                 }
 
                 actionBar.titleColor = Theme.mixColors( fromColors[Theme.color_text]!!, toColors[Theme.color_text]!!, animRatio )
+
+                themeCell.keyColor = Theme.mixColors( fromColors[Theme.color_text]!!, toColors[Theme.color_text]!!, animRatio )
             }
 
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationStart(animation: Animator?) {
                     super.onAnimationStart(animation)
-
-                    darkThemeSwitch.isEnabled = false
 
                     Utils.enableDarkStatusBar(requireActivity().window, Theme.isDarkTheme())
                 }
@@ -199,18 +155,92 @@ class SettingsFragment : BaseFragment(), Navigator.TagProvider
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
 
-                    darkThemeSwitch.isEnabled = true
-
                     Theme.setTheme(toTheme)
                 }
             })
 
             start()
         }
-
-        USER.settings?.theme_isDark = isDark
     }
 
+
+    inner class ThemePopup : BottomPopup(context)
+    {
+        private lateinit var popupView: FrameLayout
+        private lateinit var layout: VLinearLayout
+        private lateinit var actionBar: ActionBar
+        private lateinit var checkGroup: SingleCheckGroup
+
+        init
+        {
+            createUI()
+        }
+
+        private fun createUI()
+        {
+            popupView = FrameLayout(context).apply {
+                background = Theme.rect(
+                    Theme.color(Theme.color_bg),
+                    radii = FloatArray(4).apply {
+                        fill( Utils.dp(12F) )
+                    }
+                )
+            }
+
+            setContentView(popupView, LayoutHelper.frame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                Gravity.CENTER_HORIZONTAL
+            ).apply {
+                setMargins(Utils.dp(12), 0, Utils.dp(12), Utils.dp(12))
+            })
+
+            createActionBar()
+            createCheckGroup()
+
+            layout = VLinearLayout(context).apply {
+                addView(actionBar, LayoutHelper.createLinear(
+                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
+                ))
+                addView(checkGroup, LayoutHelper.createLinear(
+                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                    0, 0, 0, 15
+                ))
+            }
+
+            popupView.addView(layout)
+        }
+
+        private fun createActionBar()
+        {
+            actionBar = ActionBar(context).apply {
+//                titleColor = Theme.color(Theme.color_text, Theme.LIGHT)
+                title = Locale.text(Locale.text_theme)
+            }
+        }
+
+        private fun createCheckGroup()
+        {
+            checkGroup = SingleCheckGroup(context).apply {
+                addCheck( Locale.text(Locale.text_theme_asInSystem) ) {
+                    switchTheme(true)
+                    activeTheme = Locale.text(Locale.text_theme_asInSystem)
+                    dismiss()
+                }
+                addCheck( Locale.text(Locale.text_theme_light) ) {
+                    switchTheme(false)
+                    activeTheme = Locale.text(Locale.text_theme_light)
+                    dismiss()
+                }
+                addCheck( Locale.text(Locale.text_theme_dark) ) {
+                    switchTheme(true)
+                    activeTheme = Locale.text(Locale.text_theme_dark)
+                    dismiss()
+                }
+
+                check( activeTheme, false )
+            }
+        }
+    }
 }
 
 

@@ -37,7 +37,7 @@ import tv.ridal.UI.Layout.VLinearLayout
 import tv.ridal.Utils.Utils
 import kotlin.math.abs
 
-class MoviesFragment : BaseFragment()
+class MoviesFragment : BaseAppFragment()
 {
     override val stableTag: String
         get() = "MoviesFragment${View.generateViewId()}"
@@ -673,7 +673,7 @@ class MoviesFragment : BaseFragment()
                 // Фильтры могут содержать либо Жанры либо Секции, вместе не может быть
                 if (hasGenres())
                 {
-                    genreCell = FilterCell().apply {
+                    genreCell = FilterCell(context).apply {
                         filterName = Locale.text(Locale.text_genre)
                         filterValue = activeGenre!!
                     }
@@ -684,7 +684,7 @@ class MoviesFragment : BaseFragment()
                 }
                 else if (hasSections())
                 {
-                    sectionCell = FilterCell().apply {
+                    sectionCell = FilterCell(context).apply {
                         filterName = Locale.text(Locale.text_section)
                         filterValue = activeSection!!
                     }
@@ -694,7 +694,7 @@ class MoviesFragment : BaseFragment()
                     ))
                 }
                 // Сортировка есть всегда
-                sortingCell = FilterCell().apply {
+                sortingCell = FilterCell(context).apply {
                     filterName = Locale.text(Locale.text_sorting)
                     filterValue = activeSorting
                 }

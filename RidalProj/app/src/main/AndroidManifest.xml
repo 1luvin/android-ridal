@@ -20,7 +20,7 @@
         <meta-data android:name="android.max_aspect" android:value="100.0" />
 
         <activity
-            android:name=".ApplicationActivity"
+            android:name=".AppActivity"
             android:windowSoftInputMode="adjustPan"
             >
             <intent-filter>
