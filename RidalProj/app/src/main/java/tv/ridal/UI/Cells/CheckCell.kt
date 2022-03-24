@@ -27,12 +27,11 @@ class CheckCell(context: Context) : FrameLayout(context)
 
             textView.text = text
         }
-    var textColor: Int = Theme.color(Theme.color_radio)
+    var textColor: Int = Theme.color(Theme.color_text2)
         set(value) {
             field = value
 
-//            if (isChecked) textView.setTextColor(textColor)
-            if (textAnimator != null && ! textAnimator!!.isRunning)
+            if (textAnimator == null || ! textAnimator!!.isRunning)
             {
                 textView.setTextColor(textColor)
             }
@@ -41,8 +40,7 @@ class CheckCell(context: Context) : FrameLayout(context)
         set(value) {
             field = value
 
-//            if ( ! isChecked) textView.setTextColor(textColor)
-            if (textAnimator != null && ! textAnimator!!.isRunning)
+            if (textAnimator == null || ! textAnimator!!.isRunning)
             {
                 textView.setTextColor(textColor)
             }
@@ -82,7 +80,7 @@ class CheckCell(context: Context) : FrameLayout(context)
 
         textView = TextView(context).apply {
             setTextColor(textColor)
-            textSize = 15.5F
+            textSize = 16.5F
             typeface = Theme.typeface(Theme.tf_normal)
             setLines(1)
             maxLines = 1

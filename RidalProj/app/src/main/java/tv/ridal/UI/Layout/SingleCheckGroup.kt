@@ -42,6 +42,20 @@ class SingleCheckGroup(context: Context) : VLinearLayout(context)
         toCheck?.setChecked(true, animated)
     }
 
+    fun setTextColor(color: Int)
+    {
+        checkCells.forEach {
+            it.textColor = color
+        }
+    }
+
+    fun setTextColorChecked(color: Int)
+    {
+        checkCells.forEach {
+            it.textColorChecked = color
+        }
+    }
+
     override fun invalidate()
     {
         super.invalidate()

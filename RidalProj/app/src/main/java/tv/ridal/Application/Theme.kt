@@ -28,6 +28,21 @@ class Theme
         // const val ...
         // ...
 
+        fun mainColors() : IntArray
+        {
+            return intArrayOf(
+                COLOR_TWITCH,
+                COLOR_LIGHT_CHERRY,
+                COLOR_TELEGRAM,
+                COLOR_TWITCH,
+                COLOR_LIGHT_CHERRY,
+                COLOR_TELEGRAM,
+                COLOR_TWITCH,
+                COLOR_LIGHT_CHERRY,
+                COLOR_TELEGRAM
+            )
+        }
+
         init
         {
             createColors()
@@ -226,6 +241,26 @@ class Theme
         fun darkenColor(colorKey: String, value: Float = 0.02F) : Int
         {
             return darkenColor( color(colorKey), value )
+        }
+        // Осветляет или затемняет цвет
+        fun overlayColor(color: Int, value: Float = 0.02F) : Int
+        {
+            val hsv = FloatArray(3)
+            val outHsv = FloatArray(3)
+            Color.colorToHSV(color, hsv)
+            outHsv[0] = hsv[0]
+            outHsv[1] = hsv[1]
+            if (hsv[2] > 0.5F) {
+                outHsv[2] = hsv[2] - value
+            } else {
+                outHsv[2] = hsv[2] + value
+            }
+
+            return Color.HSVToColor(outHsv)
+        }
+        fun overlayColor(colorKey: String, value: Float = 0.02F) : Int
+        {
+            return overlayColor( color(colorKey), value )
         }
         // Сделать прозрачнее
         fun alphaColor(color: Int, alpha: Float) : Int
