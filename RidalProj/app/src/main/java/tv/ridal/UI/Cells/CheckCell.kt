@@ -4,6 +4,7 @@ import android.animation.AnimatorSet
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.view.Gravity
 import android.widget.FrameLayout
@@ -18,6 +19,15 @@ import tv.ridal.Utils.Utils
 class CheckCell(context: Context) : FrameLayout(context)
 {
     private var checkView: ImageView
+    private var checkDrawable: Drawable
+
+    var checkColor: Int = Theme.color(Theme.color_main)
+        set(value) {
+            field = value
+
+            checkDrawable = Theme.drawable(R.drawable.done, checkColor)
+            checkView.setImageDrawable(checkDrawable)
+        }
 
     private var textView: TextView
 
@@ -58,11 +68,11 @@ class CheckCell(context: Context) : FrameLayout(context)
         isClickable = true
         setOnTouchListener( InstantPressListener(this) )
 
-        setOnClickListener {
-            setChecked( ! isChecked )
-        }
+//        setOnClickListener {
+//            setChecked( ! isChecked )
+//        }
 
-        val checkDrawable = Theme.drawable(R.drawable.done, Theme.color_main)
+        checkDrawable = Theme.drawable(R.drawable.done, Theme.color_main)
         checkView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.CENTER
 
@@ -104,14 +114,6 @@ class CheckCell(context: Context) : FrameLayout(context)
             MeasureSpec.getSize(widthMeasureSpec),
             Utils.dp(46)
         )
-    }
-
-    override fun invalidate()
-    {
-        super.invalidate()
-
-        textColor = Theme.color(Theme.color_radio)
-        textColorChecked = Theme.color(Theme.color_text)
     }
 
     fun setChecked(checked: Boolean, animated: Boolean = true)

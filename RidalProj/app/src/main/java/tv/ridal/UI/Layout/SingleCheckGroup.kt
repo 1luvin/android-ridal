@@ -1,11 +1,12 @@
 package tv.ridal.UI.Layout
 
 import android.content.Context
+import androidx.core.view.children
 import tv.ridal.UI.Cells.CheckCell
 
 class SingleCheckGroup(context: Context) : VLinearLayout(context)
 {
-    private var checkCells: ArrayList<CheckCell> = ArrayList()
+    var checkCells: ArrayList<CheckCell> = ArrayList()
 
     init
     {
@@ -42,6 +43,18 @@ class SingleCheckGroup(context: Context) : VLinearLayout(context)
         toCheck?.setChecked(true, animated)
     }
 
+    fun setCheckColor(color: Int)
+    {
+        checkCells.forEach {
+            it.checkColor = color
+        }
+    }
+
+    fun getCheckColor() : Int
+    {
+        return checkCells[0].checkColor
+    }
+
     fun setTextColor(color: Int)
     {
         checkCells.forEach {
@@ -53,15 +66,6 @@ class SingleCheckGroup(context: Context) : VLinearLayout(context)
     {
         checkCells.forEach {
             it.textColorChecked = color
-        }
-    }
-
-    override fun invalidate()
-    {
-        super.invalidate()
-
-        checkCells.forEach {
-            it.invalidate()
         }
     }
 

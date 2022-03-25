@@ -8,6 +8,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import tv.ridal.Application.Theme
 import tv.ridal.R
+import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.Utils.Utils
 
@@ -74,7 +75,7 @@ class ColorView(context: Context) : FrameLayout(context)
 
     private fun animateTo(select: Boolean)
     {
-        val from = alpha
+        val from = imageView.alpha
         val to = if (select) 1F else 0F
 
         ValueAnimator.ofFloat(from, to).apply {

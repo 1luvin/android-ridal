@@ -24,7 +24,13 @@ class Theme
 
         const val COLOR_TWITCH = 0xFF7C24FF.toInt()
         const val COLOR_LIGHT_CHERRY = 0xFFFF005F.toInt()
-        const val COLOR_TELEGRAM = 0xFF34ABDF.toInt()
+        const val COLOR_TELEGRAM = 0xFF00B2FF.toInt()
+        const val COLOR_BLUE = 0xFF0000FF.toInt()
+        const val COLOR_RED = 0xFFFF0000.toInt()
+        const val COLOR_GREEN = 0xFF00FF00.toInt()
+        const val COLOR_AQUA = 0xFF00FFA3.toInt()
+        const val COLOR_ORANGE = 0xFFFA8700.toInt()
+        const val COLOR_PINK = 0xFFFF00F5.toInt()
         // const val ...
         // ...
 
@@ -34,12 +40,12 @@ class Theme
                 COLOR_TWITCH,
                 COLOR_LIGHT_CHERRY,
                 COLOR_TELEGRAM,
-                COLOR_TWITCH,
-                COLOR_LIGHT_CHERRY,
-                COLOR_TELEGRAM,
-                COLOR_TWITCH,
-                COLOR_LIGHT_CHERRY,
-                COLOR_TELEGRAM
+                COLOR_BLUE,
+                COLOR_RED,
+                COLOR_GREEN,
+                COLOR_AQUA,
+                COLOR_ORANGE,
+                COLOR_PINK
             )
         }
 

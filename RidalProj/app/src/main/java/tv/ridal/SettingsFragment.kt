@@ -2,6 +2,7 @@ package tv.ridal
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import android.widget.*
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.UI.ActionBar.BigActionBar
+import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.UI.Layout.SingleCheckGroup
 import tv.ridal.UI.Layout.VLinearLayout
@@ -46,7 +48,7 @@ class SettingsFragment : BaseSettingsFragment()
 
     private lateinit var colorsSectionView: RTextView
     private val colors: IntArray = Theme.mainColors()
-    private lateinit var colorsView: HorizontalScrollView
+    private lateinit var colorsView: ColorsView
 
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -139,39 +141,7 @@ class SettingsFragment : BaseSettingsFragment()
     {
         colorsSectionView = createSectionView( Locale.text(Locale.text_mainColor) )
 
-        val colorsLayout = LinearLayout(context)
-        for (i in colors.indices)
-        {
-            val colorView = ColorView(context).apply {
-                color = colors[i]
-
-                setOnClickListener {
-                    // TODO
-                }
-            }
-
-            colorsLayout.addView(colorView, LayoutHelper.createLinear(
-                LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-                if (i != 0) 10 else 0, 0, 0, 0
-            ))
-        }
-
-        colorsView = HorizontalScrollView(context).apply {
-            setPadding(Utils.dp(15), Utils.dp(15), Utils.dp(15), Utils.dp(15))
-            clipToPadding = false
-            background = Theme.rect(
-                Theme.overlayColor(Theme.color_bg, 0.04F),
-                radii = FloatArray(4).apply {
-                    fill( Utils.dp(15F) )
-                }
-            )
-
-            isSmoothScrollingEnabled = false
-            isHorizontalScrollBarEnabled = false
-            overScrollMode = View.OVER_SCROLL_NEVER
-
-            addView(colorsLayout)
-        }
+        colorsView = ColorsView()
 
         layout.apply {
             addView(colorsSectionView, LayoutHelper.createLinear(
@@ -252,6 +222,93 @@ class SettingsFragment : BaseSettingsFragment()
 
             start()
         }
+    }
+
+    inner class ColorsView : FrameLayout(context)
+    {
+        var activeColor: Int = colors[0]
+        private lateinit var horizontalScroll: HorizontalScrollView
+        private lateinit var layout: LinearLayout
+        private var colorViews: ArrayList<ColorView> = ArrayList()
+
+        init
+        {
+            createUI()
+        }
+
+        private fun createUI()
+        {
+            isClickable = true
+            setOnTouchListener( InstantPressListener(this) )
+
+            background = Theme.rect(
+                Theme.overlayColor(Theme.color_bg, 0.04F),
+                radii = FloatArray(4).apply {
+                    fill( Utils.dp(15F) )
+                }
+            )
+
+            layout = LinearLayout(context)
+
+            for (i in colors.indices)
+            {
+                val colorView = ColorView(context).apply {
+                    color = colors[i]
+
+                    setOnClickListener {
+                        if ( ! it.isSelected)
+                        {
+                            val cv = colorViews.find {
+                                it.isSelected
+                            }
+                            cv?.isSelected = false
+
+                            this.isSelected = true
+
+                            onColorChanged(color)
+                        }
+                    }
+                }
+                colorViews.add(colorView)
+
+                layout.addView(colorView, LayoutHelper.createLinear(
+                    LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+                    if (i != 0) 10 else 0, 0, 0, 0
+                ))
+            }
+
+            horizontalScroll = HorizontalScrollView(context).apply {
+                val pad = Utils.dp(15)
+                setPadding(pad, pad, pad, pad)
+                clipToPadding = false
+
+                isSmoothScrollingEnabled = false
+                isHorizontalScrollBarEnabled = false
+                overScrollMode = View.OVER_SCROLL_NEVER
+
+                addView(layout)
+            }
+
+            addView(horizontalScroll)
+        }
+
+        private fun onColorChanged(newColor: Int)
+        {
+            val oldColor = themeCheckGroup.getCheckColor()
+
+            ValueAnimator.ofInt(oldColor, newColor).apply {
+                setEvaluator( ArgbEvaluator() )
+                duration = 250
+
+                addUpdateListener {
+                    val color = it.animatedValue as Int
+                    themeCheckGroup.setCheckColor(color)
+                }
+
+                start()
+            }
+        }
+
     }
 }
 
