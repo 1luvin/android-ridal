@@ -1,5 +1,6 @@
 package tv.ridal.Application
 
+import android.content.res.Configuration
 import android.graphics.*
 import android.graphics.drawable.*
 import androidx.core.content.ContextCompat
@@ -31,8 +32,6 @@ class Theme
         const val COLOR_AQUA = 0xFF00FFA3.toInt()
         const val COLOR_ORANGE = 0xFFFA8700.toInt()
         const val COLOR_PINK = 0xFFFF00F5.toInt()
-        // const val ...
-        // ...
 
         fun mainColors() : IntArray
         {
@@ -56,8 +55,6 @@ class Theme
 
         private fun createColors()
         {
-            mainColor = COLOR_TELEGRAM
-
             var colorBg = 0xFF1A1640.toInt()
             var colorText = 0xFFFFFFFF.toInt()
             var colorText2 = mixColors(colorBg, colorText, 0.7F)
@@ -82,20 +79,82 @@ class Theme
                 put(color_popup_holder, 0xFFAAAAAA.toInt())
                 put(color_radio, 0xFFBBBBBB.toInt())
             }
+
+            colorBg = COLOR_WHITE
+            colorText = 0xFF000000.toInt()
+            colorText2 = mixColors(colorBg, colorText, 0.7F)
+            colorBottomNavIconInactive = mixColors(colorBg, 0xFF000000.toInt(), 0.5F)
+            colorSearchResultMiddle = mixColors(colorBg, colorText, 0.5F)
+            colorActionBarBack = mixColors(colorBg, 0xFF000000.toInt(), 0.7F)
+
+            lightColors = HashMap<String, Int>().apply {
+                put(color_bg, colorBg)
+                put(color_text, colorText)
+                put(color_text2, colorText2)
+                put(color_bottomNavIcon_inactive, colorBottomNavIconInactive)
+                put(color_bottomNavIcon_active, 0xFF000000.toInt())
+                put(color_searchResult_best, colorSearchResultBest)
+                put(color_searchResult_middle, colorSearchResultMiddle)
+                put(color_searchResult_worst, colorSearchResultWorst)
+                put(color_actionBar_back, colorActionBarBack)
+                put(color_actionBar_menuItem, 0xFF000000.toInt())
+                put(color_negative, 0xFFFF6565.toInt())
+                put(color_popup_holder, 0xFF666666.toInt())
+                put(color_radio, 0xFF333333.toInt())
+            }
         }
 
+        const val FOLLOW_SYSTEM = -1
         const val LIGHT: Int = 0
         const val DARK: Int = 1
 
-        fun isDarkTheme() : Boolean
+        fun isDark() : Boolean
         {
             return activeColors == darkColors
         }
 
-        fun setTheme(theme: Int)
+        fun initTheme()
         {
-            activeColors = colorsList[theme]
+            val pref = ApplicationLoader.instance().settingsPref
+            if ( ! pref.contains(theme) )
+            {
+                pref.edit()
+                    .putInt(theme, FOLLOW_SYSTEM)
+                    .apply()
+            }
+
+            val t = pref.getInt(theme, FOLLOW_SYSTEM)
+
+            setTheme(t)
         }
+
+        fun setTheme(themeId: Int)
+        {
+            ApplicationLoader.instance().settingsPref.edit().putInt(theme, themeId).apply()
+            this.themeId = themeId
+
+            if (themeId == FOLLOW_SYSTEM)
+            {
+                val conf = ApplicationLoader.instance().configuration
+                val nightMode = conf.uiMode and Configuration.UI_MODE_NIGHT_YES
+                if (nightMode == Configuration.UI_MODE_NIGHT_YES)
+                    activeColors = colorsList[DARK]
+                else
+                    activeColors = colorsList[LIGHT]
+            }
+            else
+            {
+                activeColors = colorsList[themeId]
+            }
+        }
+
+        var themeId: Int = 0 // !
+
+        /*
+            Ключи для тем
+         */
+
+        const val theme = "theme"
 
         /*
             Ключи для цветов
@@ -131,42 +190,40 @@ class Theme
          */
 
         // Основной цвет
-        var mainColor = 0 // !
-        // Светлые цвета
-        val lightColors = HashMap<String, Int>().apply {
-            this[color_main] = COLOR_TWITCH
-            this[color_bg] = 0xFFFFFFFF.toInt()
-            this[color_text] = 0xFF000000.toInt()
-            this[color_text2] = 0xFF666666.toInt()
 
-            this[color_searchResult_best] = 0xFF00FF00.toInt()
-            this[color_searchResult_middle] = 0xFF666666.toInt()
-            this[color_searchResult_worst] = 0xFFFF0000.toInt()
-
-            this[color_bottomNavIcon_inactive] = 0xFFAAAAAA.toInt()
-            this[color_bottomNavIcon_active] = COLOR_TWITCH
-
-            this[color_actionBar_back] = 0xFF666666.toInt()
-
-            this[color_bigActionBar_item_bg] = 0xFFEEEEEE.toInt()
-
-            this[color_negative] = 0xFFFF6565.toInt()
-
-            this[color_popup_holder] = 0xFFAAAAAA.toInt()
-
-            this[color_radio] = 0xFF777777.toInt()
+        fun initMainColor()
+        {
+            val pref = ApplicationLoader.instance().settingsPref
+            if ( ! pref.contains(color_main) )
+            {
+                pref.edit()
+                    .putInt(color_main, COLOR_TWITCH)
+                    .apply()
+            }
+            mainColor = pref.getInt(color_main, COLOR_TWITCH)
         }
+
+        var mainColor = 0 // !
+            set(value) {
+                field = value
+
+                ApplicationLoader.instance().settingsPref.edit().putInt(color_main, mainColor).apply()
+            }
+
+        // Светлые цвета
+        lateinit var lightColors: HashMap<String, Int>
+            private set
         // Темные цвета
         lateinit var darkColors: HashMap<String, Int>
+            private set
+        // Активные цвета
+        var activeColors = HashMap<String, Int>()
             private set
         // Список всех цветов
         val colorsList = listOf(
             lightColors,
             darkColors,
         )
-        // Активные цвета
-        var activeColors = HashMap<String, Int>()
-            private set
 
         fun color(colorKey: String) : Int
         {

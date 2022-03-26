@@ -4,11 +4,17 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
+import android.content.res.Configuration
+import android.graphics.Rect
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.view.children
+import tv.ridal.Application.ApplicationLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.UI.ActionBar.BigActionBar
@@ -18,6 +24,7 @@ import tv.ridal.UI.Layout.SingleCheckGroup
 import tv.ridal.UI.Layout.VLinearLayout
 import tv.ridal.UI.View.ColorView
 import tv.ridal.UI.View.RTextView
+import tv.ridal.UI.setPaddings
 import tv.ridal.Utils.Utils
 
 class SettingsFragment : BaseSettingsFragment()
@@ -39,7 +46,7 @@ class SettingsFragment : BaseSettingsFragment()
     private lateinit var actionBar: BigActionBar
 
     private lateinit var themeSectionView: RTextView
-    private val themes: List<String> = listOf(
+    private val themeNames: Array<String> = arrayOf(
         Locale.text(Locale.text_theme_asInSystem),
         Locale.text(Locale.text_theme_light),
         Locale.text(Locale.text_theme_dark)
@@ -116,16 +123,13 @@ class SettingsFragment : BaseSettingsFragment()
                 }
             )
 
-            themes.forEach {
-                addCheck(it) {
-                    if (it == themes[0] || it == themes[2]) {
-                        switchTheme(true)
-                    } else {
-                        switchTheme(false)
-                    }
+            for (i in themeNames.indices)
+            {
+                addCheck( themeNames[i] ) {
+                    switchTheme(i - 1)
                 }
             }
-            check(themes[0])
+            check(themeNames[Theme.themeId + 1])
         }
 
         layout.apply {
@@ -155,10 +159,25 @@ class SettingsFragment : BaseSettingsFragment()
         }
     }
 
-    private fun switchTheme(isDark: Boolean)
+    private fun switchTheme(themeId: Int)
     {
         val fromColors = Theme.activeColors
-        val toTheme = if (isDark) 1 else 0
+
+        val toTheme: Int
+        if (themeId == Theme.FOLLOW_SYSTEM)
+        {
+            val conf = ApplicationLoader.instance().configuration
+            val nightMode = conf.uiMode and Configuration.UI_MODE_NIGHT_YES
+            if (nightMode == Configuration.UI_MODE_NIGHT_YES)
+                toTheme = Theme.DARK
+            else
+                toTheme = Theme.LIGHT
+        }
+        else
+        {
+            toTheme = themeId
+        }
+
         val toColors = Theme.colorsList[toTheme]
 
         val f_bg = fromColors[Theme.color_bg]!!
@@ -199,6 +218,26 @@ class SettingsFragment : BaseSettingsFragment()
                         fill( Utils.dp(15F) )
                     }
                 )
+                colorsView.apply {
+                    leftGradientView.background = Theme.rect(
+                        Theme.Fill(
+                            intArrayOf( Theme.mixColors( f_bg_l, t_bg_l, animRatio ), Theme.COLOR_TRANSPARENT ),
+                            leftGradientOri
+                        ),
+                        radii = FloatArray(4).apply {
+                            fill(Utils.dp(15F))
+                        }
+                    )
+                    rightGradientView.background = Theme.rect(
+                        Theme.Fill(
+                            intArrayOf( Theme.mixColors( f_bg_l, t_bg_l, animRatio ), Theme.COLOR_TRANSPARENT ),
+                            rightGradientOri
+                        ),
+                        radii = FloatArray(4).apply {
+                            fill(Utils.dp(15F))
+                        }
+                    )
+                }
             }
 
             addListener(object : AnimatorListenerAdapter() {
@@ -210,13 +249,14 @@ class SettingsFragment : BaseSettingsFragment()
                         setTextColorChecked(t_text)
                     }
 
-                    Utils.enableDarkStatusBar(requireActivity().window, ! isDark)
+                    val enable = toTheme == 0
+                    Utils.enableDarkStatusBar(requireActivity().window, enable)
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
 
-                    Theme.setTheme(toTheme)
+                    Theme.setTheme(themeId)
                 }
             })
 
@@ -226,17 +266,17 @@ class SettingsFragment : BaseSettingsFragment()
 
     inner class ColorsView : FrameLayout(context)
     {
-        var activeColor: Int = colors[0]
         private lateinit var horizontalScroll: HorizontalScrollView
         private lateinit var layout: LinearLayout
         private var colorViews: ArrayList<ColorView> = ArrayList()
 
-        init
-        {
-            createUI()
-        }
+        lateinit var leftGradientView: View
+        val leftGradientOri: GradientDrawable.Orientation = GradientDrawable.Orientation.LEFT_RIGHT
+        lateinit var rightGradientView: View
+        val rightGradientOri: GradientDrawable.Orientation = GradientDrawable.Orientation.RIGHT_LEFT
+        private val gradientWidth: Int = Utils.dp(30)
 
-        private fun createUI()
+        init
         {
             isClickable = true
             setOnTouchListener( InstantPressListener(this) )
@@ -244,10 +284,39 @@ class SettingsFragment : BaseSettingsFragment()
             background = Theme.rect(
                 Theme.overlayColor(Theme.color_bg, 0.04F),
                 radii = FloatArray(4).apply {
-                    fill( Utils.dp(15F) )
+                    fill(Utils.dp(15F))
                 }
             )
 
+            createUI()
+        }
+
+        private fun createUI()
+        {
+            createScroll()
+
+            createColorsLayout()
+            horizontalScroll.addView(layout)
+
+            addView(horizontalScroll)
+
+            leftGradientView = createGradientView(leftGradientOri).apply {
+                alpha = 0F
+            }
+            rightGradientView = createGradientView(rightGradientOri)
+
+            addView(leftGradientView, LayoutHelper.frame(
+                gradientWidth, LayoutHelper.MATCH_PARENT,
+                Gravity.LEFT
+            ))
+            addView(rightGradientView, LayoutHelper.frame(
+                gradientWidth, LayoutHelper.MATCH_PARENT,
+                Gravity.RIGHT
+            ))
+        }
+
+        private fun createColorsLayout()
+        {
             layout = LinearLayout(context)
 
             for (i in colors.indices)
@@ -277,23 +346,56 @@ class SettingsFragment : BaseSettingsFragment()
                 ))
             }
 
+            val cv = colorViews.find {
+                it.color == Theme.mainColor
+            }
+            cv?.isSelected = true
+        }
+
+        private fun createScroll()
+        {
             horizontalScroll = HorizontalScrollView(context).apply {
-                val pad = Utils.dp(15)
-                setPadding(pad, pad, pad, pad)
+                setPaddings( Utils.dp(15) )
                 clipToPadding = false
 
                 isSmoothScrollingEnabled = false
                 isHorizontalScrollBarEnabled = false
                 overScrollMode = View.OVER_SCROLL_NEVER
 
-                addView(layout)
+                setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+                    // TODO: странная дичь со scrollRange
+                    val range = computeHorizontalScrollRange() + Utils.dp(60)
+                    if (scrollX in 0 until gradientWidth)
+                    {
+                        leftGradientView.alpha = scrollX / gradientWidth.toFloat()
+                    }
+                    else if (scrollX in (range - gradientWidth) until range)
+                    {
+                        rightGradientView.alpha = 1F - Utils.mapToFloat(scrollX, (range - gradientWidth), range)
+                    }
+                }
             }
+        }
 
-            addView(horizontalScroll)
+        private fun createGradientView(orientation: GradientDrawable.Orientation) : View
+        {
+            val cFrom: Int = Theme.overlayColor(Theme.color_bg, 0.04F)
+            val cTo: Int = Theme.COLOR_TRANSPARENT
+
+            return View(context).apply {
+                background = Theme.rect(
+                    Theme.Fill( intArrayOf(cFrom, cTo), orientation ),
+                    radii = FloatArray(4).apply {
+                        fill(Utils.dp(15F))
+                    }
+                )
+            }
         }
 
         private fun onColorChanged(newColor: Int)
         {
+            Theme.mainColor = newColor
+
             val oldColor = themeCheckGroup.getCheckColor()
 
             ValueAnimator.ofInt(oldColor, newColor).apply {

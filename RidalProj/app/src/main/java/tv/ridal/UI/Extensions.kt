@@ -1,7 +1,15 @@
 package tv.ridal.UI
 
+import android.view.View
 import androidx.fragment.app.FragmentTransaction
 import tv.ridal.R
+
+// View
+
+fun View.setPaddings(padding: Int)
+{
+    setPadding(padding, padding, padding, padding)
+}
 
 // FragmentTransaction
 

@@ -55,6 +55,11 @@ class Utils
             return ceil(value / density).toInt()
         }
 
+        fun mapToFloat(v: Int, start: Int, end: Int) : Float
+        {
+            return (v - start) * 1F / (end - start)
+        }
+
 
         fun enableDarkStatusBar(window: Window, enable: Boolean)
         {

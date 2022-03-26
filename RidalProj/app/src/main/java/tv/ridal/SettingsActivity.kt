@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import tv.ridal.Application.Theme
 import tv.ridal.UI.Layout.LayoutHelper
+import tv.ridal.Utils.Utils
 
 class SettingsActivity : BaseActivity()
 {
@@ -50,7 +51,7 @@ class SettingsActivity : BaseActivity()
             WindowInsetsCompat.CONSUMED
         }
 
-        window.statusBarColor = Theme.color(Theme.color_main)
+        setupStatusBar()
 
         fragmentContainer = FragmentContainerView(this).apply {
             id = View.generateViewId()
@@ -65,6 +66,11 @@ class SettingsActivity : BaseActivity()
         supportFragmentManager.beginTransaction().add(
             fragmentContainer.id, SettingsFragment.newInstance()
         ).commit()
+    }
+
+    private fun setupStatusBar()
+    {
+        Utils.enableDarkStatusBar(window, ! Theme.isDark())
     }
 
 }

@@ -57,7 +57,6 @@ class AppActivity : BaseActivity()
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-
         INSTANCE = this
 
         val contentView = LayoutInflater.from(this).inflate(R.layout.activity_application, null)
@@ -74,7 +73,7 @@ class AppActivity : BaseActivity()
         }
 
         Utils.checkDisplaySize(this)
-        Utils.enableDarkStatusBar(window, false)
+        setupStatusBar()
 
         bottomNavigationView = findViewById(R.id.bottom_navigation)
 
@@ -125,6 +124,11 @@ class AppActivity : BaseActivity()
         }
 
         onBackPressedDispatcher.addCallback(this) { if (!multiStackNavigator.pop()) finish() }
+    }
+
+    private fun setupStatusBar()
+    {
+        Utils.enableDarkStatusBar(window, ! Theme.isDark())
     }
 }
 

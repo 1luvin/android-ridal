@@ -8,7 +8,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import tv.ridal.Application.Theme
 import tv.ridal.R
-import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.Utils.Utils
 
@@ -31,6 +30,8 @@ class ColorView(context: Context) : FrameLayout(context)
 
     override fun setSelected(selected: Boolean)
     {
+        if (selected == isSelected) return
+
         super.setSelected(selected)
 
         animateTo(selected)
