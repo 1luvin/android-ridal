@@ -296,9 +296,12 @@ class SettingsFragment : BaseSettingsFragment()
             createScroll()
 
             createColorsLayout()
-            horizontalScroll.addView(layout)
-
-            addView(horizontalScroll)
+            horizontalScroll.addView(layout, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
+            ))
+            addView(horizontalScroll, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
+            ))
 
             leftGradientView = createGradientView(leftGradientOri).apply {
                 alpha = 0F
@@ -327,29 +330,46 @@ class SettingsFragment : BaseSettingsFragment()
                     setOnClickListener {
                         if ( ! it.isSelected)
                         {
-                            val cv = colorViews.find {
-                                it.isSelected
-                            }
-                            cv?.isSelected = false
-
-                            this.isSelected = true
-
-                            onColorChanged(color)
+                            selectColor(color)
                         }
                     }
                 }
                 colorViews.add(colorView)
 
-                layout.addView(colorView, LayoutHelper.createLinear(
-                    LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-                    if (i != 0) 10 else 0, 0, 0, 0
-                ))
+                if (colorView.color == Theme.mainColor)
+                {
+                    layout.addView(colorView, 0, LayoutHelper.createLinear(
+                        LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT
+                    ))
+                }
+                else
+                {
+                    layout.addView(colorView, LayoutHelper.createLinear(
+                        LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+                        10, 0, 0, 0
+                    ))
+                }
             }
 
             val cv = colorViews.find {
                 it.color == Theme.mainColor
             }
             cv?.isSelected = true
+        }
+
+        private fun selectColor(color: Int)
+        {
+            var cv = colorViews.find {
+                it.isSelected
+            }
+            cv?.isSelected = false
+
+            cv = colorViews.find {
+                it.color == color
+            }
+            cv?.isSelected = true
+
+            onColorChanged(color)
         }
 
         private fun createScroll()
@@ -364,14 +384,19 @@ class SettingsFragment : BaseSettingsFragment()
 
                 setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
                     // TODO: странная дичь со scrollRange
-                    val range = computeHorizontalScrollRange() + Utils.dp(60)
-                    if (scrollX in 0 until gradientWidth)
+                    val range = computeHorizontalScrollRange() + Utils.dp(61)
+                    if (scrollX < gradientWidth)
                     {
                         leftGradientView.alpha = scrollX / gradientWidth.toFloat()
                     }
-                    else if (scrollX in (range - gradientWidth) until range)
+                    else if (scrollX > range - gradientWidth)
                     {
                         rightGradientView.alpha = 1F - Utils.mapToFloat(scrollX, (range - gradientWidth), range)
+                    }
+                    else
+                    {
+                        leftGradientView.alpha = 1F
+                        rightGradientView.alpha = 1F
                     }
                 }
             }

@@ -68,6 +68,7 @@ class CatalogSectionCell(context: Context) : FrameLayout(context)
         val pointerDrawable = Theme.drawable(R.drawable.pointer_forward).apply {
             setTint(Theme.color(Theme.color_main))
         }
+
         pointerImage = ImageView(context).apply {
             setImageDrawable(pointerDrawable)
         }

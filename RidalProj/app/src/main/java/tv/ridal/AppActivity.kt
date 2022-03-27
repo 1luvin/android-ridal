@@ -117,13 +117,17 @@ class AppActivity : BaseActivity()
 
             itemRippleColor = ColorStateList.valueOf(
                 Theme.alphaColor(
-                    Theme.color(Theme.color_bottomNavIcon_active),
+                    Theme.mainColor,
                     0.05F
                 )
             )
         }
 
         onBackPressedDispatcher.addCallback(this) { if (!multiStackNavigator.pop()) finish() }
+
+        Theme.onThemeChanged {
+            recreate()
+        }
     }
 
     private fun setupStatusBar()

@@ -26,10 +26,8 @@ class Theme
         const val COLOR_TWITCH = 0xFF7C24FF.toInt()
         const val COLOR_LIGHT_CHERRY = 0xFFFF005F.toInt()
         const val COLOR_TELEGRAM = 0xFF00B2FF.toInt()
-        const val COLOR_BLUE = 0xFF0000FF.toInt()
-        const val COLOR_RED = 0xFFFF0000.toInt()
-        const val COLOR_GREEN = 0xFF00FF00.toInt()
-        const val COLOR_AQUA = 0xFF00FFA3.toInt()
+        const val COLOR_SOFT_BLUE = 0xFF4D00FF.toInt()
+        const val COLOR_SOFT_GREEN = 0xFF54EA54.toInt()
         const val COLOR_ORANGE = 0xFFFA8700.toInt()
         const val COLOR_PINK = 0xFFFF00F5.toInt()
 
@@ -39,10 +37,8 @@ class Theme
                 COLOR_TWITCH,
                 COLOR_LIGHT_CHERRY,
                 COLOR_TELEGRAM,
-                COLOR_BLUE,
-                COLOR_RED,
-                COLOR_GREEN,
-                COLOR_AQUA,
+                COLOR_SOFT_BLUE,
+                COLOR_SOFT_GREEN,
                 COLOR_ORANGE,
                 COLOR_PINK
             )
@@ -128,6 +124,12 @@ class Theme
             setTheme(t)
         }
 
+        private var onThemeChanged: (() -> Unit)? = null
+        fun onThemeChanged(l: () -> Unit)
+        {
+            onThemeChanged = l
+        }
+
         fun setTheme(themeId: Int)
         {
             ApplicationLoader.instance().settingsPref.edit().putInt(theme, themeId).apply()
@@ -146,6 +148,8 @@ class Theme
             {
                 activeColors = colorsList[themeId]
             }
+
+            onThemeChanged?.invoke()
         }
 
         var themeId: Int = 0 // !

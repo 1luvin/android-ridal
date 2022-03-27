@@ -557,19 +557,21 @@ class MoviesFragment : BaseAppFragment()
                 gravity = Gravity.CENTER
                 setOnTouchListener( InstantPressListener(this) )
 
-                background = Theme.rect(
-                    Theme.color_main,
-                    radii = FloatArray(4).apply {
-                        fill(Utils.dp(7F))
-                    }
-                )
+//                background = Theme.rect(
+//                    Theme.COLOR_TRANSPARENT,
+//                    Theme.Outline(Theme.mainColor),
+//                    radii = FloatArray(4).apply {
+//                        fill(Utils.dp(7F))
+//                    }
+//                )
+                background = null
 
                 this.text = Locale.text(Locale.text_showResults)
 
-                setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16F)
+                setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17F)
                 isAllCaps = false
                 typeface = Theme.typeface(Theme.tf_bold)
-                setTextColor(Theme.COLOR_WHITE)
+                setTextColor(Theme.mainColor)
 
                 setOnClickListener {
                     val isFiltersChanged = applyNewFilters()
@@ -581,6 +583,12 @@ class MoviesFragment : BaseAppFragment()
                 }
             }
 
+            val divider = View(context).apply {
+                background = Theme.rect(
+                    Theme.overlayColor(Theme.color_bg, 0.07F)
+                )
+            }
+
             bottomLayout = FrameLayout(context).apply {
                 layoutParams = LayoutHelper.createFrame(
                     LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
@@ -590,6 +598,11 @@ class MoviesFragment : BaseAppFragment()
                     LayoutHelper.MATCH_PARENT, 46,
                     Gravity.BOTTOM,
                     20, 10, 20, 10
+                ))
+
+                addView(divider, LayoutHelper.frame(
+                    LayoutHelper.MATCH_PARENT, Utils.dp(1),
+                    Gravity.TOP
                 ))
             }
 
@@ -736,8 +749,6 @@ class MoviesFragment : BaseAppFragment()
             private var scrollHeight: Int = 0 // !
             lateinit var genresCheckGroup: SingleCheckGroup
 
-            private var doneButton: FloatingActionButton
-
             init
             {
                 createActionBar()
@@ -748,16 +759,6 @@ class MoviesFragment : BaseAppFragment()
                     LayoutHelper.MATCH_PARENT, scrollHeight,
                     Gravity.START or Gravity.TOP,
                     0, actionBar.measuredHeight, 0, 0
-                ))
-
-                doneButton = createDoneButton {
-                    filtersView!!.genreCell!!.filterValue = genresCheckGroup.currentChecked()
-                    navigate(genreView!!, filtersView!!)
-                }
-                addView(doneButton, LayoutHelper.createFrame(
-                    LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-                    Gravity.END or Gravity.BOTTOM,
-                    0, 0, 10, 10
                 ))
             }
 
@@ -792,13 +793,19 @@ class MoviesFragment : BaseAppFragment()
             {
                 genresCheckGroup = SingleCheckGroup(context).apply {
                     genres!!.forEach {
-                        addCheck(it)
+                        addCheck(it) {
+                            filtersView!!.genreCell!!.filterValue = it
+                            navigate(genreView!!, filtersView!!)
+                        }
                     }
                     check(activeGenre!!)
 
                     measure(0, 0)
                 }
                 scroll = NestedScrollView(context).apply {
+                    setPadding(0, 0, 0, Utils.dp(12))
+                    clipToPadding = false
+
                     addView(genresCheckGroup)
                 }
                 val availableHeight = (Utils.displayHeight * 0.65).toInt() - (actionBar.measuredHeight + bottomLayout.measuredHeight)
@@ -823,8 +830,6 @@ class MoviesFragment : BaseAppFragment()
             private var scrollHeight: Int = 0 // !
             lateinit var sortingCheckGroup: SingleCheckGroup
 
-            private var doneButton: FloatingActionButton
-
             init
             {
                 createActionBar()
@@ -835,16 +840,6 @@ class MoviesFragment : BaseAppFragment()
                     LayoutHelper.MATCH_PARENT, scrollHeight,
                     Gravity.START or Gravity.TOP,
                     0, actionBar.measuredHeight, 0, 0
-                ))
-
-                doneButton = createDoneButton {
-                    filtersView!!.sortingCell.filterValue = sortingCheckGroup.currentChecked()
-                    navigate(sortingView, filtersView!!)
-                }
-                addView(doneButton, LayoutHelper.createFrame(
-                    LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-                    Gravity.END or Gravity.BOTTOM,
-                    0, 0, 10, 10
                 ))
             }
 
@@ -884,13 +879,19 @@ class MoviesFragment : BaseAppFragment()
             {
                 sortingCheckGroup = SingleCheckGroup(context).apply {
                     sortings.forEach {
-                        addCheck(it)
+                        addCheck(it) {
+                            filtersView!!.sortingCell.filterValue = it
+                            navigate(sortingView, filtersView!!)
+                        }
                     }
                     check(activeSorting)
 
                     measure(0, 0)
                 }
                 scroll = NestedScrollView(context).apply {
+                    setPadding(0, 0, 0, Utils.dp(12))
+                    clipToPadding = false
+
                     addView(sortingCheckGroup)
                 }
                 val availableHeight = (Utils.displayHeight * 0.65).toInt() - (actionBar.measuredHeight + bottomLayout.measuredHeight)
@@ -911,26 +912,6 @@ class MoviesFragment : BaseAppFragment()
         {
 
         }
-
-
-        private fun createDoneButton(onClick: () -> Unit) : FloatingActionButton
-        {
-            return FloatingActionButton(context).apply {
-                setOnTouchListener( InstantPressListener(this) )
-
-                customSize = Utils.dp(50)
-
-                backgroundTintList = ColorStateList.valueOf(Theme.color(Theme.color_main))
-
-                setImageDrawable(Theme.drawable(R.drawable.done_bold))
-                imageTintList = ColorStateList.valueOf(Theme.COLOR_WHITE)
-
-                setOnClickListener {
-                    onClick.invoke()
-                }
-            }
-        }
-
     }
 
 }
