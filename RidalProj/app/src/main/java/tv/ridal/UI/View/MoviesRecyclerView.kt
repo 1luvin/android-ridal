@@ -7,7 +7,7 @@ import android.widget.EdgeEffect
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import tv.ridal.Application.Theme
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
 
 class MoviesRecyclerView(context: Context) : RecyclerView(context)
 {

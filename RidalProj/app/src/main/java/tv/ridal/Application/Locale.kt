@@ -26,8 +26,8 @@ class Locale
 
                     texts[hint_search] = "Фильм, сериал, мультфильм, аниме"
 
-                    texts[share_application] = "Привет, я использую ${ApplicationLoader.APP_NAME} для просмотра кино. " +
-                            "Присоеденяйся! Скачать его можно здесь: ${ApplicationLoader.WEBSITE}"
+                    texts[share_application] = "Привет, я использую ${AppLoader.APP_NAME} для просмотра кино. " +
+                            "Присоеденяйся! Скачать его можно здесь: ${AppLoader.WEBSITE}"
 
                     texts[text_section] = "Раздел"
                     texts[text_films] = "Фильмы"

@@ -1,10 +1,11 @@
-package tv.ridal
+package tv.ridal.UI.Activities.AppActivity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.res.ColorStateList
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
@@ -19,10 +20,11 @@ import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import jp.wasabeef.blurry.Blurry
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import tv.ridal.UI.Adapters.MoviesAdapter
-import tv.ridal.Application.ApplicationLoader
+import tv.ridal.Application.AppLoader
 import tv.ridal.Application.Theme
 import tv.ridal.UI.ActionBar.ActionBar
 import tv.ridal.Application.Locale
@@ -34,7 +36,8 @@ import tv.ridal.UI.Layout.SingleCheckGroup
 import tv.ridal.UI.Popup.BottomPopup
 import tv.ridal.HDRezka.*
 import tv.ridal.UI.Layout.VLinearLayout
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
+import tv.ridal.R
 import kotlin.math.abs
 
 class MoviesFragment : BaseAppFragment()
@@ -112,7 +115,7 @@ class MoviesFragment : BaseAppFragment()
 
     private var loading: Boolean = false
 
-    private val requestQueue: RequestQueue = Volley.newRequestQueue( ApplicationLoader.instance() )
+    private val requestQueue: RequestQueue = Volley.newRequestQueue( AppLoader.instance() )
     private val requestTagMovies: String = "requestTagMovies"
 
 
@@ -120,7 +123,7 @@ class MoviesFragment : BaseAppFragment()
     {
         super.onCreate(savedInstanceState)
 
-        createUi()
+        createUI()
 
         checkFilters()
 
@@ -139,7 +142,7 @@ class MoviesFragment : BaseAppFragment()
     }
 
 
-    private fun createUi()
+    private fun createUI()
     {
         rootFrame = FrameLayout(context).apply {
             setBackgroundColor(Theme.color(Theme.color_bg))
@@ -557,13 +560,6 @@ class MoviesFragment : BaseAppFragment()
                 gravity = Gravity.CENTER
                 setOnTouchListener( InstantPressListener(this) )
 
-//                background = Theme.rect(
-//                    Theme.COLOR_TRANSPARENT,
-//                    Theme.Outline(Theme.mainColor),
-//                    radii = FloatArray(4).apply {
-//                        fill(Utils.dp(7F))
-//                    }
-//                )
                 background = null
 
                 this.text = Locale.text(Locale.text_showResults)
@@ -590,14 +586,10 @@ class MoviesFragment : BaseAppFragment()
             }
 
             bottomLayout = FrameLayout(context).apply {
-                layoutParams = LayoutHelper.createFrame(
-                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
-                )
-
                 addView(showResultsButton, LayoutHelper.createFrame(
-                    LayoutHelper.MATCH_PARENT, 46,
+                    LayoutHelper.MATCH_PARENT, 60,
                     Gravity.BOTTOM,
-                    20, 10, 20, 10
+                    20, 0, 20, 0
                 ))
 
                 addView(divider, LayoutHelper.frame(

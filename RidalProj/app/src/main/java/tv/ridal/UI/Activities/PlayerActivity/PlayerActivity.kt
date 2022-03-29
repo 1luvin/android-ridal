@@ -1,4 +1,4 @@
-package tv.ridal
+package tv.ridal.UI.Activities.PlayerActivity
 
 import android.os.Build
 import android.os.Bundle
@@ -7,6 +7,7 @@ import android.widget.FrameLayout
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
+import tv.ridal.UI.Activities.BaseActivity
 import tv.ridal.HDRezka.Streams.Stream
 import tv.ridal.UI.Layout.LayoutHelper
 

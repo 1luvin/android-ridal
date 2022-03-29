@@ -1,4 +1,4 @@
-package tv.ridal
+package tv.ridal.UI.Activities.AppActivity
 
 import android.content.Context
 import androidx.fragment.app.Fragment

@@ -1,4 +1,4 @@
-package tv.ridal
+package tv.ridal.UI.Activities.AppActivity
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,8 +11,9 @@ import androidx.core.widget.NestedScrollView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
+import tv.ridal.*
 import tv.ridal.UI.Adapters.MoviesAdapter
-import tv.ridal.Application.ApplicationLoader
+import tv.ridal.Application.AppLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.UI.ActionBar.BigActionBar
@@ -20,7 +21,8 @@ import tv.ridal.UI.View.SectionView
 import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Parser
 import tv.ridal.UI.Layout.VLinearLayout
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
+import tv.ridal.UI.Activities.SettingsActivity.SettingsActivity
 import kotlin.random.Random
 
 class CatalogFragment : BaseAppFragment()
@@ -38,7 +40,7 @@ class CatalogFragment : BaseAppFragment()
     private lateinit var scrollLayout: LinearLayout
     private lateinit var actionBar: BigActionBar
 
-    private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
+    private val requestQueue: RequestQueue = AppLoader.instance().requestQueue
 
     private val sectionViews: ArrayList<SectionView> = ArrayList()
 
@@ -99,7 +101,7 @@ class CatalogFragment : BaseAppFragment()
         actionBar = BigActionBar(context).apply {
             setPadding(0, Utils.dp(30), 0, 0)
 
-            title = ApplicationLoader.APP_NAME
+            title = AppLoader.APP_NAME
 
             this.menu = menu
         }
@@ -130,7 +132,7 @@ class CatalogFragment : BaseAppFragment()
 
                         adapter = MoviesAdapter(movies).apply {
                             onMovieClick {
-                                startFragment( MovieFragment.newInstance(it) )
+                                startFragment(MovieFragment.newInstance(it))
                             }
                         }
 

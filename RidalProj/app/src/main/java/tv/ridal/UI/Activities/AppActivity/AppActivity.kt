@@ -1,4 +1,4 @@
-package tv.ridal
+package tv.ridal.UI.Activities.AppActivity
 
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -13,8 +13,11 @@ import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.multiStackNavigationController
 import tv.ridal.Application.Theme
 import tv.ridal.UI.fade
+import tv.ridal.UI.setBackgroundColor
 import tv.ridal.UI.zoom
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
+import tv.ridal.UI.Activities.BaseActivity
+import tv.ridal.R
 
 class AppActivity : BaseActivity()
 {
@@ -102,7 +105,7 @@ class AppActivity : BaseActivity()
         }
 
         bottomNavigationView.apply {
-            setBackgroundColor(Theme.lightenColor(Theme.color_bg))
+            setBackgroundColor( Theme.color_bg )
 
             itemIconTintList = ColorStateList(
                 arrayOf(

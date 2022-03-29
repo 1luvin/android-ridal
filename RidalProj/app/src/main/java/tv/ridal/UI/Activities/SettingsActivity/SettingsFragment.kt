@@ -1,11 +1,10 @@
-package tv.ridal
+package tv.ridal.UI.Activities.SettingsActivity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.res.Configuration
-import android.graphics.Rect
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.Gravity
@@ -13,8 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.view.children
-import tv.ridal.Application.ApplicationLoader
+import tv.ridal.Application.AppLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.UI.ActionBar.BigActionBar
@@ -25,7 +23,7 @@ import tv.ridal.UI.Layout.VLinearLayout
 import tv.ridal.UI.View.ColorView
 import tv.ridal.UI.View.RTextView
 import tv.ridal.UI.setPaddings
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
 
 class SettingsFragment : BaseSettingsFragment()
 {
@@ -166,7 +164,7 @@ class SettingsFragment : BaseSettingsFragment()
         val toTheme: Int
         if (themeId == Theme.FOLLOW_SYSTEM)
         {
-            val conf = ApplicationLoader.instance().configuration
+            val conf = AppLoader.instance().configuration
             val nightMode = conf.uiMode and Configuration.UI_MODE_NIGHT_YES
             if (nightMode == Configuration.UI_MODE_NIGHT_YES)
                 toTheme = Theme.DARK

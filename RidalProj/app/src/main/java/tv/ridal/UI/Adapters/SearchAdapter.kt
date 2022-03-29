@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import tv.ridal.Application.ApplicationLoader
+import tv.ridal.Application.AppLoader
 import tv.ridal.UI.Cells.SearchResultCell
 import tv.ridal.HDRezka.SearchResult
 import kotlin.random.Random
@@ -12,7 +12,7 @@ import kotlin.random.Random
 class SearchAdapter(private var results: ArrayList<SearchResult>) : BaseAdapter()
 {
     val context: Context
-        get() = ApplicationLoader.instance().applicationContext
+        get() = AppLoader.instance().applicationContext
 
     override fun getCount(): Int {
         return results.size

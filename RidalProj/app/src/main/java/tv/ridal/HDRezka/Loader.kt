@@ -1,21 +1,17 @@
 package tv.ridal.HDRezka
 
 import android.content.Context
-import android.graphics.drawable.Animatable
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.view.View
 import coil.imageLoader
 import coil.request.ImageRequest
-import coil.transition.TransitionTarget
-import tv.ridal.Application.ApplicationLoader
+import tv.ridal.Application.AppLoader
 
 class Loader
 {
     companion object
     {
         private val context: Context
-            get() = ApplicationLoader.instance().applicationContext
+            get() = AppLoader.instance().applicationContext
 
         fun loadImage(imageUrl: CharSequence, onLoaded: (d: Drawable?) -> Unit)
         {

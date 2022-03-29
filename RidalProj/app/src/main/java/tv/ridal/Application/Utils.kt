@@ -1,13 +1,11 @@
-package tv.ridal.Utils
+package tv.ridal.Application
 
 import android.app.Activity
 import android.content.Context
 import android.util.DisplayMetrics
 import android.view.Window
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import tv.ridal.Application.ApplicationLoader
 import kotlin.math.ceil
 import kotlin.math.floor
 

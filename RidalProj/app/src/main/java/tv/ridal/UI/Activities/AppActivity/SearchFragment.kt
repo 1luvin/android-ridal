@@ -1,4 +1,4 @@
-package tv.ridal
+package tv.ridal.UI.Activities.AppActivity
 
 import android.os.Bundle
 import android.view.*
@@ -9,7 +9,7 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import tv.ridal.UI.Adapters.MoviesAdapter
-import tv.ridal.Application.ApplicationLoader
+import tv.ridal.Application.AppLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.UI.GridSpacingItemDecoration
@@ -20,7 +20,7 @@ import tv.ridal.HDRezka.HDRezka
 import tv.ridal.HDRezka.Movie
 import tv.ridal.HDRezka.Parser
 import tv.ridal.UI.Layout.VLinearLayout
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
 import kotlin.collections.ArrayList
 
 
@@ -44,7 +44,7 @@ class SearchFragment : BaseAppFragment()
     // подсказки
     private lateinit var movieSuggestionsView: RecyclerView
 
-    private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
+    private val requestQueue: RequestQueue = AppLoader.instance().requestQueue
 
 
     override fun onCreate(savedInstanceState: Bundle?)

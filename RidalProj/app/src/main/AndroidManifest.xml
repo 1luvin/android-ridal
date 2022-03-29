@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".Application.ApplicationLoader"
+        android:name=".Application.AppLoader"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -20,7 +20,7 @@
         <meta-data android:name="android.max_aspect" android:value="100.0" />
 
         <activity
-            android:name=".AppActivity"
+            android:name=".UI.Activities.AppActivity.AppActivity"
             android:windowSoftInputMode="adjustPan"
             >
             <intent-filter>
@@ -29,11 +29,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SettingsActivity">
+        <activity android:name=".UI.Activities.SettingsActivity.SettingsActivity">
 
         </activity>
 
-        <activity android:name=".PlayerActivity">
+        <activity android:name=".UI.Activities.PlayerActivity.PlayerActivity">
 
         </activity>
 

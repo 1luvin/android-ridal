@@ -8,7 +8,7 @@ import tv.ridal.Application.Theme
 import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.UI.View.RTextView
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
 
 class ValueCell(context: Context) : FrameLayout(context)
 {

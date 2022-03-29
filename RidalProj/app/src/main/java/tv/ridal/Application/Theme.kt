@@ -5,7 +5,6 @@ import android.graphics.*
 import android.graphics.drawable.*
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import tv.ridal.Utils.Utils
 
 class Theme
 {
@@ -111,7 +110,7 @@ class Theme
 
         fun initTheme()
         {
-            val pref = ApplicationLoader.instance().settingsPref
+            val pref = AppLoader.instance().settingsPref
             if ( ! pref.contains(theme) )
             {
                 pref.edit()
@@ -132,12 +131,12 @@ class Theme
 
         fun setTheme(themeId: Int)
         {
-            ApplicationLoader.instance().settingsPref.edit().putInt(theme, themeId).apply()
+            AppLoader.instance().settingsPref.edit().putInt(theme, themeId).apply()
             this.themeId = themeId
 
             if (themeId == FOLLOW_SYSTEM)
             {
-                val conf = ApplicationLoader.instance().configuration
+                val conf = AppLoader.instance().configuration
                 val nightMode = conf.uiMode and Configuration.UI_MODE_NIGHT_YES
                 if (nightMode == Configuration.UI_MODE_NIGHT_YES)
                     activeColors = colorsList[DARK]
@@ -197,7 +196,7 @@ class Theme
 
         fun initMainColor()
         {
-            val pref = ApplicationLoader.instance().settingsPref
+            val pref = AppLoader.instance().settingsPref
             if ( ! pref.contains(color_main) )
             {
                 pref.edit()
@@ -211,7 +210,7 @@ class Theme
             set(value) {
                 field = value
 
-                ApplicationLoader.instance().settingsPref.edit().putInt(color_main, mainColor).apply()
+                AppLoader.instance().settingsPref.edit().putInt(color_main, mainColor).apply()
             }
 
         // Светлые цвета
@@ -262,7 +261,7 @@ class Theme
 
         fun typeface(tfKey: String) : Typeface
         {
-            return Typeface.createFromAsset(ApplicationLoader.instance().assets, tfKey)
+            return Typeface.createFromAsset(AppLoader.instance().assets, tfKey)
         }
 
         /*
@@ -350,7 +349,7 @@ class Theme
 
         fun drawable(drawableId: Int): Drawable
         {
-            return ContextCompat.getDrawable(ApplicationLoader.instance().applicationContext, drawableId)!!
+            return ContextCompat.getDrawable(AppLoader.instance().applicationContext, drawableId)!!
         }
         fun drawable(drawableId: Int, color: Int): Drawable
         {

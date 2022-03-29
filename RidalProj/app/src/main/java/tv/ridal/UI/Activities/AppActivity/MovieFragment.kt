@@ -1,4 +1,4 @@
-package tv.ridal
+package tv.ridal.UI.Activities.AppActivity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -37,7 +37,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import tv.ridal.Application.ApplicationLoader
+import tv.ridal.Application.AppLoader
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.HDRezka.HDRezka
@@ -58,7 +58,9 @@ import tv.ridal.UI.Popup.BottomPopup
 import tv.ridal.UI.Popup.LoadingPopup
 import tv.ridal.UI.SpacingItemDecoration
 import tv.ridal.UI.View.RTextView
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
+import tv.ridal.UI.Activities.PlayerActivity.PlayerActivity
+import tv.ridal.R
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -802,7 +804,7 @@ class MovieFragment : BaseAppFragment()
         }
     }
 
-    private val requestQueue: RequestQueue = ApplicationLoader.instance().requestQueue
+    private val requestQueue: RequestQueue = AppLoader.instance().requestQueue
     private val requestTag: String = "requestTag"
 
     private fun loadMovieInfo()
@@ -1392,20 +1394,18 @@ class MovieFragment : BaseAppFragment()
 
     }
 
-    inner class SectionView(sectionName: String) : LinearLayout(context)
+    inner class SectionView(sectionName: String) : VLinearLayout(context)
     {
         private var sectionNameView: TextView
         private var container: FrameLayout
 
         init
         {
-            orientation = LinearLayout.VERTICAL
-
-            sectionNameView = createSectionNameView(sectionName)
+            sectionNameView = createSectionView(sectionName)
             addView(sectionNameView)
 
             container = FrameLayout(context)
-            addView(container, LayoutHelper.createFrame(
+            addView(container, LayoutHelper.createLinear(
                 LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT
             ))
         }
@@ -1417,16 +1417,21 @@ class MovieFragment : BaseAppFragment()
         }
     }
 
-    private fun createSectionNameView(text: String) : RTextView
+    private fun createSectionView(text: String) : RTextView
     {
         return RTextView(context).apply {
             setPadding(Utils.dp(20), Utils.dp(15), Utils.dp(20), Utils.dp(5))
 
-            this.text = text
+            textSize = 16F
+            typeface = Theme.typeface(Theme.tf_normal)
+            setTextColor(Theme.color(Theme.color_text2))
+            setLines(1)
+            maxLines = 1
+            isSingleLine = true
+            ellipsize = TextUtils.TruncateAt.END
+            isAllCaps = true
 
-            textSize = 17F
-            typeface = Theme.typeface(Theme.tf_bold)
-            setTextColor(Theme.color(Theme.color_main))
+            this.text = text
         }
     }
 

@@ -1,4 +1,4 @@
-package tv.ridal
+package tv.ridal.UI.Activities
 
 import androidx.appcompat.app.AppCompatActivity
 

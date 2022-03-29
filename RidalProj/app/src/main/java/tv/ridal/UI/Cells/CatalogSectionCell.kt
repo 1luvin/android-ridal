@@ -11,7 +11,7 @@ import tv.ridal.Application.Theme
 import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.R
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
 
 class CatalogSectionCell(context: Context) : FrameLayout(context)
 {

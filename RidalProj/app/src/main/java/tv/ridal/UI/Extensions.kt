@@ -2,6 +2,7 @@ package tv.ridal.UI
 
 import android.view.View
 import androidx.fragment.app.FragmentTransaction
+import tv.ridal.Application.Theme
 import tv.ridal.R
 
 // View
@@ -9,6 +10,11 @@ import tv.ridal.R
 fun View.setPaddings(padding: Int)
 {
     setPadding(padding, padding, padding, padding)
+}
+
+fun View.setBackgroundColor(colorKey: String)
+{
+    setBackgroundColor( Theme.color(colorKey) )
 }
 
 // FragmentTransaction

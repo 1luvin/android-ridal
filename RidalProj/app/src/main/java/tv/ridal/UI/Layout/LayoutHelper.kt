@@ -2,7 +2,7 @@ package tv.ridal.UI.Layout
 
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
 
 class LayoutHelper
 {

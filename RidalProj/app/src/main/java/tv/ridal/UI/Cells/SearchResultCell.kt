@@ -7,7 +7,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import tv.ridal.Application.Theme
 import tv.ridal.UI.Layout.LayoutHelper
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
 
 class SearchResultCell(context: Context) : FrameLayout(context)
 {

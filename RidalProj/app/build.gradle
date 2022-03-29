@@ -15,6 +15,10 @@ android {
     buildToolsVersion '30.0.3'
 
     defaultConfig {
+        // for blurring view
+        renderscriptTargetApi 21
+        renderscriptSupportModeEnabled true
+
         applicationId 'tv.ridal'
         minSdkVersion 23
         versionCode 1

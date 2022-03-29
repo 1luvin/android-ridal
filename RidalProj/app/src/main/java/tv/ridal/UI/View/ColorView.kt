@@ -9,7 +9,7 @@ import android.widget.ImageView
 import tv.ridal.Application.Theme
 import tv.ridal.R
 import tv.ridal.UI.Layout.LayoutHelper
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
 
 class ColorView(context: Context) : FrameLayout(context)
 {

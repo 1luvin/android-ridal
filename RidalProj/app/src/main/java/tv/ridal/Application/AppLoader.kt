@@ -4,11 +4,10 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
-import android.content.res.Resources
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 
-class ApplicationLoader : Application()
+class AppLoader : Application()
 {
     companion object
     {
@@ -18,10 +17,10 @@ class ApplicationLoader : Application()
         const val SETTINGS_PREF = "tv.ridal.settings"
 
         @Volatile
-        private var INSTANCE: ApplicationLoader? = null
+        private var INSTANCE: AppLoader? = null
         fun instance() =
             INSTANCE ?: synchronized(this) {
-                INSTANCE ?: ApplicationLoader().also {
+                INSTANCE ?: AppLoader().also {
                     INSTANCE = it
                 }
             }

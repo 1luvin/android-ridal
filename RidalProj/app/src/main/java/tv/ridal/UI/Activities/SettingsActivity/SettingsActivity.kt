@@ -1,18 +1,17 @@
-package tv.ridal
+package tv.ridal.UI.Activities.SettingsActivity
 
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import tv.ridal.Application.Theme
 import tv.ridal.UI.Layout.LayoutHelper
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
+import tv.ridal.UI.Activities.BaseActivity
 
 class SettingsActivity : BaseActivity()
 {

@@ -10,7 +10,7 @@ import tv.ridal.Application.Theme
 import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.R
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
 
 class PointerCell(context: Context) : FrameLayout(context)
 {
@@ -61,7 +61,7 @@ class PointerCell(context: Context) : FrameLayout(context)
     {
         val height: Int = if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY) {
             MeasureSpec.getSize(heightMeasureSpec)
-        } else Utils.dp(40)
+        } else Utils.dp(42)
 
         super.onMeasure(
             MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),

@@ -1,23 +1,16 @@
 package tv.ridal.UI.View
 
-import android.animation.ObjectAnimator
 import android.content.Context
 import android.text.*
 import android.view.Gravity
-import android.view.KeyEvent
-import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.R
-import tv.ridal.UI.InstantPressListener
-import tv.ridal.Utils.Utils
+import tv.ridal.Application.Utils
 
 class SearchView(context: Context) : FrameLayout(context)
 {
