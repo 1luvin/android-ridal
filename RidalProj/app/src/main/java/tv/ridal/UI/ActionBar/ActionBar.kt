@@ -13,14 +13,12 @@ import android.widget.*
 import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import com.github.ybq.android.spinkit.style.Pulse
-import jp.wasabeef.blurry.Blurry
 import tv.ridal.Application.Theme
 import tv.ridal.UI.Drawables.MultiDrawable
 import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.UI.View.RTextView
 import tv.ridal.Application.Utils
-import tv.ridal.R
 import kotlin.math.max
 
 class ActionBar(context: Context) : FrameLayout(context)

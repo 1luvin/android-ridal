@@ -20,7 +20,6 @@ import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import jp.wasabeef.blurry.Blurry
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import tv.ridal.UI.Adapters.MoviesAdapter

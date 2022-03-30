@@ -294,12 +294,8 @@ class SettingsFragment : BaseSettingsFragment()
             createScroll()
 
             createColorsLayout()
-            horizontalScroll.addView(layout, LayoutHelper.createFrame(
-                LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
-            ))
-            addView(horizontalScroll, LayoutHelper.createFrame(
-                LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
-            ))
+            horizontalScroll.addView(layout)
+            addView(horizontalScroll)
 
             leftGradientView = createGradientView(leftGradientOri).apply {
                 alpha = 0F
@@ -382,7 +378,7 @@ class SettingsFragment : BaseSettingsFragment()
 
                 setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
                     // TODO: странная дичь со scrollRange
-                    val range = computeHorizontalScrollRange() + Utils.dp(61)
+                    val range = computeHorizontalScrollRange() - Utils.dp(30)
                     if (scrollX < gradientWidth)
                     {
                         leftGradientView.alpha = scrollX / gradientWidth.toFloat()
