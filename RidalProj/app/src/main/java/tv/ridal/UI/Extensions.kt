@@ -1,9 +1,17 @@
 package tv.ridal.UI
 
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentTransaction
 import tv.ridal.Application.Theme
 import tv.ridal.R
+
+// Log
+
+fun msg(msg: String)
+{
+    Log.d("msg", msg)
+}
 
 // View
 

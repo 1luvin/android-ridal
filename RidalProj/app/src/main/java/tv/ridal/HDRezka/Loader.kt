@@ -4,14 +4,14 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import coil.imageLoader
 import coil.request.ImageRequest
-import tv.ridal.Application.AppLoader
+import tv.ridal.Application.App
 
 class Loader
 {
     companion object
     {
         private val context: Context
-            get() = AppLoader.instance().applicationContext
+            get() = App.instance().applicationContext
 
         fun loadImage(imageUrl: CharSequence, onLoaded: (d: Drawable?) -> Unit)
         {

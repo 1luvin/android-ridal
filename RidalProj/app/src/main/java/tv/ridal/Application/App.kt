@@ -7,7 +7,7 @@ import android.content.res.Configuration
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 
-class AppLoader : Application()
+class App : Application()
 {
     companion object
     {
@@ -17,10 +17,10 @@ class AppLoader : Application()
         const val SETTINGS_PREF = "tv.ridal.settings"
 
         @Volatile
-        private var INSTANCE: AppLoader? = null
+        private var INSTANCE: App? = null
         fun instance() =
             INSTANCE ?: synchronized(this) {
-                INSTANCE ?: AppLoader().also {
+                INSTANCE ?: App().also {
                     INSTANCE = it
                 }
             }
@@ -46,14 +46,11 @@ class AppLoader : Application()
 
         INSTANCE = this
 
-        Theme.initMainColor()
         Theme.initTheme()
 
         Locale.setLocale(Locale.RU)
 
     }
-
-
 
 }
 

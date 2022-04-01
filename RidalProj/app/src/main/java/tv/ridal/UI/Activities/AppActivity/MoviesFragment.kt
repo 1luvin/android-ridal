@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.res.ColorStateList
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
@@ -23,7 +22,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import tv.ridal.UI.Adapters.MoviesAdapter
-import tv.ridal.Application.AppLoader
+import tv.ridal.Application.App
 import tv.ridal.Application.Theme
 import tv.ridal.UI.ActionBar.ActionBar
 import tv.ridal.Application.Locale
@@ -37,6 +36,7 @@ import tv.ridal.HDRezka.*
 import tv.ridal.UI.Layout.VLinearLayout
 import tv.ridal.Application.Utils
 import tv.ridal.R
+import tv.ridal.UI.msg
 import kotlin.math.abs
 
 class MoviesFragment : BaseAppFragment()
@@ -61,7 +61,7 @@ class MoviesFragment : BaseAppFragment()
         var url: String? = null
 
         var hasSections: Boolean = false
-        var hasSorting: Boolean = true
+        var hasSortings: Boolean = true
         var applySection: String? = null
 
         var applyGenre: String? = null
@@ -73,9 +73,17 @@ class MoviesFragment : BaseAppFragment()
             field = value
             actionBar.subtitle = subtitle!!
         }
-    private fun setSubtitle(genre: String, sorting: String)
+    private fun updateSubtitle()
     {
-        subtitle = "$genre, $sorting"
+        var str = ""
+        if (activeGenre != null) str += activeGenre
+        else if (activeSection != null) str += activeSection
+
+        if (str != "") str += ", "
+
+        if (activeSorting != "") str += activeSorting
+
+        subtitle = str
     }
 
     /*
@@ -86,17 +94,14 @@ class MoviesFragment : BaseAppFragment()
 
     private var genres: List<String>? = null
     private var activeGenre: String? = null
-    private var sortings: List<String> = listOf(
-        Locale.text(Locale.sorting_last),
-        Locale.text(Locale.sorting_popular),
-        Locale.text(Locale.sorting_watching)
-    )
-    private var activeSorting: String = sortings[0]
-    private var sections: List<String>? = null
+    private var sortings: Array<String>? = null
+    private var activeSorting: String? = null
+    private var sections: Array<String>? = null
     private var activeSection: String? = null
 
     private fun hasGenres(): Boolean = genres != null
     private fun hasSections(): Boolean = sections != null
+    private fun hasSortings(): Boolean = sortings != null
 
     private var document: Document? = null
 
@@ -114,8 +119,8 @@ class MoviesFragment : BaseAppFragment()
 
     private var loading: Boolean = false
 
-    private val requestQueue: RequestQueue = Volley.newRequestQueue( AppLoader.instance() )
-    private val requestTagMovies: String = "requestTagMovies"
+    private val requestQueue: RequestQueue = Volley.newRequestQueue( App.instance() )
+    private val requestTagMovies: String = "MoviesFragment"
 
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -133,7 +138,6 @@ class MoviesFragment : BaseAppFragment()
     {
         return rootFrame
     }
-
 
     private fun cancelRequests()
     {
@@ -157,7 +161,7 @@ class MoviesFragment : BaseAppFragment()
                 finish()
             }
 
-            title = arguments.title ?: ""
+            title = arguments.title
         }
 
         rootFrame.addView(
@@ -206,6 +210,16 @@ class MoviesFragment : BaseAppFragment()
             }
         }
 
+        if (arguments.hasSortings)
+        {
+            sortings = arrayOf(
+                Locale.text(Locale.sorting_last),
+                Locale.text(Locale.sorting_popular),
+                Locale.text(Locale.sorting_watching)
+            )
+            activeSorting = sortings!![0]
+        }
+
         if (arguments.hasSections)
         {
             sections = HDRezka.SECTION_NAMES
@@ -223,8 +237,6 @@ class MoviesFragment : BaseAppFragment()
     {
         filtersPopup = FiltersPopup().apply {
             onNewFilters {
-                setSubtitle(activeGenre ?: "", activeSorting)
-
                 clearMovies()
                 loadMovies()
             }
@@ -292,13 +304,17 @@ class MoviesFragment : BaseAppFragment()
         var url = ""
         if (document == null)
         {
+            updateSubtitle()
+
             url = arguments.url!!
             if ( hasGenres() ) {
-                println(activeGenre)
                 url += Genre.url(activeGenre!!)
             }
-            if ( arguments.hasSorting ) {
-                url += Sorting.url(activeSorting)
+            if ( hasSortings() ) {
+                url += Sorting.url(activeSorting!!)
+            }
+            if ( hasSections() ) {
+                url += Section.url(activeSection!!)
             }
         }
         else {
@@ -310,14 +326,12 @@ class MoviesFragment : BaseAppFragment()
             }
         }
 
-        println(url)
+        msg(url)
 
         val moviesRequest = StringRequest(
             Request.Method.GET, url,
             { response ->
                 loading = false
-
-                println("LOADED")
 
                 document = Jsoup.parse(response)
 
@@ -360,13 +374,13 @@ class MoviesFragment : BaseAppFragment()
 
         init
         {
+            isDraggable = false
+
             createUi()
 
             setOnShowListener {
                 onFiltersOpen()
             }
-
-            isDraggable = false
         }
 
         private fun createUi()
@@ -414,11 +428,6 @@ class MoviesFragment : BaseAppFragment()
                 genreView = GenreView().apply {
                     visibility = View.GONE
                 }
-//                popupView.addView(genreView, LayoutHelper.createFrame2(
-//                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-//                    Gravity.TOP,
-//                    0, 0, 0, bottomLayout.measuredHeight
-//                ))
             }
 
             if (hasSections())
@@ -429,7 +438,7 @@ class MoviesFragment : BaseAppFragment()
                     }
                 }
 
-                genreView = GenreView().apply {
+                sectionView = SectionView().apply {
                     visibility = View.GONE
                 }
             }
@@ -611,6 +620,12 @@ class MoviesFragment : BaseAppFragment()
                 }
             }
 
+            val newSection = sectionView!!.currentSection()
+            if (activeSection != newSection) {
+                activeSection = newSection
+                changed = true
+            }
+
             val newSorting = sortingView.currentSorting()
             if (activeSorting != newSorting) {
                 activeSorting = newSorting
@@ -632,21 +647,26 @@ class MoviesFragment : BaseAppFragment()
                     navigate(currentView, filtersView!!, false)
                 }
 
-                if (hasGenres()) {
+                if (hasGenres())
+                {
                     filtersView!!.genreCell!!.filterValue = activeGenre!!
 
                     genreView!!.genresCheckGroup.check(activeGenre!!)
                 }
-                if (hasSections()) {
+                if (hasSections())
+                {
                     filtersView!!.sectionCell!!.filterValue = activeSection!!
 
-                    // sectionView!!.checkBoxGroup.check("xxx", "xxx")
+                    sectionView!!.sectionsCheckGroup.check(activeSection!!)
                 }
-
-                filtersView!!.sortingCell.filterValue = activeSorting
             }
 
-            sortingView.sortingCheckGroup.check(activeSorting)
+            if (hasSortings())
+            {
+                filtersView!!.sortingCell.filterValue = activeSorting!!
+
+                sortingView.sortingCheckGroup.check(activeSorting!!)
+            }
         }
 
         private var newFiltersListener: (() -> Unit)? = null
@@ -692,20 +712,23 @@ class MoviesFragment : BaseAppFragment()
                         filterName = Locale.text(Locale.text_section)
                         filterValue = activeSection!!
                     }
-                    addView(genreCell, LayoutHelper.createLinear(
+                    addView(sectionCell, LayoutHelper.createLinear(
                         LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-                        20, CELL_SPACING, 20, 0
+                        0, CELL_SPACING, 0, 0
                     ))
                 }
-                // Сортировка есть всегда
-                sortingCell = FilterCell(context).apply {
-                    filterName = Locale.text(Locale.text_sorting)
-                    filterValue = activeSorting
+
+                if (hasSortings())
+                {
+                    sortingCell = FilterCell(context).apply {
+                        filterName = Locale.text(Locale.text_sorting)
+                        filterValue = activeSorting!!
+                    }
+                    addView(sortingCell, LayoutHelper.createLinear(
+                        LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                        0, CELL_SPACING, 0, CELL_SPACING
+                    ))
                 }
-                addView(sortingCell, LayoutHelper.createLinear(
-                    LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
-                    0, CELL_SPACING, 0, CELL_SPACING
-                ))
             }
 
             private fun createActionBar()
@@ -715,13 +738,18 @@ class MoviesFragment : BaseAppFragment()
 
                     menu = ActionBar.Menu(context).apply {
                         addItem(Theme.drawable(R.drawable.refresh, Theme.color_text)) {
-                            if (hasGenres()) {
+                            if (hasGenres())
+                            {
                                 activeGenre = genres!![0]
                             }
-                            if (hasSections()) {
-                                // Применяем первоначальные Секции (то есть все)
+                            if (hasSections())
+                            {
+                                activeSection = sections!![0]
                             }
-                            activeSorting = sortings[0]
+                            if (hasSortings())
+                            {
+                                activeSorting = sortings!![0]
+                            }
 
                             newFiltersListener?.invoke()
                             // Закрываем Фильтры
@@ -869,13 +897,13 @@ class MoviesFragment : BaseAppFragment()
             private fun createScroll()
             {
                 sortingCheckGroup = SingleCheckGroup(context).apply {
-                    sortings.forEach {
+                    sortings!!.forEach {
                         addCheck(it) {
                             filtersView!!.sortingCell.filterValue = it
                             navigate(sortingView, filtersView!!)
                         }
                     }
-                    check(activeSorting)
+                    check(activeSorting!!)
 
                     measure(0, 0)
                 }
@@ -899,9 +927,95 @@ class MoviesFragment : BaseAppFragment()
             }
         }
 
-        inner class SectionView : LinearLayout(context)
+        inner class SectionView : FrameLayout(context)
         {
+            private lateinit var actionBar: ActionBar
 
+            private lateinit var scroll: NestedScrollView
+            private var scrollHeight: Int = 0 // !
+            lateinit var sectionsCheckGroup: SingleCheckGroup
+
+            init
+            {
+                createUI()
+            }
+
+            override fun onVisibilityChanged(changedView: View, visibility: Int)
+            {
+                super.onVisibilityChanged(changedView, visibility)
+                // открытие сортировки
+                if (visibility == View.VISIBLE)
+                {
+                    // проверить на нулл !!
+                    sectionsCheckGroup.check( filtersView!!.sectionCell!!.filterValue, false )
+                    sectionsCheckGroup.moveCheckedOnTop()
+
+                    scroll.scrollTo(0, 0)
+                }
+            }
+
+            private fun createUI()
+            {
+                createActionBar()
+                addView(actionBar)
+
+                createScroll()
+                addView(scroll, LayoutHelper.frame(
+                    LayoutHelper.MATCH_PARENT, scrollHeight,
+                    Gravity.START or Gravity.TOP,
+                    0, actionBar.measuredHeight, 0, 0
+                ))
+            }
+
+            private fun createActionBar()
+            {
+                actionBar = ActionBar(context).apply {
+                    title = Locale.text(Locale.text_section)
+                }
+                actionBar.measure(0, 0)
+
+                if (filtersView != null)
+                {
+                    actionBar.apply {
+                        actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
+                        onActionButtonClick {
+                            navigate(sectionView!!, filtersView!!)
+                        }
+                    }
+                }
+            }
+
+            private fun createScroll()
+            {
+                sectionsCheckGroup = SingleCheckGroup(context).apply {
+                    sections!!.forEach {
+                        addCheck(it) {
+                            filtersView!!.sectionCell!!.filterValue = it
+                            navigate(sectionView!!, filtersView!!)
+                        }
+                    }
+                    check(activeSection!!)
+
+                    measure(0, 0)
+                }
+                scroll = NestedScrollView(context).apply {
+                    setPadding(0, 0, 0, Utils.dp(12))
+                    clipToPadding = false
+
+                    addView(sectionsCheckGroup)
+                }
+                val availableHeight = (Utils.displayHeight * 0.65).toInt() - (actionBar.measuredHeight + bottomLayout.measuredHeight)
+                scrollHeight = if (sectionsCheckGroup.measuredHeight < availableHeight) {
+                    LayoutHelper.WRAP_CONTENT
+                } else {
+                    availableHeight
+                }
+            }
+
+            fun currentSection() : String
+            {
+                return sectionsCheckGroup.currentChecked()
+            }
         }
     }
 

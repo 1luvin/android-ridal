@@ -18,6 +18,7 @@ import tv.ridal.UI.zoom
 import tv.ridal.Application.Utils
 import tv.ridal.UI.Activities.BaseActivity
 import tv.ridal.R
+import tv.ridal.UI.msg
 
 class AppActivity : BaseActivity()
 {
@@ -76,7 +77,7 @@ class AppActivity : BaseActivity()
         }
 
         Utils.checkDisplaySize(this)
-        setupStatusBar()
+        updateStatusBar()
 
         bottomNavigationView = findViewById(R.id.bottom_navigation)
 
@@ -127,13 +128,42 @@ class AppActivity : BaseActivity()
         }
 
         onBackPressedDispatcher.addCallback(this) { if (!multiStackNavigator.pop()) finish() }
+    }
 
-        Theme.onThemeChanged {
-            recreate()
+    override fun onResume()
+    {
+        super.onResume()
+
+        updateColors()
+        updateStatusBar()
+    }
+
+    private fun updateColors()
+    {
+        bottomNavigationView.apply {
+            setBackgroundColor( Theme.color_bg )
+
+            itemIconTintList = ColorStateList(
+                arrayOf(
+                    intArrayOf(-android.R.attr.state_checked),
+                    intArrayOf(android.R.attr.state_checked)
+                ),
+                intArrayOf(
+                    Theme.color(Theme.color_bottomNavIcon_inactive),
+                    Theme.color(Theme.color_bottomNavIcon_active),
+                )
+            )
+
+            itemRippleColor = ColorStateList.valueOf(
+                Theme.alphaColor(
+                    Theme.mainColor,
+                    0.05F
+                )
+            )
         }
     }
 
-    private fun setupStatusBar()
+    private fun updateStatusBar()
     {
         Utils.enableDarkStatusBar(window, ! Theme.isDark())
     }

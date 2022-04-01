@@ -13,6 +13,15 @@ class SingleCheckGroup(context: Context) : VLinearLayout(context)
 
     }
 
+    override fun setEnabled(enabled: Boolean)
+    {
+        super.setEnabled(enabled)
+
+        checkCells.forEach {
+            it.isEnabled = enabled
+        }
+    }
+
     fun addCheck(text: String, onCheck: (() -> Unit)? = null)
     {
         val checkCell = CheckCell(context).apply {

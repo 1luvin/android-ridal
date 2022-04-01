@@ -37,7 +37,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import tv.ridal.Application.AppLoader
+import tv.ridal.Application.App
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.HDRezka.HDRezka
@@ -804,7 +804,7 @@ class MovieFragment : BaseAppFragment()
         }
     }
 
-    private val requestQueue: RequestQueue = AppLoader.instance().requestQueue
+    private val requestQueue: RequestQueue = App.instance().requestQueue
     private val requestTag: String = "requestTag"
 
     private fun loadMovieInfo()
@@ -918,7 +918,7 @@ class MovieFragment : BaseAppFragment()
                             title = list.name!!
                             url = list.url!!
 
-                            hasSorting = false
+                            hasSortings = false
                         }
                         startFragment( MoviesFragment.newInstance(args) )
                     }
@@ -950,7 +950,7 @@ class MovieFragment : BaseAppFragment()
                             title = collection.name!!
                             url = collection.url!!
 
-                            hasSorting = false
+                            hasSortings = false
                         }
                         startFragment( MoviesFragment.newInstance(args) )
                     }
@@ -981,6 +981,8 @@ class MovieFragment : BaseAppFragment()
                         val args = MoviesFragment.Arguments().apply {
                             title = country.name!!
                             url = country.url!!
+
+                            hasSections = true
                         }
                         startFragment( MoviesFragment.newInstance(args) )
                     }

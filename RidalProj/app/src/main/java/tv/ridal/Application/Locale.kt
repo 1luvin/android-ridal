@@ -26,10 +26,11 @@ class Locale
 
                     texts[hint_search] = "Фильм, сериал, мультфильм, аниме"
 
-                    texts[share_application] = "Привет, я использую ${AppLoader.APP_NAME} для просмотра кино. " +
-                            "Присоеденяйся! Скачать его можно здесь: ${AppLoader.WEBSITE}"
+                    texts[share_application] = "Привет, я использую ${App.APP_NAME} для просмотра кино. " +
+                            "Присоеденяйся! Скачать его можно здесь: ${App.WEBSITE}"
 
                     texts[text_section] = "Раздел"
+                    texts[text_allSections] = "Все разделы"
                     texts[text_films] = "Фильмы"
                     texts[text_series] = "Сериалы"
                     texts[text_cartoons] = "Мультфильмы"
@@ -164,6 +165,7 @@ class Locale
         const val share_application = "share_application"
 
         const val text_section = "text_section"
+        const val text_allSections = "text_allSections"
         const val text_films = "text_films"
         const val text_series = "text_series"
         const val text_cartoons = "text_cartoons"

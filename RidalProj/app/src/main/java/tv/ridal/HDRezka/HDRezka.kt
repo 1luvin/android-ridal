@@ -15,7 +15,7 @@ class HDRezka
         const val ANIME = "Аниме"
 
         val SECTION_NAMES
-            get() = listOf(
+            get() = arrayOf(
                 Locale.text(Locale.text_films),
                 Locale.text(Locale.text_series),
                 Locale.text(Locale.text_cartoons),

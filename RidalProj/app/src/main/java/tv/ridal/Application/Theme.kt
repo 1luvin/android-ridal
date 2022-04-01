@@ -3,8 +3,10 @@ package tv.ridal.Application
 import android.content.res.Configuration
 import android.graphics.*
 import android.graphics.drawable.*
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.lifecycle.MutableLiveData
 
 class Theme
 {
@@ -110,33 +112,33 @@ class Theme
 
         fun initTheme()
         {
-            val pref = AppLoader.instance().settingsPref
+            // Инициализация темы
+            val pref = App.instance().settingsPref
             if ( ! pref.contains(theme) )
             {
                 pref.edit()
                     .putInt(theme, FOLLOW_SYSTEM)
                     .apply()
             }
-
             val t = pref.getInt(theme, FOLLOW_SYSTEM)
-
             setTheme(t)
-        }
-
-        private var onThemeChanged: (() -> Unit)? = null
-        fun onThemeChanged(l: () -> Unit)
-        {
-            onThemeChanged = l
+            // Инициализация основного цвета
+            if ( ! pref.contains(color_main) )
+            {
+                pref.edit()
+                    .putInt(color_main, COLOR_TWITCH)
+                    .apply()
+            }
+            mainColor = pref.getInt(color_main, COLOR_TWITCH)
         }
 
         fun setTheme(themeId: Int)
         {
-            AppLoader.instance().settingsPref.edit().putInt(theme, themeId).apply()
-            this.themeId = themeId
+            currentId = themeId
 
             if (themeId == FOLLOW_SYSTEM)
             {
-                val conf = AppLoader.instance().configuration
+                val conf = App.instance().configuration
                 val nightMode = conf.uiMode and Configuration.UI_MODE_NIGHT_YES
                 if (nightMode == Configuration.UI_MODE_NIGHT_YES)
                     activeColors = colorsList[DARK]
@@ -147,11 +149,19 @@ class Theme
             {
                 activeColors = colorsList[themeId]
             }
-
-            onThemeChanged?.invoke()
         }
 
-        var themeId: Int = 0 // !
+        fun update()
+        {
+            val editor = App.instance().settingsPref.edit()
+            editor.apply {
+                putInt(theme, currentId)
+                putInt(color_main, mainColor)
+            }
+            editor.apply()
+        }
+
+        var currentId: Int = 0 // !
 
         /*
             Ключи для тем
@@ -192,26 +202,7 @@ class Theme
             Цвета
          */
 
-        // Основной цвет
-
-        fun initMainColor()
-        {
-            val pref = AppLoader.instance().settingsPref
-            if ( ! pref.contains(color_main) )
-            {
-                pref.edit()
-                    .putInt(color_main, COLOR_TWITCH)
-                    .apply()
-            }
-            mainColor = pref.getInt(color_main, COLOR_TWITCH)
-        }
-
         var mainColor = 0 // !
-            set(value) {
-                field = value
-
-                AppLoader.instance().settingsPref.edit().putInt(color_main, mainColor).apply()
-            }
 
         // Светлые цвета
         lateinit var lightColors: HashMap<String, Int>
@@ -261,7 +252,7 @@ class Theme
 
         fun typeface(tfKey: String) : Typeface
         {
-            return Typeface.createFromAsset(AppLoader.instance().assets, tfKey)
+            return Typeface.createFromAsset(App.instance().assets, tfKey)
         }
 
         /*
@@ -349,7 +340,7 @@ class Theme
 
         fun drawable(drawableId: Int): Drawable
         {
-            return ContextCompat.getDrawable(AppLoader.instance().applicationContext, drawableId)!!
+            return ContextCompat.getDrawable(App.instance().applicationContext, drawableId)!!
         }
         fun drawable(drawableId: Int, color: Int): Drawable
         {

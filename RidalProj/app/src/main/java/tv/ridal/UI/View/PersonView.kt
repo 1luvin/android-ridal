@@ -12,7 +12,7 @@ import android.widget.TextView
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
-import tv.ridal.Application.AppLoader
+import tv.ridal.Application.App
 import tv.ridal.Application.Theme
 import tv.ridal.HDRezka.Loader
 import tv.ridal.HDRezka.Parser
@@ -30,7 +30,7 @@ class PersonView(context: Context) : FrameLayout(context)
 
     private var photoDrawable: Drawable? = null
 
-    private var requestQueue = AppLoader.instance().requestQueue
+    private var requestQueue = App.instance().requestQueue
 
     fun loadPersonPhoto(personUrl: String)
     {

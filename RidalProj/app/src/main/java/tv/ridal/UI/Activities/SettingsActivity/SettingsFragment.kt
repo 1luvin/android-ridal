@@ -12,7 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import tv.ridal.Application.AppLoader
+import tv.ridal.Application.App
 import tv.ridal.Application.Locale
 import tv.ridal.Application.Theme
 import tv.ridal.UI.ActionBar.BigActionBar
@@ -24,6 +24,7 @@ import tv.ridal.UI.View.ColorView
 import tv.ridal.UI.View.RTextView
 import tv.ridal.UI.setPaddings
 import tv.ridal.Application.Utils
+import kotlin.random.Random
 
 class SettingsFragment : BaseSettingsFragment()
 {
@@ -50,6 +51,9 @@ class SettingsFragment : BaseSettingsFragment()
         Locale.text(Locale.text_theme_dark)
     )
     private lateinit var themeCheckGroup: SingleCheckGroup
+    private var themeAnimator: ValueAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
+        duration = 220
+    }
 
     private lateinit var colorsSectionView: RTextView
     private val colors: IntArray = Theme.mainColors()
@@ -79,6 +83,14 @@ class SettingsFragment : BaseSettingsFragment()
 
         createThemeSection()
         createColorsSection()
+    }
+
+    override fun onDestroy()
+    {
+        super.onDestroy()
+
+        // обновление темы в данных пользователя
+        Theme.update()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -127,7 +139,7 @@ class SettingsFragment : BaseSettingsFragment()
                     switchTheme(i - 1)
                 }
             }
-            check(themeNames[Theme.themeId + 1])
+            check( themeNames[Theme.currentId + 1] )
         }
 
         layout.apply {
@@ -164,7 +176,7 @@ class SettingsFragment : BaseSettingsFragment()
         val toTheme: Int
         if (themeId == Theme.FOLLOW_SYSTEM)
         {
-            val conf = AppLoader.instance().configuration
+            val conf = App.instance().configuration
             val nightMode = conf.uiMode and Configuration.UI_MODE_NIGHT_YES
             if (nightMode == Configuration.UI_MODE_NIGHT_YES)
                 toTheme = Theme.DARK
@@ -189,7 +201,7 @@ class SettingsFragment : BaseSettingsFragment()
         val t_text2 = toColors[Theme.color_text2]!!
 
         ValueAnimator.ofFloat(0F, 1F).apply {
-            duration = 250
+            duration = 190
 
             addUpdateListener {
                 val animRatio = it.animatedValue as Float
@@ -243,6 +255,7 @@ class SettingsFragment : BaseSettingsFragment()
                     super.onAnimationStart(animation)
 
                     themeCheckGroup.apply {
+                        isEnabled = false
                         setTextColor(t_text2)
                         setTextColorChecked(t_text)
                     }
@@ -253,6 +266,10 @@ class SettingsFragment : BaseSettingsFragment()
 
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
+
+                    themeCheckGroup.apply {
+                        isEnabled = true
+                    }
 
                     Theme.setTheme(themeId)
                 }
