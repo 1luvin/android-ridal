@@ -6,10 +6,10 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import tv.ridal.HDRezka.Streams.Stream
 import tv.ridal.HDRezka.Streams.StreamData
+import tv.ridal.UI.msg
 
 class Parser
 {
-
     companion object
     {
 

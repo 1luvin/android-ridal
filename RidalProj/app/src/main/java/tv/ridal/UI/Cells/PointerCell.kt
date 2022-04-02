@@ -5,16 +5,16 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.TextView
 import tv.ridal.Application.Theme
 import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.R
 import tv.ridal.Application.Utils
+import tv.ridal.UI.View.RTextView
 
 class PointerCell(context: Context) : FrameLayout(context)
 {
-    private var textView: TextView
+    private var textView: RTextView
     private var pointerView: ImageView
 
     var text: String = ""
@@ -29,11 +29,11 @@ class PointerCell(context: Context) : FrameLayout(context)
         isClickable = true
         setOnTouchListener(InstantPressListener(this))
 
-        setPadding(Utils.dp(20), 0, Utils.dp(20), 0)
+        setPadding(Utils.dp(20), 0, Utils.dp(15), 0)
 
-        textView = TextView(context).apply {
+        textView = RTextView(context).apply {
             setTextColor(Theme.color(Theme.color_text))
-            textSize = 17F
+            textSize = 16.5F
             typeface = Theme.typeface(Theme.tf_normal)
             setLines(1)
             maxLines = 1
@@ -41,15 +41,15 @@ class PointerCell(context: Context) : FrameLayout(context)
             ellipsize = TextUtils.TruncateAt.END
         }
         addView(textView, LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+            LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.CENTER_VERTICAL,
-            0, 0, 15 + 24, 0))
+            0, 0, 24, 0))
 
-        val pointerDrawable = Theme.drawable(R.drawable.pointer_forward, Theme.color_main)
+        val pointer = Theme.drawable(R.drawable.pointer_forward, Theme.color_main)
         pointerView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.CENTER
 
-            setImageDrawable(pointerDrawable)
+            setImageDrawable(pointer)
         }
         addView(pointerView, LayoutHelper.createFrame(
             24, 24,

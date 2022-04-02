@@ -4,16 +4,16 @@ import android.content.Context
 import android.text.TextUtils
 import android.view.Gravity
 import android.widget.FrameLayout
-import android.widget.TextView
 import tv.ridal.Application.Theme
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.Application.Utils
+import tv.ridal.UI.View.RTextView
 
 class SearchResultCell(context: Context) : FrameLayout(context)
 {
-    private var movieNameView: TextView
-    private var movieDataView: TextView
-    private var movieRatingView: TextView
+    private var movieNameView: RTextView
+    private var movieDataView: RTextView
+    private var movieRatingView: RTextView
 
     var movieName: String = ""
         set(value) {
@@ -32,12 +32,12 @@ class SearchResultCell(context: Context) : FrameLayout(context)
             field = value
 
             movieRatingView.text = value
-            if (this.movieRating != "") movieRatingView.setTextColor(colorForValue(value.toFloat()))
+            if (movieRating != "") movieRatingView.setTextColor(colorForValue(value.toFloat()))
         }
 
     init
     {
-        movieRatingView = TextView(context).apply {
+        movieRatingView = RTextView(context).apply {
             setTextColor(Theme.color(Theme.color_main))
             textSize = 17F
             typeface = Theme.typeface(Theme.tf_normal)
@@ -49,10 +49,10 @@ class SearchResultCell(context: Context) : FrameLayout(context)
         addView(movieRatingView, LayoutHelper.createFrame(
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.END or Gravity.CENTER_VERTICAL,
-            20, 0, 25, 0
+            20, 0, 20, 0
         ))
 
-        movieNameView = TextView(context).apply {
+        movieNameView = RTextView(context).apply {
             setTextColor(Theme.color(Theme.color_text))
             textSize = 17F
             typeface = Theme.typeface(Theme.tf_bold)
@@ -63,7 +63,7 @@ class SearchResultCell(context: Context) : FrameLayout(context)
         }
         addView(movieNameView)
 
-        movieDataView = TextView(context).apply {
+        movieDataView = RTextView(context).apply {
             setTextColor(Theme.color(Theme.color_text2))
             textSize = 15F
             typeface = Theme.typeface(Theme.tf_normal)
@@ -81,17 +81,17 @@ class SearchResultCell(context: Context) : FrameLayout(context)
         movieRatingView.measure(0, 0)
 
         movieNameView.layoutParams = LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+            LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.TOP,
-            25, 7, movieRatingView.measuredWidth, 0
+            20, 7, movieRatingView.measuredWidth, 0
         )
 
         movieNameView.measure(0, 0)
 
         movieDataView.layoutParams = LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+            LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.TOP,
-            25, 7 + 17 + 4, movieRatingView.measuredWidth, 0
+            20, 7 + 17 + 4, movieRatingView.measuredWidth, 0
         )
 
         super.onMeasure(

@@ -5,17 +5,17 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.TextView
 import tv.ridal.Application.Theme
 import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.R
 import tv.ridal.Application.Utils
+import tv.ridal.UI.View.RTextView
 
 class FilterCell(context: Context) : FrameLayout(context)
 {
-    private var nameView: TextView
-    private var valueView: TextView
+    private var nameView: RTextView
+    private var valueView: RTextView
     private var pointerView: ImageView
 
     var filterName: String = ""
@@ -23,7 +23,6 @@ class FilterCell(context: Context) : FrameLayout(context)
             field = value
 
             nameView.text = filterName
-            requestLayout()
         }
 
     var filterValue: String = ""
@@ -31,7 +30,6 @@ class FilterCell(context: Context) : FrameLayout(context)
             field = value
 
             valueView.text = filterValue
-            requestLayout()
         }
 
     init
@@ -41,7 +39,7 @@ class FilterCell(context: Context) : FrameLayout(context)
 
         setPadding(Utils.dp(20), Utils.dp(10), Utils.dp(15), Utils.dp(10))
 
-        nameView = TextView(context).apply {
+        nameView = RTextView(context).apply {
             setTextColor(Theme.color(Theme.color_text))
             textSize = 17F
             typeface = Theme.typeface(Theme.tf_bold)
@@ -54,7 +52,7 @@ class FilterCell(context: Context) : FrameLayout(context)
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.CENTER_VERTICAL))
 
-        valueView = TextView(context).apply {
+        valueView = RTextView(context).apply {
             setTextColor(Theme.color(Theme.color_main))
             textSize = 16.5F
             typeface = Theme.typeface(Theme.tf_normal)
@@ -68,17 +66,16 @@ class FilterCell(context: Context) : FrameLayout(context)
             Gravity.END or Gravity.CENTER_VERTICAL,
             0, 0, 24, 0))
 
-        val pointerDrawable = Theme.drawable(R.drawable.pointer_forward, Theme.color_main)
+        val pointer = Theme.drawable(R.drawable.pointer_forward, Theme.color_main)
         pointerView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.CENTER
 
-            setImageDrawable(pointerDrawable)
+            setImageDrawable(pointer)
         }
         addView(pointerView, LayoutHelper.createFrame(
             24, 24,
             Gravity.END or Gravity.CENTER_VERTICAL))
     }
-
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
     {
@@ -102,6 +99,7 @@ class FilterCell(context: Context) : FrameLayout(context)
             0
         )
     }
+
 }
 
 

@@ -71,7 +71,7 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
         }
         else
         {
-            holder.bind(movies[position])
+            holder.bind( movies[position] )
         }
     }
 

@@ -11,7 +11,7 @@ class PeopleAdapter(private val people: ArrayList<Movie.Person>) : RecyclerView.
 {
 
     private var onPersonClick: ((Movie.Person) -> Unit)? = null
-    fun onPersonClick(l: ((Movie.Person) -> Unit))
+    fun onPersonClick(l: (Movie.Person) -> Unit)
     {
         onPersonClick = l
     }
@@ -50,7 +50,10 @@ class PeopleAdapter(private val people: ArrayList<Movie.Person>) : RecyclerView.
         holder.bind( people[position] )
     }
 
-    override fun getItemCount(): Int = people.size
+    override fun getItemCount(): Int
+    {
+        return people.size
+    }
 
 }
 

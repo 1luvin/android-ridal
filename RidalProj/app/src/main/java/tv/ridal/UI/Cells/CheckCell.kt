@@ -1,7 +1,5 @@
 package tv.ridal.UI.Cells
 
-import android.animation.AnimatorSet
-import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -9,12 +7,14 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.TextView
+import androidx.core.view.marginLeft
+import androidx.core.view.updateLayoutParams
 import tv.ridal.Application.Theme
 import tv.ridal.UI.InstantPressListener
 import tv.ridal.UI.Layout.LayoutHelper
 import tv.ridal.R
 import tv.ridal.Application.Utils
+import tv.ridal.UI.View.RTextView
 
 class CheckCell(context: Context) : FrameLayout(context)
 {
@@ -29,7 +29,7 @@ class CheckCell(context: Context) : FrameLayout(context)
             checkView.setImageDrawable(checkDrawable)
         }
 
-    private var textView: TextView
+    private var textView: RTextView
 
     var text: String = ""
         set(value) {
@@ -41,7 +41,7 @@ class CheckCell(context: Context) : FrameLayout(context)
         set(value) {
             field = value
 
-            if (textAnimator == null || ! textAnimator!!.isRunning)
+            if (stateAnimator == null || ! stateAnimator!!.isRunning)
             {
                 textView.setTextColor(textColor)
             }
@@ -50,17 +50,19 @@ class CheckCell(context: Context) : FrameLayout(context)
         set(value) {
             field = value
 
-            if (textAnimator == null || ! textAnimator!!.isRunning)
+            if (stateAnimator == null || ! stateAnimator!!.isRunning)
             {
                 textView.setTextColor(textColor)
             }
         }
 
-    var isChecked = false
+    private val textX: Int = Utils.dp(20)
+    private val textXChecked: Int = Utils.dp(15 + 24 + 10)
+
+    var isChecked: Boolean = false
         private set
 
-    private var textAnimator: AnimatorSet? = null
-    private var checkAnimator: ValueAnimator? = null
+    private var stateAnimator: ValueAnimator? = null
     private val ANIM_DURATION: Long = 190L
 
     init
@@ -72,11 +74,11 @@ class CheckCell(context: Context) : FrameLayout(context)
         checkView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.CENTER
 
+            setImageDrawable(checkDrawable)
+
             scaleX = 0F
             scaleY = 0F
             alpha = 0F
-
-            setImageDrawable(checkDrawable)
         }
         addView(checkView, LayoutHelper.createFrame(
             24, 24,
@@ -84,7 +86,7 @@ class CheckCell(context: Context) : FrameLayout(context)
             15, 0, 0, 0
         ))
 
-        textView = TextView(context).apply {
+        textView = RTextView(context).apply {
             setTextColor(textColor)
             textSize = 16.5F
             typeface = Theme.typeface(Theme.tf_normal)
@@ -92,13 +94,11 @@ class CheckCell(context: Context) : FrameLayout(context)
             maxLines = 1
             isSingleLine = true
             ellipsize = TextUtils.TruncateAt.END
-
-            translationX = - Utils.dp(19F + 10F)
         }
-        addView(textView, LayoutHelper.createFrame(
-            LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+        addView(textView, LayoutHelper.frame(
+            LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.CENTER_VERTICAL,
-            20 + 19 + 10, 0, 15, 0
+            textX, 0, textX, 0
         ))
     }
 
@@ -118,8 +118,7 @@ class CheckCell(context: Context) : FrameLayout(context)
 
         if (animated)
         {
-            animateTextChange()
-            animateCheckChange()
+            animateToState(checked)
         }
         else
         {
@@ -131,74 +130,62 @@ class CheckCell(context: Context) : FrameLayout(context)
             }
             textView.apply {
                 setTextColor( if (checked) textColorChecked else textColor )
-                translationX = if (checked) 0F else - Utils.dp(19F + 10F)
+                updateLayoutParams<FrameLayout.LayoutParams> {
+                    if (checked) {
+                        setMargins(Utils.dp(15 + 24 + 15), 0, Utils.dp(20), 0)
+                    } else {
+                        setMargins(Utils.dp(20), 0, Utils.dp(20), 0)
+                    }
+                }
             }
         }
 
         isChecked = checked
     }
 
-    private fun animateTextChange()
+    private fun animateToState(checked: Boolean)
     {
-        val startColor = textView.currentTextColor
-        val endColor = if (isChecked) {
-            textColor
-        } else {
-            textColorChecked
-        }
-
-        val startTranslation = textView.translationX
-        val endTranslation = if (isChecked) {
-            - Utils.dp(19F + 10F)
-        } else {
-            0F
-        }
-
-        textAnimator?.cancel()
-        textAnimator = AnimatorSet().apply {
-            duration = ANIM_DURATION
-
-            playTogether(
-                ValueAnimator.ofInt(startColor, endColor).apply {
-                    setEvaluator( ArgbEvaluator() )
-
-                    addUpdateListener {
-                        val animatedColor = it.animatedValue as Int
-                        textView.setTextColor(animatedColor)
-                    }
-                },
-                ValueAnimator.ofFloat(startTranslation, endTranslation).apply {
-                    addUpdateListener {
-                        val animatedTranslation = it.animatedValue as Float
-                        textView.translationX = animatedTranslation
-                    }
-                }
-            )
-
-            start()
-        }
-    }
-
-    private fun animateCheckChange()
-    {
-        val startScale = checkView.scaleX
-        val endScale = if (isChecked) {
-            0F
-        } else {
+        val from_scale = checkView.scaleX // == scaleY == alpha
+        val to_scale = if (checked) {
             1F
+        } else {
+            0F
         }
 
-        checkAnimator?.cancel()
-        checkAnimator = ValueAnimator.ofFloat(startScale, endScale).apply {
+        val from_textColor = textView.currentTextColor
+        val to_textColor = if (checked) {
+            textColorChecked
+        } else {
+            textColor
+        }
+
+        val from_textX = textView.marginLeft
+        val to_textX = if (checked) {
+            textXChecked
+        } else {
+            textX
+        }
+
+        stateAnimator?.cancel()
+        stateAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
             duration = ANIM_DURATION
 
             addUpdateListener {
-                val animatedScaleAlpha = it.animatedValue as Float
+                val process = it.animatedValue as Float
 
+                val currScale = from_scale + (to_scale - from_scale) * process
                 checkView.apply {
-                    scaleX = animatedScaleAlpha
-                    scaleY = animatedScaleAlpha
-                    alpha = animatedScaleAlpha
+                    scaleX = currScale
+                    scaleY = currScale
+                    alpha = currScale
+                }
+
+                val currColor = Theme.mixColors( from_textColor, to_textColor, process )
+                textView.setTextColor(currColor)
+
+                val currX = from_textX + (to_textX - from_textX) * process
+                textView.updateLayoutParams<FrameLayout.LayoutParams> {
+                    setMargins(currX.toInt(), 0, textX, 0)
                 }
             }
 
