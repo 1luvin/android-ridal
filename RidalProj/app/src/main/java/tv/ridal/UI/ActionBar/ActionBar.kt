@@ -2,6 +2,7 @@ package tv.ridal.UI.ActionBar
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Typeface
@@ -225,6 +226,21 @@ class ActionBar(context: Context) : FrameLayout(context)
         }
     }
 
+    fun animateActionButtonColor(color: Int)
+    {
+        ValueAnimator.ofInt(actionButtonColor, color).apply {
+            duration = 170
+
+            setEvaluator( ArgbEvaluator() )
+
+            addUpdateListener {
+                actionButtonColor = it.animatedValue as Int
+            }
+
+            start()
+        }
+    }
+
 
 
     fun hideTitle(animated: Boolean = true)
@@ -234,6 +250,8 @@ class ActionBar(context: Context) : FrameLayout(context)
         if (animated)
         {
             ValueAnimator.ofFloat(titleView!!.alpha, 0F).apply {
+                duration = 170
+
                 addUpdateListener {
                     titleView!!.alpha = it.animatedValue as Float
                 }
@@ -265,6 +283,8 @@ class ActionBar(context: Context) : FrameLayout(context)
         if (animated)
         {
             ValueAnimator.ofFloat(titleView!!.alpha, 1F).apply {
+                duration = 170
+
                 addUpdateListener {
                     titleView!!.alpha = it.animatedValue as Float
                 }

@@ -149,7 +149,7 @@ class MovieFragment : BaseAppFragment()
     private fun createActionBar()
     {
         actionBar = ActionBar(context).apply {
-            setPadding(0, Utils.dp(25), 0, 0)
+            setPadding(0, Utils.dp(30), 0, 0)
             /*
             2 background служат для того чтобы менять их в зависимости от положения на экране
             для того чтобы ActionBar не закрывал постер, background делаем прозрачным
@@ -166,7 +166,8 @@ class MovieFragment : BaseAppFragment()
             /*
             изначально кнопка "Назад" белого цвета в независимости от выбранной темы
              */
-            actionButtonIcon = Theme.drawable(R.drawable.back, Theme.COLOR_WHITE)
+            actionButtonIcon = Theme.drawable(R.drawable.back)
+            actionButtonColor = Theme.COLOR_WHITE
             onActionButtonClick {
                 finish()
             }
@@ -191,11 +192,13 @@ class MovieFragment : BaseAppFragment()
                     actionBar.apply {
                         showBackground(1)
                         showTitle()
+                        animateActionButtonColor( Theme.color(Theme.color_text2) )
                     }
                 } else if (limitHeight in scrollY until oldScrollY) {
                     actionBar.apply {
                         showBackground(0)
                         hideTitle()
+                        animateActionButtonColor( Theme.COLOR_WHITE )
                     }
                 }
 
@@ -855,13 +858,13 @@ class MovieFragment : BaseAppFragment()
             setDuration(movieInfo.duration)
         }
 
-        // рейтинги
+        // Рейтинги
         if ( movieInfo.hasRatings() )
         {
             headerView.setRatings(movieInfo.ratings!!)
         }
 
-        // описание
+        // Описание
         if ( movieInfo.hasDescription() )
         {
             val tv = TextView(context).apply {
@@ -876,7 +879,7 @@ class MovieFragment : BaseAppFragment()
             scrollLayout.addView(tv)
         }
 
-        // актеры
+        // Фктеры
         if ( movieInfo.hasActors() )
         {
             actorsView = createPeopleView(movieInfo.actors!!)
@@ -903,7 +906,7 @@ class MovieFragment : BaseAppFragment()
             scrollLayout.addView(producersSection)
         }
 
-        // входит в списки
+        // Входит в списки
         if ( movieInfo.hasInLists() )
         {
             val layout = VLinearLayout(context)
@@ -918,7 +921,7 @@ class MovieFragment : BaseAppFragment()
                             title = list.name!!
                             url = list.url!!
 
-                            hasSortings = false
+                            filters = HDRezka.Filters.NO_FILTERS
                         }
                         startFragment( MoviesFragment.newInstance(args) )
                     }
@@ -935,7 +938,7 @@ class MovieFragment : BaseAppFragment()
             scrollLayout.addView(section)
         }
 
-        // входит в коллекции
+        // Входит в коллекции
         if ( movieInfo.hasInCollections() )
         {
             val layout = VLinearLayout(context)
@@ -950,7 +953,7 @@ class MovieFragment : BaseAppFragment()
                             title = collection.name!!
                             url = collection.url!!
 
-                            hasSortings = false
+                            filters = HDRezka.Filters.SORTING
                         }
                         startFragment( MoviesFragment.newInstance(args) )
                     }
@@ -967,7 +970,7 @@ class MovieFragment : BaseAppFragment()
             scrollLayout.addView(section)
         }
 
-        // страна
+        // Страна
         if ( movieInfo.hasCountries() )
         {
             val layout = VLinearLayout(context)
@@ -982,7 +985,7 @@ class MovieFragment : BaseAppFragment()
                             title = country.name!!
                             url = country.url!!
 
-                            hasSections = true
+                            filters = HDRezka.Filters.SECTION_SORTING
                         }
                         startFragment( MoviesFragment.newInstance(args) )
                     }
@@ -999,7 +1002,7 @@ class MovieFragment : BaseAppFragment()
             scrollLayout.addView(countriesSection)
         }
 
-        // жанры
+        // Жанры
         if ( movieInfo.hasGenres() )
         {
             val layout = VLinearLayout(context).apply {
@@ -1015,6 +1018,8 @@ class MovieFragment : BaseAppFragment()
                         val args = MoviesFragment.Arguments().apply {
                             title = HDRezka.getSectionNameByMovieType(movie.type.ruType)
                             url = genre.url!!
+
+                            filters = HDRezka.Filters.GENRE_SORTING
 
                             applyGenre = genre.name!!
                         }
@@ -1424,14 +1429,13 @@ class MovieFragment : BaseAppFragment()
         return RTextView(context).apply {
             setPadding(Utils.dp(20), Utils.dp(15), Utils.dp(20), Utils.dp(5))
 
-            textSize = 16F
-            typeface = Theme.typeface(Theme.tf_normal)
-            setTextColor(Theme.color(Theme.color_text2))
+            textSize = 20F
+            typeface = Theme.typeface(Theme.tf_bold)
+            setTextColor( Theme.color_text )
             setLines(1)
             maxLines = 1
             isSingleLine = true
             ellipsize = TextUtils.TruncateAt.END
-            isAllCaps = true
 
             this.text = text
         }

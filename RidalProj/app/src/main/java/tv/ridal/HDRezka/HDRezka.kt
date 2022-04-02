@@ -6,7 +6,6 @@ class HDRezka
 {
     companion object
     {
-
         const val PAGE_CAPACITY = 36
 
         const val FILM = "Фильм"
@@ -14,13 +13,12 @@ class HDRezka
         const val CARTOON = "Мультфильм"
         const val ANIME = "Аниме"
 
-        val SECTION_NAMES
-            get() = arrayOf(
-                Locale.text(Locale.text_films),
-                Locale.text(Locale.text_series),
-                Locale.text(Locale.text_cartoons),
-                Locale.text(Locale.text_anime)
-            )
+        val sectionNames: Array<String> = arrayOf(
+            Locale.text(Locale.text_films),
+            Locale.text(Locale.text_series),
+            Locale.text(Locale.text_cartoons),
+            Locale.text(Locale.text_anime)
+        )
 
         const val RATINGS = "Рейтинги"
         const val IMDB = "IMDb"
@@ -48,8 +46,12 @@ class HDRezka
         val URL_ANIME
             get() = url_base + "animation/"
 
-        val SECTION_URLS
-            get() = listOf(URL_FILMS, URL_SERIES, URL_CARTOONS, URL_ANIME)
+        val section_urls: Array<String> = arrayOf(
+            URL_FILMS,
+            URL_SERIES,
+            URL_CARTOONS,
+            URL_ANIME
+        )
 
 
         // Секции
@@ -86,6 +88,11 @@ class HDRezka
                 else -> "error_type"
             }
         }
+    }
+
+    enum class Filters
+    {
+        NO_FILTERS, SECTION_SORTING, GENRE_SORTING, SORTING
     }
 }
 

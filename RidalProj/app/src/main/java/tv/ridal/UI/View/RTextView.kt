@@ -1,6 +1,7 @@
 package tv.ridal.UI.View
 
 import android.content.Context
+import android.graphics.Typeface
 import android.util.TypedValue
 import android.widget.TextView
 import tv.ridal.Application.Theme

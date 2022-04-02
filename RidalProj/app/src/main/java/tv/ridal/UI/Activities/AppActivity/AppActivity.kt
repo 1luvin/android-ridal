@@ -18,7 +18,6 @@ import tv.ridal.UI.zoom
 import tv.ridal.Application.Utils
 import tv.ridal.UI.Activities.BaseActivity
 import tv.ridal.R
-import tv.ridal.UI.msg
 
 class AppActivity : BaseActivity()
 {
@@ -45,7 +44,7 @@ class AppActivity : BaseActivity()
         when(index)
         {
             0 -> {
-                val f = CatalogFragment.newInstance()
+                val f = CatalogFragment.instance()
                 f to f.stableTag
             }
             1 -> {

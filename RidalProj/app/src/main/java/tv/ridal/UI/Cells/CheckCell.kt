@@ -68,10 +68,6 @@ class CheckCell(context: Context) : FrameLayout(context)
         isClickable = true
         setOnTouchListener( InstantPressListener(this) )
 
-//        setOnClickListener {
-//            setChecked( ! isChecked )
-//        }
-
         checkDrawable = Theme.drawable(R.drawable.done, Theme.color_main)
         checkView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.CENTER
@@ -112,7 +108,7 @@ class CheckCell(context: Context) : FrameLayout(context)
 
         setMeasuredDimension(
             MeasureSpec.getSize(widthMeasureSpec),
-            Utils.dp(46)
+            Utils.dp(44)
         )
     }
 

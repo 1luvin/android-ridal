@@ -43,8 +43,7 @@ class PointerCell(context: Context) : FrameLayout(context)
         addView(textView, LayoutHelper.createFrame(
             LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
             Gravity.START or Gravity.CENTER_VERTICAL,
-            0, 0, 15 + 24, 0
-        ))
+            0, 0, 15 + 24, 0))
 
         val pointerDrawable = Theme.drawable(R.drawable.pointer_forward, Theme.color_main)
         pointerView = ImageView(context).apply {
