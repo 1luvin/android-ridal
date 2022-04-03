@@ -131,11 +131,14 @@ class CheckCell(context: Context) : FrameLayout(context)
             textView.apply {
                 setTextColor( if (checked) textColorChecked else textColor )
                 updateLayoutParams<FrameLayout.LayoutParams> {
-                    if (checked) {
-                        setMargins(Utils.dp(15 + 24 + 15), 0, Utils.dp(20), 0)
+
+                    val tx = if (checked) {
+                        textXChecked
                     } else {
-                        setMargins(Utils.dp(20), 0, Utils.dp(20), 0)
+                        textX
                     }
+
+                    setMargins(tx, 0, textX, 0)
                 }
             }
         }

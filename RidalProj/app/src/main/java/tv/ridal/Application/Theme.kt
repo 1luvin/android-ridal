@@ -3,9 +3,11 @@ package tv.ridal.Application
 import android.content.res.Configuration
 import android.graphics.*
 import android.graphics.drawable.*
+import android.view.Window
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.MutableLiveData
 
 class Theme
@@ -392,6 +394,15 @@ class Theme
                     cornerRadii = radiiArray
                 }
             }
+        }
+
+        /*
+            Window
+         */
+
+        fun enableDarkStatusBar(window: Window, enable: Boolean)
+        {
+            WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = enable
         }
 
     }

@@ -63,7 +63,7 @@ class SettingsActivity : BaseActivity()
         }
 
         supportFragmentManager.beginTransaction().add(
-            fragmentContainer.id, SettingsFragment.newInstance()
+            fragmentContainer.id, SettingsFragment.instance()
         ).commit()
     }
 

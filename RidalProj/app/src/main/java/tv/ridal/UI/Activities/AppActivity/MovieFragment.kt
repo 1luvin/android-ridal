@@ -61,6 +61,7 @@ import tv.ridal.UI.View.RTextView
 import tv.ridal.Application.Utils
 import tv.ridal.UI.Activities.PlayerActivity.PlayerActivity
 import tv.ridal.R
+import tv.ridal.UI.setBackgroundColor
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -84,9 +85,18 @@ class MovieFragment : BaseAppFragment()
     {
         super.onCreate(savedInstanceState)
 
+        enableDarkStatusBar(false)
+
         loadMovieInfo()
 
         createUI()
+    }
+
+    override fun onDestroy()
+    {
+        super.onDestroy()
+
+        enableDarkStatusBar( ! Theme.isDark() )
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -111,7 +121,7 @@ class MovieFragment : BaseAppFragment()
     private fun createUI()
     {
         rootFrame = FrameLayout(context).apply {
-            setBackgroundColor(Theme.color(Theme.color_bg))
+            setBackgroundColor( Theme.color_bg )
         }
 
         createScroll()
@@ -189,12 +199,14 @@ class MovieFragment : BaseAppFragment()
                 val limitHeight = headerView.movieNameHeightIndicator
 
                 if (limitHeight in oldScrollY until scrollY) {
+                    enableDarkStatusBar( ! Theme.isDark() )
                     actionBar.apply {
                         showBackground(1)
                         showTitle()
                         animateActionButtonColor( Theme.color(Theme.color_text2) )
                     }
                 } else if (limitHeight in scrollY until oldScrollY) {
+                    enableDarkStatusBar(false)
                     actionBar.apply {
                         showBackground(0)
                         hideTitle()
@@ -1061,15 +1073,16 @@ class MovieFragment : BaseAppFragment()
     inner class HeaderView : FrameLayout(context)
     {
         var posterView: ImageView
-        private var gradientView: View
+        private lateinit var gradientView: View
         private var nameView: TextView
         private var ratingsLayout: LinearLayout? = null
         private var dataText: TextView? = null
         private var actorsText: TextView? = null
         private var durationView: LinearLayout? = null
 
-        var movieNameHeightIndicator: Int = 0 // !
+        private val secondaryTextColor: Int = Theme.alphaColor(Theme.COLOR_WHITE, 0.8F)
 
+        var movieNameHeightIndicator: Int = 0 // !
 
         fun setPoster(drawable: Drawable)
         {
@@ -1117,8 +1130,8 @@ class MovieFragment : BaseAppFragment()
                 }
             }
 
-            dataText = TextView(context).apply {
-                setTextColor( Theme.color(Theme.color_text2) )
+            dataText = RTextView(context).apply {
+                setTextColor( secondaryTextColor )
                 typeface = Theme.typeface(Theme.tf_normal)
                 textSize = 16F
                 setLines(1)
@@ -1129,7 +1142,7 @@ class MovieFragment : BaseAppFragment()
                 text = dataStr
             }
             addView(dataText, LayoutHelper.createFrame(
-                LayoutHelper.WRAP_CONTENT,  LayoutHelper.WRAP_CONTENT,
+                LayoutHelper.MATCH_PARENT,  LayoutHelper.WRAP_CONTENT,
                 Gravity.START or Gravity.BOTTOM
             ))
         }
@@ -1142,16 +1155,17 @@ class MovieFragment : BaseAppFragment()
 
             for (i in actors.indices)
             {
-                if (i == 3) break
-
                 str += actors[i].name
+
+                if (i == 2) break
+
                 if (i != actors.lastIndex) {
                     str += ", "
                 }
             }
 
-            actorsText = TextView(context).apply {
-                setTextColor( Theme.color(Theme.color_text2) )
+            actorsText = RTextView(context).apply {
+                setTextColor( secondaryTextColor )
                 typeface = Theme.typeface(Theme.tf_normal)
                 textSize = 16F
                 setLines(1)
@@ -1162,7 +1176,7 @@ class MovieFragment : BaseAppFragment()
                 text = str
             }
             addView(actorsText, LayoutHelper.createFrame(
-                LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
+                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
                 Gravity.START or Gravity.BOTTOM
             ))
         }
@@ -1171,7 +1185,7 @@ class MovieFragment : BaseAppFragment()
         {
             if (duration == null) return
 
-            durationView = DurationView(context, duration)
+            durationView = DurationView(duration)
             addView(durationView, LayoutHelper.createFrame(
                 LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
                 Gravity.START or Gravity.BOTTOM
@@ -1188,7 +1202,7 @@ class MovieFragment : BaseAppFragment()
 
             for (rating in ratings)
             {
-                val ratingView = RatingView(context, rating)
+                val ratingView = RatingView(rating)
 
                 ratingsLayout!!.addView(ratingView, LayoutHelper.createLinear(
                     LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
@@ -1213,26 +1227,19 @@ class MovieFragment : BaseAppFragment()
                 LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT
             ))
 
-            gradientView = View(context).apply {
-                background = Theme.rect(
-                    Theme.Fill(
-                        intArrayOf( Theme.color(Theme.color_bg), Theme.COLOR_TRANSPARENT ),
-                        GradientDrawable.Orientation.BOTTOM_TOP
-                    )
-                )
-            }
-            addView(gradientView, FrameLayout.LayoutParams(
-                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM
+            createBottomToGradient()
+            addView(gradientView, LayoutHelper.createFrame(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
+                Gravity.BOTTOM
             ))
 
-            nameView = TextView(context).apply {
+            nameView = RTextView(context).apply {
                 setTextColor( Theme.COLOR_WHITE )
-                setTextSize(TypedValue.COMPLEX_UNIT_DIP, 32F)
+                textSize = 32F
                 typeface = Theme.typeface(Theme.tf_bold)
                 setLines(1)
                 maxLines = 1
                 isSingleLine = true
-
                 ellipsize = TextUtils.TruncateAt.END
 
                 text = movie.name
@@ -1241,6 +1248,24 @@ class MovieFragment : BaseAppFragment()
                 LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
                 Gravity.START or Gravity.BOTTOM
             ))
+        }
+
+        private fun createBottomToGradient()
+        {
+            val color = if ( Theme.isDark() ) {
+                Theme.color(Theme.color_bg)
+            } else {
+                Theme.alphaColor(Theme.COLOR_BLACK, 0.5F)
+            }
+
+            gradientView = View(context).apply {
+                background = Theme.rect(
+                    Theme.Fill(
+                        intArrayOf( color, Theme.COLOR_TRANSPARENT ),
+                        GradientDrawable.Orientation.BOTTOM_TOP
+                    )
+                )
+            }
         }
 
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
@@ -1269,9 +1294,9 @@ class MovieFragment : BaseAppFragment()
                 var padding = Utils.dp(15)
                 if (durationView != null) padding = Utils.dp(10)
 
-                actorsText!!.setPadding(Utils.dp(20), 0, Utils.dp(15), padding)
+                actorsText!!.setPadding(0, 0, 0, padding)
                 actorsText!!.updateLayoutParams<FrameLayout.LayoutParams> {
-                    setMargins(0, 0, 0, bottomPadding)
+                    setMargins(Utils.dp(20), 0, Utils.dp(20), bottomPadding)
                 }
                 actorsText!!.measure(0, 0)
                 bottomPadding += actorsText!!.measuredHeight
@@ -1282,9 +1307,9 @@ class MovieFragment : BaseAppFragment()
                 var padding = Utils.dp(15)
                 if (actorsText != null) padding = Utils.dp(5)
 
-                dataText!!.setPadding(Utils.dp(20), 0, Utils.dp(15), padding)
+                dataText!!.setPadding(0, 0, 0, padding)
                 dataText!!.updateLayoutParams<FrameLayout.LayoutParams> {
-                    setMargins(0, 0, 0, bottomPadding)
+                    setMargins(Utils.dp(20), 0, Utils.dp(20), bottomPadding)
                 }
 
                 dataText!!.measure(0, 0)
@@ -1293,18 +1318,18 @@ class MovieFragment : BaseAppFragment()
 
             bottomPadding += Utils.dp(3)
             nameView.updateLayoutParams<FrameLayout.LayoutParams> {
-                setMargins(Utils.dp(20), 0, 0, bottomPadding)
+                setMargins(Utils.dp(20), 0, Utils.dp(20), bottomPadding)
             }
 
             gradientView.updateLayoutParams<FrameLayout.LayoutParams> {
-                height = this@HeaderView.measuredHeight - Utils.dp(25 + 56)
+                height = this@HeaderView.measuredHeight - Utils.dp(30 + 50)
             }
 
             actionBar.measure(0, 0)
             movieNameHeightIndicator = measuredHeight - bottomPadding - actionBar.measuredHeight
         }
 
-        inner class RatingView(context: Context, private val rating: Movie.Rating) : LinearLayout(context)
+        inner class RatingView(private val rating: Movie.Rating) : LinearLayout(context)
         {
             private val COLOR_IMDB: Int = 0xFFF3C31B.toInt()
             private val COLOR_KP: Int = 0xFFFB5504.toInt()
@@ -1363,7 +1388,7 @@ class MovieFragment : BaseAppFragment()
 
         }
 
-        inner class DurationView(context: Context, private val duration: String) : LinearLayout(context)
+        inner class DurationView(private val duration: String) : LinearLayout(context)
         {
             init
             {
@@ -1439,6 +1464,11 @@ class MovieFragment : BaseAppFragment()
 
             this.text = text
         }
+    }
+
+    private fun enableDarkStatusBar(enable: Boolean)
+    {
+        Theme.enableDarkStatusBar( (context as AppActivity).window, enable )
     }
 
 }

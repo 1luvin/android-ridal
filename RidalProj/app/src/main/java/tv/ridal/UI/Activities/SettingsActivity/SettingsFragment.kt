@@ -7,6 +7,7 @@ import android.animation.ValueAnimator
 import android.content.res.Configuration
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -30,13 +31,7 @@ class SettingsFragment : BaseSettingsFragment()
 {
     companion object
     {
-        const val TAG = "SettingsFragment"
-
-        fun newInstance(): SettingsFragment
-        {
-            val fragment = SettingsFragment()
-            return fragment
-        }
+        fun instance() = SettingsFragment()
     }
 
     private lateinit var rootLayout: FrameLayout
@@ -51,9 +46,6 @@ class SettingsFragment : BaseSettingsFragment()
         Locale.text(Locale.text_theme_dark)
     )
     private lateinit var themeCheckGroup: SingleCheckGroup
-    private var themeAnimator: ValueAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
-        duration = 220
-    }
 
     private lateinit var colorsSectionView: RTextView
     private val colors: IntArray = Theme.mainColors()
@@ -110,12 +102,15 @@ class SettingsFragment : BaseSettingsFragment()
     private fun createSectionView(text: String) : RTextView
     {
         return RTextView(context).apply {
-            setPadding(Utils.dp(40), Utils.dp(10), Utils.dp(20), Utils.dp(10))
+            setPadding(Utils.dp(20 + 15), Utils.dp(13), Utils.dp(20), Utils.dp(10))
 
-            textSize = 16F
-            typeface = Theme.typeface(Theme.tf_normal)
-            setTextColor(Theme.color(Theme.color_text2))
-            isAllCaps = true
+            textSize = 20F
+            typeface = Theme.typeface(Theme.tf_bold)
+            setTextColor( Theme.color_text2 )
+            setLines(1)
+            maxLines = 1
+            isSingleLine = true
+            ellipsize = TextUtils.TruncateAt.END
 
             this.text = text
         }
