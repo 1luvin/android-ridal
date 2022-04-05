@@ -65,15 +65,22 @@ class Theme
 
             darkColors = HashMap<String, Int>().apply {
                 put(color_bg, colorBg)
+
                 put(color_text, colorText)
                 put(color_text2, colorText2)
+
+                put(color_bottomNavBg, lightenColor(colorBg, 0.03F))
                 put(color_bottomNavIcon_inactive, colorBottomNavIconInactive)
                 put(color_bottomNavIcon_active, 0xFFFFFFFF.toInt())
+
                 put(color_searchResult_best, colorSearchResultBest)
                 put(color_searchResult_middle, colorSearchResultMiddle)
                 put(color_searchResult_worst, colorSearchResultWorst)
+
+                put(color_actionBar_bg, lightenColor(colorBg, 0.03F))
                 put(color_actionBar_back, colorActionBarBack)
                 put(color_actionBar_menuItem, 0xFFFFFFFF.toInt())
+
                 put(color_negative, 0xFFFF6565.toInt())
                 put(color_popup_holder, 0xFFAAAAAA.toInt())
                 put(color_radio, 0xFFBBBBBB.toInt())
@@ -88,15 +95,22 @@ class Theme
 
             lightColors = HashMap<String, Int>().apply {
                 put(color_bg, colorBg)
+
                 put(color_text, colorText)
                 put(color_text2, colorText2)
+
+                put(color_bottomNavBg, colorBg)
                 put(color_bottomNavIcon_inactive, colorBottomNavIconInactive)
                 put(color_bottomNavIcon_active, 0xFF000000.toInt())
+
                 put(color_searchResult_best, colorSearchResultBest)
                 put(color_searchResult_middle, colorSearchResultMiddle)
                 put(color_searchResult_worst, colorSearchResultWorst)
+
+                put(color_actionBar_bg, colorBg)
                 put(color_actionBar_back, colorActionBarBack)
                 put(color_actionBar_menuItem, 0xFF000000.toInt())
+
                 put(color_negative, 0xFFFF6565.toInt())
                 put(color_popup_holder, 0xFF666666.toInt())
                 put(color_radio, 0xFF333333.toInt())
@@ -186,13 +200,13 @@ class Theme
         const val color_searchResult_middle = "color_searchResult_middle"
         const val color_searchResult_worst = "color_searchResult_worst"
 
+        const val color_bottomNavBg = "color_bottomNavBg"
         const val color_bottomNavIcon_inactive = "color_bottomNavIcon_inactive"
         const val color_bottomNavIcon_active = "color_bottomNavIcon_active"
 
+        const val color_actionBar_bg = "color_actionBar_bg"
         const val color_actionBar_back = "color_actionBar_back"
         const val color_actionBar_menuItem = "color_actionBar_menuItem"
-
-        const val color_bigActionBar_item_bg = "color_bigActionBar_item_bg"
 
         const val color_negative = "color_negative"
 

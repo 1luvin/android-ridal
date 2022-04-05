@@ -104,7 +104,7 @@ class BigActionBar(context: Context) : FrameLayout(context)
                 }
             }
 
-            this.addView(itemView, LayoutHelper.createLinear(
+            addView(itemView, LayoutHelper.createLinear(
                 40, 40,
                 if (itemsCount() != 0) 15 else 0, 0, 0, 0
             ))

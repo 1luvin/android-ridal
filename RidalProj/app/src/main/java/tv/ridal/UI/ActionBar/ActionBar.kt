@@ -209,6 +209,20 @@ class ActionBar(context: Context) : FrameLayout(context)
         ))
     }
 
+    private fun changeActionBarContents(other: ActionBar)
+    {
+        val f_actionButtonColor = actionButtonColor
+        val t_actionButtonColor = other.actionButtonColor
+
+
+
+        ValueAnimator.ofFloat(0F, 1F).apply {
+            duration = 170
+
+            // доделать
+        }
+    }
+
 
     fun setBackgrounds(layers: Array<out Drawable>)
     {

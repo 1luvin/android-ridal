@@ -170,7 +170,7 @@ class MovieFragment : BaseAppFragment()
                     Theme.rect(
                         Theme.Fill( intArrayOf(Theme.alphaColor(Theme.COLOR_BLACK, 0.5F), Theme.COLOR_TRANSPARENT), GradientDrawable.Orientation.TOP_BOTTOM )
                     ),
-                    Theme.rect( Theme.lightenColor(Theme.color_bg, 0.03F) )
+                    Theme.rect( Theme.color_actionBar_bg )
                 )
             )
             /*

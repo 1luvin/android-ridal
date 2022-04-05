@@ -105,7 +105,9 @@ class AppActivity : BaseActivity()
         }
 
         bottomNavigationView.apply {
-            setBackgroundColor( Theme.color_bg )
+            backgroundTintList = ColorStateList.valueOf(
+                Theme.color(Theme.color_bottomNavBg)
+            )
 
             itemIconTintList = ColorStateList(
                 arrayOf(
