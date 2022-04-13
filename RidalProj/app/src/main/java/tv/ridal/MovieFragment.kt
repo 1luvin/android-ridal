@@ -54,11 +54,12 @@ import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.VLinearLayout
 import tv.ridal.ui.popup.BottomPopup
 import tv.ridal.ui.popup.LoadingPopup
-import tv.ridal.ui.decoration.SpacingItemDecoration
+import tv.ridal.ui.recyclerview.SpacingItemDecoration
 import tv.ridal.ui.popup.ImagePopup
 import tv.ridal.ui.view.RTextView
 import tv.ridal.utils.Utils
 import tv.ridal.ui.setBackgroundColor
+import tv.ridal.ui.view.DropdownLayout
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -362,7 +363,7 @@ class MovieFragment : BaseAppFragment()
         // Описание
         if ( movieInfo.hasDescription() )
         {
-            val tv = TextView(context).apply {
+            val tv = RTextView(context).apply {
                 setPadding(Utils.dp(20), 0, Utils.dp(20), 0)
 
                 setTextColor( Theme.color(Theme.color_text) )
@@ -371,7 +372,15 @@ class MovieFragment : BaseAppFragment()
 
                 text = movieInfo.description!!.text!!
             }
-            scrollLayout.addView(tv)
+
+            val dropdownLayout = DropdownLayout(context).apply {
+                textView = tv
+                collapseLines = 3
+            }
+
+            scrollLayout.addView(dropdownLayout, Layout.frame(
+                Layout.MATCH_PARENT, Layout.WRAP_CONTENT
+            ))
         }
 
         // Актеры

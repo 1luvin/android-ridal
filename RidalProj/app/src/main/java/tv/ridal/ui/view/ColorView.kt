@@ -13,14 +13,13 @@ import tv.ridal.utils.Utils
 
 class ColorView(context: Context) : FrameLayout(context)
 {
-    private var bgView: View
     private var imageView: ImageView
 
     var color: Int = 0xFF666666.toInt()
         set(value) {
             field = value
 
-            bgView.background = Theme.rect(
+            background = Theme.rect(
                 color,
                 radii = FloatArray(4).apply {
                     fill( Utils.dp(15F) )
@@ -31,7 +30,6 @@ class ColorView(context: Context) : FrameLayout(context)
     override fun setSelected(selected: Boolean)
     {
         if (selected == isSelected) return
-
         super.setSelected(selected)
 
         animateTo(selected)
@@ -39,15 +37,12 @@ class ColorView(context: Context) : FrameLayout(context)
 
     init
     {
-        bgView = View(context).apply {
-            background = Theme.rect(
-                color,
-                radii = FloatArray(4).apply {
-                    fill( Utils.dp(15F) )
-                }
-            )
-        }
-        addView(bgView)
+        background = Theme.rect(
+            color,
+            radii = FloatArray(4).apply {
+                fill( Utils.dp(15F) )
+            }
+        )
 
         imageView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.FIT_CENTER

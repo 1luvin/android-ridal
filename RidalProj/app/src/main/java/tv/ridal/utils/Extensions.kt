@@ -60,7 +60,7 @@ fun Drawable.asBitmap() : Bitmap
 
 fun FragmentTransaction.zoom()
 {
-    this.setCustomAnimations(
+    setCustomAnimations(
         R.anim.zoom_in,
         R.anim.zoom_out,
         R.anim.zoom_pop_in,
@@ -70,7 +70,7 @@ fun FragmentTransaction.zoom()
 
 fun FragmentTransaction.fade()
 {
-    this.setCustomAnimations(
+    setCustomAnimations(
         R.anim.fade_in,
         R.anim.fade_out,
         R.anim.fade_out,

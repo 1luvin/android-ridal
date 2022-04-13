@@ -25,7 +25,8 @@ class MoviesRecyclerView(context: Context) : RecyclerView(context)
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     }
 
-    override fun setAdapter(adapter: Adapter<*>?) {
+    override fun setAdapter(adapter: Adapter<*>?)
+    {
         super.setAdapter(adapter)
 
         addItemDecoration(object : RecyclerView.ItemDecoration() {

@@ -1,4 +1,4 @@
-package tv.ridal.ui.decoration
+package tv.ridal.ui.recyclerview
 
 import android.graphics.Rect
 import android.view.View

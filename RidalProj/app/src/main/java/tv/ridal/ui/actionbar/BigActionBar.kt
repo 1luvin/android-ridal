@@ -88,7 +88,6 @@ class BigActionBar(context: Context) : FrameLayout(context)
     {
         init
         {
-            orientation = LinearLayout.HORIZONTAL
             setPadding(Utils.dp(15), 0, Utils.dp(25), 0)
         }
 

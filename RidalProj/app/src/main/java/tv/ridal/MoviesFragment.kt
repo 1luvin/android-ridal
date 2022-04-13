@@ -26,7 +26,7 @@ import tv.ridal.utils.Theme
 import tv.ridal.ui.actionbar.ActionBar
 import tv.ridal.utils.Locale
 import tv.ridal.ui.cell.FilterCell
-import tv.ridal.ui.decoration.GridSpacingItemDecoration
+import tv.ridal.ui.recyclerview.GridSpacingItemDecoration
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.layout.SingleCheckGroup
