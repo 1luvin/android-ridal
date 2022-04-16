@@ -82,7 +82,6 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
 
         return count
     }
-
 }
 
 

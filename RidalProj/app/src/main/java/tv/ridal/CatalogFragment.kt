@@ -2,17 +2,17 @@ package tv.ridal
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.core.widget.NestedScrollView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
@@ -21,13 +21,13 @@ import tv.ridal.utils.Locale
 import tv.ridal.utils.Theme
 import tv.ridal.ui.actionbar.BigActionBar
 import tv.ridal.hdrezka.HDRezka
+import tv.ridal.hdrezka.Movie
 import tv.ridal.hdrezka.Parser
 import tv.ridal.ui.layout.VLinearLayout
 import tv.ridal.utils.Utils
 import tv.ridal.ui.*
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.listener.InstantPressListener
-import tv.ridal.ui.view.MoviesRecyclerView
 import tv.ridal.ui.view.RTextView
 import kotlin.random.Random
 
@@ -139,17 +139,12 @@ class CatalogFragment : BaseAppFragment()
                 { response ->
                     val sectionView = sectionViews[i]
 
-                    val movies = Parser.parseMovies(response, 10)!!
-
                     sectionView.apply {
                         sectionName = sectionNames[i]
                         sectionSubtext = Parser.parseSectionMoviesSize(response)
 
-                        adapter = MoviesAdapter(movies).apply {
-                            onMovieClick {
-                                startFragment(MovieFragment.instance(it))
-                            }
-                        }
+                        movies.addAll( Parser.parseMovies(response, 10)!! )
+                        updateMovies()
 
                         onOpen {
                             val args = MoviesFragment.Arguments().apply {
@@ -161,6 +156,10 @@ class CatalogFragment : BaseAppFragment()
                             startFragment(
                                 MoviesFragment.newInstance(args)
                             )
+                        }
+
+                        onMovieClick {
+                            startFragment( MovieFragment.instance(it) )
                         }
                     }
                 },
@@ -174,13 +173,17 @@ class CatalogFragment : BaseAppFragment()
 
     inner class SectionView(context: Context) : VLinearLayout(context)
     {
-        private var openListener: (() -> Unit)? = null
+        private var onOpen: (() -> Unit)? = null
         fun onOpen(l: () -> Unit)
         {
-            openListener = l
+            onOpen = l
         }
 
-        private var headerCell: SectionCell
+        private var onMovieClick: ((Movie) -> Unit)? = null
+        fun onMovieClick(l: (Movie) -> Unit)
+        {
+            onMovieClick = l
+        }
 
         var sectionName: String = ""
             set(value) {
@@ -196,26 +199,78 @@ class CatalogFragment : BaseAppFragment()
                 headerCell.sectionSubtext = sectionSubtext
             }
 
-        private var recyclerView: MoviesRecyclerView
+        var movies: ArrayList<Movie> = ArrayList()
+            private set
+        fun updateMovies()
+        {
+            moviesAdapter.notifyDataSetChanged()
+        }
 
-        var adapter: MoviesAdapter? = null
-            set(value) {
-                field = value
-
-                recyclerView.adapter = adapter
-            }
+        private lateinit var headerCell: SectionCell
+        private lateinit var moviesView: RecyclerView
+        private lateinit var moviesAdapter: RecyclerView.Adapter<MoviesAdapter.ViewHolder>
 
         init
         {
+            setPadding(0, 0, 0, Utils.dp(20))
+
+            createHeaderCell()
+            addView(headerCell, Layout.linear(
+                Layout.MATCH_PARENT, Layout.WRAP_CONTENT
+            ))
+
+            createMoviesView()
+            addView(moviesView, Layout.linear(
+                Layout.MATCH_PARENT, Layout.WRAP_CONTENT
+            ))
+        }
+
+        private fun createHeaderCell()
+        {
             headerCell = SectionCell(context).apply {
                 setOnClickListener {
-                    openListener?.invoke()
+                    onOpen?.invoke()
                 }
             }
-            addView(headerCell)
+        }
 
-            recyclerView = MoviesRecyclerView(context)
-            addView(recyclerView)
+        private fun createMoviesView()
+        {
+            moviesView = RecyclerView(context).apply {
+                setPadding(Utils.dp(5), Utils.dp(5), Utils.dp(5), Utils.dp(5))
+                clipToPadding = false
+
+                edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
+                    override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
+                        return EdgeEffect(view.context).apply { color = Theme.color(Theme.color_main) }
+                    }
+                }
+
+                addItemDecoration(object : RecyclerView.ItemDecoration() {
+                    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State)
+                    {
+                        super.getItemOffsets(outRect, view, parent, state)
+
+                        val position = parent.getChildAdapterPosition(view)
+                        val size = adapter!!.itemCount
+
+                        outRect.left = Utils.dp(15)
+
+                        if (position == size - 1)
+                            outRect.right = Utils.dp(15)
+                    }
+                })
+
+                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+
+                adapter = MoviesAdapter(movies).apply {
+                    onMovieClick {
+                        onMovieClick?.invoke(it)
+                    }
+                }.also {
+                    moviesAdapter = it
+                }
+            }
         }
 
     }

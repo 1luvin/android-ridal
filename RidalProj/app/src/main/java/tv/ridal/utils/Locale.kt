@@ -142,6 +142,8 @@ class Locale
                     texts[sorting_watching] = "Сейчас смотрят"
 
                     texts[text_showResults] = "Показать результаты"
+
+                    texts[text_more] = "Больше"
                 }
             }
         }
@@ -277,6 +279,8 @@ class Locale
         const val sorting_watching = "sorting_watching"
 
         const val text_showResults = "text_showResults"
+
+        const val text_more = "text_more"
 
 
         private var texts = HashMap<String, String>()

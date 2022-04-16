@@ -3,7 +3,6 @@ package tv.ridal.ui.view
 import android.animation.ValueAnimator
 import android.content.Context
 import android.view.Gravity
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import tv.ridal.utils.Theme

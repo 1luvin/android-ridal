@@ -14,12 +14,13 @@ import tv.ridal.utils.Theme
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.hdrezka.Loader
+import tv.ridal.ui.msg
+import tv.ridal.ui.setTextColor
 import tv.ridal.utils.Utils
 import kotlin.math.ceil
 
 class MovieView(context: Context) : FrameLayout(context)
 {
-
     private var posterView: ImageView
     var posterUrl: String = ""
         set(value) {
@@ -30,7 +31,6 @@ class MovieView(context: Context) : FrameLayout(context)
 
     private fun onPosterLoaded(poster: Drawable?)
     {
-        // ошибка загрузки постера
         if (poster == null) return
 
         val rawBitmap = (poster as BitmapDrawable).bitmap
@@ -45,7 +45,7 @@ class MovieView(context: Context) : FrameLayout(context)
     }
 
     private var posterDrawable: Drawable? = null
-    var posterWidthPx = Utils.dp(113)
+    private var posterWidthPx = Utils.dp(113)
         set(value) {
             field = value
 
@@ -89,42 +89,41 @@ class MovieView(context: Context) : FrameLayout(context)
     init
     {
         isClickable = true
-        setOnTouchListener(InstantPressListener(this))
+        setOnTouchListener( InstantPressListener(this) )
 
         background = Theme.rect(Theme.color_bg)
+
+        // children
 
         posterView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.FIT_XY
         }
-        addView(
-            posterView, Layout.ezFrame(
-                Utils.px(posterWidthPx), Utils.px(posterHeightPx),
-                Gravity.START or Gravity.TOP
-            )
-        )
+        addView(posterView, Layout.frame(
+            posterWidthPx, posterHeightPx,
+            Gravity.START or Gravity.TOP
+        ))
 
         movieTypeView = TextView(context).apply {
             setPadding(Utils.dp(5), Utils.dp(2), Utils.dp(5), Utils.dp(2))
 
             background = Theme.rect(
-                Theme.alphaColor(Theme.COLOR_LIGHT_CHERRY, 0.7F), radii = floatArrayOf(
+                Theme.alphaColor(Theme.COLOR_LIGHT_CHERRY, 0.7F),
+                radii = floatArrayOf(
                     0F, Utils.dp(6F), 0F, Utils.dp(7F)
                 )
             )
 
-            setTextColor(Theme.COLOR_WHITE)
+            setTextColor( Theme.COLOR_WHITE )
             textSize = 13F
             typeface = Theme.typeface(Theme.tf_bold)
             setLines(1)
             maxLines = 1
             isSingleLine = true
         }
-        addView(
-            movieTypeView, Layout.ezFrame(
-                Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-                Gravity.END or Gravity.TOP
-            )
-        )
+        addView(movieTypeView, Layout.frame(
+            Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
+            Gravity.END or Gravity.TOP
+        ))
 
         gradient = LinearGradient(
             0F, posterHeightPx + 0F, 0F, posterHeightPx / 2F,
@@ -134,21 +133,19 @@ class MovieView(context: Context) : FrameLayout(context)
         )
         gradientPaint.shader = gradient
 
-        movieNameView = TextView(context).apply {
-            setTextColor(Theme.color(Theme.color_text))
-            textSize = 15F
+        movieNameView = RTextView(context).apply {
+            setTextColor( Theme.color_text )
+            textSize = 16F
             typeface = Theme.typeface(Theme.tf_bold)
             setLines(1)
             maxLines = 1
             isSingleLine = true
             ellipsize = TextUtils.TruncateAt.END
         }
-        addView(
-            movieNameView, Layout.ezFrame(
-                Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-                Gravity.START or Gravity.BOTTOM
-            )
-        )
+        addView(movieNameView, Layout.frame(
+            Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
+            Gravity.START or Gravity.BOTTOM
+        ))
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
@@ -165,9 +162,23 @@ class MovieView(context: Context) : FrameLayout(context)
             posterWidthPx = width
         }
 
+        val nameHeight = Utils.dp(30)
+
         super.onMeasure(
             MeasureSpec.makeMeasureSpec(posterWidthPx, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(posterHeightPx + Utils.dp( 30), MeasureSpec.EXACTLY)
+            MeasureSpec.makeMeasureSpec(posterHeightPx + nameHeight, MeasureSpec.EXACTLY)
+        )
+
+        var availableWidth = measuredWidth - Utils.dp(20)
+        movieTypeView.measure(
+            MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
+            0
+        )
+
+        availableWidth = measuredWidth
+        movieNameView.measure(
+            MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
+            MeasureSpec.makeMeasureSpec( nameHeight, MeasureSpec.AT_MOST )
         )
     }
 
@@ -176,42 +187,6 @@ class MovieView(context: Context) : FrameLayout(context)
         super.dispatchDraw(canvas)
 
         canvas.drawRect(0F, posterHeightPx / 2F, posterWidthPx + 0F, posterHeightPx + Utils.dp(1F), gradientPaint)
-    }
-
-    inner class ViewAllView(context: Context) : FrameLayout(context)
-    {
-        private var textView: TextView
-
-        init
-        {
-            isClickable = true
-            setOnTouchListener( InstantPressListener(this) )
-
-            background = Theme.rect(
-                Theme.color_main
-            )
-
-            textView = TextView(context).apply {
-                setTextColor(Theme.color(Theme.color_text))
-                textSize = 16F
-                typeface = Theme.typeface(Theme.tf_bold)
-                setLines(1)
-                maxLines = 1
-                isSingleLine = true
-                ellipsize = TextUtils.TruncateAt.END
-            }
-            addView(textView, Layout.ezFrame(
-                Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-                Gravity.CENTER
-            ))
-        }
-
-        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-            super.onMeasure(
-                MeasureSpec.makeMeasureSpec(posterWidthPx, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(posterHeightPx + Utils.dp( 30), MeasureSpec.EXACTLY)
-            )
-        }
     }
 
 }

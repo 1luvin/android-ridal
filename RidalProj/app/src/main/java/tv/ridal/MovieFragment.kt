@@ -34,6 +34,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import okhttp3.internal.Util
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import tv.ridal.utils.Locale
@@ -59,7 +60,7 @@ import tv.ridal.ui.popup.ImagePopup
 import tv.ridal.ui.view.RTextView
 import tv.ridal.utils.Utils
 import tv.ridal.ui.setBackgroundColor
-import tv.ridal.ui.view.DropdownLayout
+import tv.ridal.ui.view.DropdownTextLayout
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -127,6 +128,7 @@ class MovieFragment : BaseAppFragment()
         return rootFrame
     }
 
+
     private fun loadMovieInfo()
     {
         val request = StringRequest(Request.Method.GET, movie.url,
@@ -159,7 +161,7 @@ class MovieFragment : BaseAppFragment()
         scrollLayout.apply {
             addView(headerView)
             addView(watchButton, Layout.ezLinear(
-                Layout.MATCH_PARENT, 40,
+                Layout.MATCH_PARENT, 46,
                 Gravity.CENTER_HORIZONTAL,
                 20, 10, 20, 15
             ))
@@ -224,26 +226,24 @@ class MovieFragment : BaseAppFragment()
 
                 val limitHeight = headerView.movieNameHeightIndicator
 
-                if (limitHeight in oldScrollY until scrollY) {
+                if (limitHeight in oldScrollY until scrollY)
+                {
                     enableDarkStatusBar( ! Theme.isDark() )
                     actionBar.apply {
                         showBackground(1)
                         showTitle()
                         animateActionButtonColor( Theme.color(Theme.color_text2) )
                     }
-                } else if (limitHeight in scrollY until oldScrollY) {
+                    watchFab.show()
+                }
+                else if (limitHeight in scrollY until oldScrollY)
+                {
                     enableDarkStatusBar(false)
                     actionBar.apply {
                         showBackground(0)
                         hideTitle()
                         animateActionButtonColor( Theme.COLOR_WHITE )
                     }
-                }
-
-                val watchBtnHeight = headerView.measuredHeight + watchButton.measuredHeight - actionBar.measuredHeight
-                if (watchBtnHeight in oldScrollY until scrollY) {
-                    watchFab.show()
-                } else if (watchBtnHeight in scrollY until oldScrollY) {
                     watchFab.hide()
                 }
             }
@@ -269,7 +269,7 @@ class MovieFragment : BaseAppFragment()
             iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
 
             letterSpacing = 0.0F
-            setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16F)
+            setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.5F)
             isAllCaps = false
             typeface = Theme.typeface(Theme.tf_bold)
             setTextColor(Theme.COLOR_WHITE)
@@ -366,15 +366,18 @@ class MovieFragment : BaseAppFragment()
             val tv = RTextView(context).apply {
                 setPadding(Utils.dp(20), 0, Utils.dp(20), 0)
 
-                setTextColor( Theme.color(Theme.color_text) )
+                setTextColor( Theme.color_text )
                 typeface = Theme.typeface(Theme.tf_normal)
                 textSize = 16.5F
 
                 text = movieInfo.description!!.text!!
             }
 
-            val dropdownLayout = DropdownLayout(context).apply {
+            val dropdownLayout = DropdownTextLayout(context).apply {
+                setPadding(0, Utils.dp(5), 0, Utils.dp(5))
+
                 textView = tv
+                expandText = Locale.text(Locale.text_more)
                 collapseLines = 3
             }
 
@@ -807,6 +810,8 @@ class MovieFragment : BaseAppFragment()
             val wms = MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY)
             super.onMeasure(wms, wms)
 
+            val availableWidthForText = measuredWidth - (Utils.dp(20 * 2))
+
             var bottomPadding = 0
             if (ratingsLayout != null)
             {
@@ -832,7 +837,12 @@ class MovieFragment : BaseAppFragment()
                 actorsText!!.updateLayoutParams<FrameLayout.LayoutParams> {
                     setMargins(Utils.dp(20), 0, Utils.dp(20), bottomPadding)
                 }
-                actorsText!!.measure(0, 0)
+
+                actorsText!!.measure(
+                    MeasureSpec.makeMeasureSpec( availableWidthForText, MeasureSpec.AT_MOST ),
+                    0
+                )
+
                 bottomPadding += actorsText!!.measuredHeight
             }
 
@@ -846,7 +856,11 @@ class MovieFragment : BaseAppFragment()
                     setMargins(Utils.dp(20), 0, Utils.dp(20), bottomPadding)
                 }
 
-                dataText!!.measure(0, 0)
+                dataText!!.measure(
+                    MeasureSpec.makeMeasureSpec( availableWidthForText, MeasureSpec.AT_MOST ),
+                    0
+                )
+
                 bottomPadding += dataText!!.measuredHeight
             }
 
