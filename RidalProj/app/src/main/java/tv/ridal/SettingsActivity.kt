@@ -8,9 +8,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentContainerView
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.ui.layout.Layout
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 
 class SettingsActivity : BaseActivity()
 {

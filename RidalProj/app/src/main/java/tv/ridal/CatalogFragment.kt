@@ -16,30 +16,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
-import tv.ridal.adapters.MoviesAdapter
-import tv.ridal.utils.Locale
-import tv.ridal.utils.Theme
+import tv.ridal.adapter.MoviesAdapter
+import tv.ridal.util.Locale
+import tv.ridal.util.Theme
 import tv.ridal.ui.actionbar.BigActionBar
 import tv.ridal.hdrezka.HDRezka
 import tv.ridal.hdrezka.Movie
 import tv.ridal.hdrezka.Parser
 import tv.ridal.ui.layout.VLinearLayout
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 import tv.ridal.ui.*
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.view.RTextView
-import kotlin.random.Random
 
 class CatalogFragment : BaseAppFragment()
 {
     override val stableTag: String
-        get() = "CatalogFragment${Random.nextInt()}"
-
-    companion object
-    {
-        fun instance() = CatalogFragment()
-    }
+        get() = "CatalogFragment"
 
     private lateinit var rootLayout: FrameLayout
     private lateinit var scroll: NestedScrollView
@@ -48,7 +42,6 @@ class CatalogFragment : BaseAppFragment()
     private val sectionViews: ArrayList<SectionView> = ArrayList()
 
     private val requestQueue: RequestQueue = App.instance().requestQueue
-
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -115,7 +108,7 @@ class CatalogFragment : BaseAppFragment()
     {
         val sendIntent = Intent().apply {
             action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, Locale.text(Locale.share_application))
+            putExtra(Intent.EXTRA_TEXT, Locale.string(R.string.app_share))
             type = "text/plain"
         }
         val shareIntent = Intent.createChooser(sendIntent, "")
@@ -127,10 +120,10 @@ class CatalogFragment : BaseAppFragment()
         val urls = HDRezka.section_urls
 
         val sectionNames = listOf(
-            Locale.text(Locale.text_films),
-            Locale.text(Locale.text_series),
-            Locale.text(Locale.text_cartoons),
-            Locale.text(Locale.text_anime),
+            Locale.string(R.string.films),
+            Locale.string(R.string.series),
+            Locale.string(R.string.cartoons),
+            Locale.string(R.string.anime),
         )
 
         for (i in urls.indices)

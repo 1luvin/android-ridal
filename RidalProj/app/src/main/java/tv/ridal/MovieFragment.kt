@@ -34,11 +34,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import okhttp3.internal.Util
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import tv.ridal.utils.Locale
-import tv.ridal.utils.Theme
+import tv.ridal.util.Locale
+import tv.ridal.util.Theme
 import tv.ridal.hdrezka.HDRezka
 import tv.ridal.ui.layout.Layout
 import tv.ridal.hdrezka.Movie
@@ -49,7 +48,7 @@ import tv.ridal.hdrezka.Streams.SeriesStreamData
 import tv.ridal.hdrezka.Streams.Stream
 import tv.ridal.hdrezka.Streams.StreamData
 import tv.ridal.ui.actionbar.ActionBar
-import tv.ridal.adapters.PeopleAdapter
+import tv.ridal.adapter.PeopleAdapter
 import tv.ridal.ui.cell.PointerCell
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.VLinearLayout
@@ -58,7 +57,7 @@ import tv.ridal.ui.popup.LoadingPopup
 import tv.ridal.ui.recyclerview.SpacingItemDecoration
 import tv.ridal.ui.popup.ImagePopup
 import tv.ridal.ui.view.RTextView
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 import tv.ridal.ui.setBackgroundColor
 import tv.ridal.ui.view.DropdownTextLayout
 import kotlin.math.abs
@@ -273,7 +272,7 @@ class MovieFragment : BaseAppFragment()
             isAllCaps = false
             typeface = Theme.typeface(Theme.tf_bold)
             setTextColor(Theme.COLOR_WHITE)
-            text = Locale.text(Locale.text_watch)
+            text = Locale.string(R.string.watch)
 
             setOnClickListener {
                 onWatch()
@@ -297,7 +296,7 @@ class MovieFragment : BaseAppFragment()
         }
     }
 
-    private fun createPeopleView(people: ArrayList<Movie.Person>) : RecyclerView
+    private fun createPeopleView(people: ArrayList<Movie.NameUrl>) : RecyclerView
     {
         return RecyclerView(context).apply {
             setPadding(Utils.dp(8), 0, Utils.dp(8), 0)
@@ -349,7 +348,7 @@ class MovieFragment : BaseAppFragment()
         }
 
         headerView.apply {
-            setData(movieInfo.releaseDate, movieInfo.countries, movieInfo.genres)
+            setData(movieInfo.releaseYear, movieInfo.countries, movieInfo.genres)
             setActors(movieInfo.actors)
             setDuration(movieInfo.duration)
         }
@@ -370,14 +369,14 @@ class MovieFragment : BaseAppFragment()
                 typeface = Theme.typeface(Theme.tf_normal)
                 textSize = 16.5F
 
-                text = movieInfo.description!!.text!!
+                text = movieInfo.description!!.text
             }
 
             val dropdownLayout = DropdownTextLayout(context).apply {
                 setPadding(0, Utils.dp(5), 0, Utils.dp(5))
 
                 textView = tv
-                expandText = Locale.text(Locale.text_more)
+                expandText = Locale.string(R.string.more)
                 collapseLines = 3
             }
 
@@ -391,7 +390,7 @@ class MovieFragment : BaseAppFragment()
         {
             actorsView = createPeopleView(movieInfo.actors!!)
 
-            val actorsSection = SectionView( Locale.text(Locale.text_actors) ).apply {
+            val actorsSection = SectionView( Locale.string(R.string.actors) ).apply {
                 setLayout(
                     actorsView!!
                 )
@@ -405,7 +404,7 @@ class MovieFragment : BaseAppFragment()
         {
             producersView = createPeopleView(movieInfo.producers!!)
 
-            val producersSection = SectionView( Locale.text(Locale.text_producers) ).apply {
+            val producersSection = SectionView( Locale.string(R.string.producers) ).apply {
                 setLayout(
                     producersView!!
                 )
@@ -422,12 +421,12 @@ class MovieFragment : BaseAppFragment()
             for (list in lists)
             {
                 val cell = PointerCell(context).apply {
-                    text = list.name!!
+                    text = list.name
 
                     setOnClickListener {
                         val args = MoviesFragment.Arguments().apply {
-                            title = list.name!!
-                            url = list.url!!
+                            title = list.name
+                            url = list.url
 
                             filters = HDRezka.Filters.NO_FILTERS
                         }
@@ -437,7 +436,7 @@ class MovieFragment : BaseAppFragment()
                 layout.addView(cell)
             }
 
-            val section = SectionView( Locale.text(Locale.text_inLists) ).apply {
+            val section = SectionView( Locale.string(R.string.inLists) ).apply {
                 setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.04F) )
 
                 setLayout(layout)
@@ -454,12 +453,12 @@ class MovieFragment : BaseAppFragment()
             for (collection in collections)
             {
                 val cell = PointerCell(context).apply {
-                    text = collection.name!!
+                    text = collection.name
 
                     setOnClickListener {
                         val args = MoviesFragment.Arguments().apply {
-                            title = collection.name!!
-                            url = collection.url!!
+                            title = collection.name
+                            url = collection.url
 
                             filters = HDRezka.Filters.SORTING
                         }
@@ -469,7 +468,7 @@ class MovieFragment : BaseAppFragment()
                 layout.addView(cell)
             }
 
-            val section = SectionView( Locale.text(Locale.text_inCollections) ).apply {
+            val section = SectionView( Locale.string(R.string.inCollections) ).apply {
                 setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.04F) )
 
                 setLayout(layout)
@@ -486,12 +485,12 @@ class MovieFragment : BaseAppFragment()
             for (country in countries)
             {
                 val countryCell = PointerCell(context).apply {
-                    text = country.name!!
+                    text = country.name
 
                     setOnClickListener {
                         val args = MoviesFragment.Arguments().apply {
-                            title = country.name!!
-                            url = country.url!!
+                            title = country.name
+                            url = country.url
 
                             filters = HDRezka.Filters.SECTION_SORTING
                         }
@@ -501,7 +500,7 @@ class MovieFragment : BaseAppFragment()
                 layout.addView(countryCell)
             }
 
-            val countriesSection = SectionView( Locale.text(Locale.text_country) ).apply {
+            val countriesSection = SectionView( Locale.string(R.string.country) ).apply {
                 setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.04F) )
 
                 setLayout(layout)
@@ -520,16 +519,16 @@ class MovieFragment : BaseAppFragment()
             for (genre in genres)
             {
                 val genreCell = PointerCell(context).apply {
-                    text = genre.name!!
+                    text = genre.name
 
                     setOnClickListener {
                         val args = MoviesFragment.Arguments().apply {
                             title = HDRezka.getSectionNameByMovieType(movie.type.ruType)
-                            url = genre.url!!
+                            url = genre.url
 
                             filters = HDRezka.Filters.GENRE_SORTING
 
-                            applyGenre = genre.name!!
+                            applyGenre = genre.name
                         }
                         startFragment(MoviesFragment.newInstance(args))
                     }
@@ -537,7 +536,7 @@ class MovieFragment : BaseAppFragment()
                 layout.addView(genreCell)
             }
 
-            val genresSection = SectionView( Locale.text(Locale.text_genre) ).apply {
+            val genresSection = SectionView( Locale.string(R.string.genre) ).apply {
                 setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.04F) )
 
                 setLayout(layout)
@@ -627,21 +626,15 @@ class MovieFragment : BaseAppFragment()
             invalidate()
         }
 
-        fun setData(date: Movie.ReleaseDate?, countries: ArrayList<Movie.Country>?, genres: ArrayList<Movie.Genre>?)
+        fun setData(date: String?, countries: ArrayList<Movie.NameUrl>?, genres: ArrayList<Movie.NameUrl>?)
         {
             var dataStr = ""
 
             if (date != null)
             {
-                val regex = "[0-9]{4}".toRegex()
-                val year = regex.find(date.date)
-
-                if (year != null)
-                {
-                    dataStr += year.value
-                    if (countries != null) {
-                        dataStr += ", "
-                    }
+                dataStr += date
+                if (countries != null) {
+                    dataStr += ", "
                 }
             }
 
@@ -684,11 +677,11 @@ class MovieFragment : BaseAppFragment()
             ))
         }
 
-        fun setActors(actors: ArrayList<Movie.Person>?)
+        fun setActors(actors: ArrayList<Movie.NameUrl>?)
         {
             if (actors == null) return
 
-            var str = "${Locale.text(Locale.text_actors)}: "
+            var str = "${Locale.string(R.string.actors)}: "
 
             for (i in actors.indices)
             {
@@ -900,7 +893,7 @@ class MovieFragment : BaseAppFragment()
 
                     drawable = Theme.drawable(R.drawable.imdb)
                 }
-                else if (rating.whose!! == HDRezka.KP)
+                else if (rating.whose == HDRezka.KP)
                 {
                     background = Theme.rect(COLOR_KP, radii = FloatArray(4).apply {
                         fill(Utils.dp(19F))
@@ -925,7 +918,7 @@ class MovieFragment : BaseAppFragment()
 
                     gravity = Gravity.CENTER_VERTICAL
 
-                    text = rating.value!!
+                    text = rating.value
                 }
                 addView(tv, Layout.ezLinear(
                     Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
@@ -1298,7 +1291,7 @@ class MovieFragment : BaseAppFragment()
             private fun createActionBar()
             {
                 actionBar = ActionBar(context).apply {
-                    title = Locale.text(Locale.text_translation)
+                    title = Locale.string(R.string.translation)
                     menu = ActionBar.LoadingMenu(context)
                 }
             }
@@ -1339,7 +1332,7 @@ class MovieFragment : BaseAppFragment()
             private fun createActionBar()
             {
                 actionBar = ActionBar(context).apply {
-                    title = Locale.text(Locale.text_season)
+                    title = Locale.string(R.string.season)
                     menu = ActionBar.LoadingMenu(context)
 
                     if ( hasTranslation() )
@@ -1413,7 +1406,7 @@ class MovieFragment : BaseAppFragment()
             private fun createActionBar()
             {
                 actionBar = ActionBar(context).apply {
-                    title = Locale.text(Locale.text_episode)
+                    title = Locale.string(R.string.episode)
                     menu = ActionBar.LoadingMenu(context)
 
                     actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)

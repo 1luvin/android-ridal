@@ -3,7 +3,7 @@ package tv.ridal.ui.view
 import android.content.Context
 import android.util.TypedValue
 import android.widget.TextView
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 
 class RTextView(context: Context) : TextView(context)
 {

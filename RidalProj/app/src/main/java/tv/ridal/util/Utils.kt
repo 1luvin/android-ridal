@@ -1,11 +1,8 @@
-package tv.ridal.utils
+package tv.ridal.util
 
 import android.app.Activity
 import android.content.Context
 import android.util.DisplayMetrics
-import android.view.Window
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -56,17 +53,6 @@ class Utils
         fun mapToFloat(v: Int, start: Int, end: Int) : Float
         {
             return (v - start) * 1F / (end - start)
-        }
-
-
-        fun enableDarkStatusBar(window: Window, enable: Boolean)
-        {
-            WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = enable
-        }
-
-        fun hideStatusBar(activity: Activity)
-        {
-            WindowInsetsControllerCompat(activity.window, activity.window.decorView).hide(WindowInsetsCompat.Type.statusBars())
         }
     }
 }

@@ -8,10 +8,10 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 
 class BigActionBar(context: Context) : FrameLayout(context)
 {

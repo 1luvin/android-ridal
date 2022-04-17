@@ -4,11 +4,11 @@ import android.content.Context
 import android.text.TextUtils
 import android.view.Gravity
 import android.widget.FrameLayout
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.view.RTextView
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 
 class ValueCell(context: Context) : FrameLayout(context)
 {

@@ -8,14 +8,11 @@ import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.core.view.doOnAttach
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.updateLayoutParams
 import tv.ridal.ui.layout.Layout
-import tv.ridal.ui.listener.InstantPressListener
-import tv.ridal.ui.msg
-import tv.ridal.utils.Theme
-import tv.ridal.utils.Utils
+import tv.ridal.util.Theme
+import tv.ridal.util.Utils
 
 class DropdownTextLayout(context: Context) : FrameLayout(context)
 {

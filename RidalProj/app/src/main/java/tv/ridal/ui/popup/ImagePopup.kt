@@ -1,7 +1,6 @@
 package tv.ridal.ui.popup
 
 import android.content.Context
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.view.Gravity
 import android.widget.FrameLayout
@@ -9,7 +8,7 @@ import android.widget.ImageView
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import tv.ridal.ui.asBitmap
 import tv.ridal.ui.layout.Layout
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 
 class ImagePopup(context: Context) : Popup(context)
 {

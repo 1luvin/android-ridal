@@ -8,9 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
-import tv.ridal.adapters.MoviesAdapter
-import tv.ridal.utils.Locale
-import tv.ridal.utils.Theme
+import tv.ridal.adapter.MoviesAdapter
+import tv.ridal.util.Locale
+import tv.ridal.util.Theme
 import tv.ridal.ui.recyclerview.GridSpacingItemDecoration
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.actionbar.BigActionBar
@@ -19,7 +19,7 @@ import tv.ridal.hdrezka.HDRezka
 import tv.ridal.hdrezka.Movie
 import tv.ridal.hdrezka.Parser
 import tv.ridal.ui.layout.VLinearLayout
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 import kotlin.collections.ArrayList
 
 
@@ -27,13 +27,6 @@ class SearchFragment : BaseAppFragment()
 {
     override val stableTag: String
         get() = "SearchFragment"
-
-    companion object
-    {
-        fun instance(): SearchFragment {
-            return SearchFragment()
-        }
-    }
 
     private lateinit var rootFrame: FrameLayout
     private lateinit var scroll: ScrollView
@@ -100,7 +93,7 @@ class SearchFragment : BaseAppFragment()
     private fun createActionBar()
     {
         actionBar = BigActionBar(context).apply {
-            title = Locale.text(Locale.text_search)
+            title = Locale.string(R.string.search)
         }
     }
 

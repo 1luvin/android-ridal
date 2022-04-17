@@ -7,7 +7,7 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.FragmentTransaction
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.R
 
 // Log

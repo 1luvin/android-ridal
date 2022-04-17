@@ -11,11 +11,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.tunjid.androidx.navigation.MultiStackNavigator
 import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.multiStackNavigationController
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.ui.fade
 import tv.ridal.ui.setBackgroundColor
 import tv.ridal.ui.zoom
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 
 class AppActivity : BaseActivity()
 {
@@ -42,11 +42,11 @@ class AppActivity : BaseActivity()
         when(index)
         {
             0 -> {
-                val f = CatalogFragment.instance()
+                val f = CatalogFragment()
                 f to f.stableTag
             }
             1 -> {
-                val f = SearchFragment.instance()
+                val f = SearchFragment()
                 f to f.stableTag
             }
             else -> Fragment() to "Fragment" // этого не произойдет
@@ -164,7 +164,7 @@ class AppActivity : BaseActivity()
 
     private fun updateStatusBar()
     {
-        Utils.enableDarkStatusBar(window, ! Theme.isDark())
+        Theme.enableDarkStatusBar(window, ! Theme.isDark())
     }
 }
 

@@ -6,11 +6,11 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import tv.ridal.utils.Locale
-import tv.ridal.utils.Theme
+import tv.ridal.util.Locale
+import tv.ridal.util.Theme
 import tv.ridal.ui.layout.Layout
 import tv.ridal.R
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 
 class SearchView(context: Context) : FrameLayout(context)
 {

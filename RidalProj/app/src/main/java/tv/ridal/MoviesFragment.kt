@@ -21,10 +21,10 @@ import com.android.volley.toolbox.Volley
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import tv.ridal.adapters.MoviesAdapter
-import tv.ridal.utils.Theme
+import tv.ridal.adapter.MoviesAdapter
+import tv.ridal.util.Theme
 import tv.ridal.ui.actionbar.ActionBar
-import tv.ridal.utils.Locale
+import tv.ridal.util.Locale
 import tv.ridal.ui.cell.FilterCell
 import tv.ridal.ui.recyclerview.GridSpacingItemDecoration
 import tv.ridal.ui.listener.InstantPressListener
@@ -33,7 +33,7 @@ import tv.ridal.ui.layout.SingleCheckGroup
 import tv.ridal.ui.popup.BottomPopup
 import tv.ridal.hdrezka.*
 import tv.ridal.ui.layout.VLinearLayout
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 import tv.ridal.ui.msg
 import tv.ridal.ui.setBackgroundColor
 import kotlin.math.abs
@@ -90,7 +90,8 @@ class MoviesFragment : BaseAppFragment()
 
     private lateinit var filtersPopup: FiltersPopup
 
-    private var genres: List<String>? = null
+    private var genres: LinkedHashMap<String, String>? = null
+    private var genreNames: Array<String>? = null
     private var activeGenre: String? = null
     private var sortings: Array<String>? = null
     private var activeSorting: String? = null
@@ -204,13 +205,14 @@ class MoviesFragment : BaseAppFragment()
         if (title in HDRezka.sectionNames)
         {
             genres = Genre.createGenres(title)
-            activeGenre = arguments.applyGenre ?: Locale.text(Locale.text_allGenres)
+            genreNames = genres!!.keys.toTypedArray()
+            activeGenre = arguments.applyGenre ?: Locale.string(R.string.allGenres)
         }
 
         sortings = arrayOf(
-            Locale.text(Locale.sorting_watching),
-            Locale.text(Locale.sorting_popular),
-            Locale.text(Locale.sorting_last)
+            Locale.string(R.string.sorting_watching),
+            Locale.string(R.string.sorting_popular),
+            Locale.string(R.string.sorting_last)
         )
         activeSorting = sortings!![0]
 
@@ -298,7 +300,7 @@ class MoviesFragment : BaseAppFragment()
 
             url = arguments.url!!
             if ( hasGenres() ) {
-                url += Genre.url(activeGenre!!)
+                url += genres!![activeGenre!!]
             }
             if ( hasSortings() ) {
                 url += Sorting.url(activeSorting!!)
@@ -564,7 +566,7 @@ class MoviesFragment : BaseAppFragment()
 
                 background = null
 
-                this.text = Locale.text(Locale.text_showResults)
+                this.text = Locale.string(R.string.showResults)
 
                 setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17F)
                 isAllCaps = false
@@ -692,7 +694,7 @@ class MoviesFragment : BaseAppFragment()
                 if (hasGenres())
                 {
                     genreCell = FilterCell(context).apply {
-                        filterName = Locale.text(Locale.text_genre)
+                        filterName = Locale.string(R.string.genre)
                         filterValue = activeGenre!!
                     }
                     addView(genreCell, Layout.ezLinear(
@@ -703,7 +705,7 @@ class MoviesFragment : BaseAppFragment()
                 else if (hasSections())
                 {
                     sectionCell = FilterCell(context).apply {
-                        filterName = Locale.text(Locale.text_section)
+                        filterName = Locale.string(R.string.section)
                         filterValue = activeSection!!
                     }
                     addView(sectionCell, Layout.ezLinear(
@@ -713,7 +715,7 @@ class MoviesFragment : BaseAppFragment()
                 }
 
                 sortingCell = FilterCell(context).apply {
-                    filterName = Locale.text(Locale.text_sorting)
+                    filterName = Locale.string(R.string.sorting)
                     filterValue = activeSorting!!
                 }
                 addView(sortingCell, Layout.ezLinear(
@@ -725,13 +727,13 @@ class MoviesFragment : BaseAppFragment()
             private fun createActionBar()
             {
                 actionBar = ActionBar(context).apply {
-                    title = Locale.text(Locale.text_filters)
+                    title = Locale.string(R.string.filters)
 
                     menu = ActionBar.Menu(context).apply {
                         addItem(Theme.drawable(R.drawable.refresh, Theme.color_text)) {
                             if (hasGenres())
                             {
-                                activeGenre = genres!![0]
+                                activeGenre = genreNames!![0]
                             }
                             if (hasSections())
                             {
@@ -788,7 +790,7 @@ class MoviesFragment : BaseAppFragment()
             private fun createActionBar()
             {
                 actionBar = ActionBar(context).apply {
-                    title = Locale.text(Locale.text_genre)
+                    title = Locale.string(R.string.genre)
 
                     actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
                     onActionButtonClick {
@@ -802,7 +804,7 @@ class MoviesFragment : BaseAppFragment()
             private fun createScroll()
             {
                 genresCheckGroup = SingleCheckGroup(context).apply {
-                    genres!!.forEach {
+                    genreNames!!.forEach {
                         addCheck(it) {
                             filtersView!!.genreCell!!.filterValue = it
                             navigate(genreView!!, filtersView!!)
@@ -870,7 +872,7 @@ class MoviesFragment : BaseAppFragment()
             private fun createActionBar()
             {
                 actionBar = ActionBar(context).apply {
-                    title = Locale.text(Locale.text_sorting)
+                    title = Locale.string(R.string.sorting)
                 }
                 actionBar.measure(0, 0)
 
@@ -974,7 +976,7 @@ class MoviesFragment : BaseAppFragment()
             private fun createActionBar()
             {
                 actionBar = ActionBar(context).apply {
-                    title = Locale.text(Locale.text_section)
+                    title = Locale.string(R.string.section)
                 }
                 actionBar.measure(0, 0)
 

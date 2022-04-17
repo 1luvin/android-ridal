@@ -1,6 +1,6 @@
 package tv.ridal.hdrezka
 
-import tv.ridal.utils.Locale
+import tv.ridal.util.Locale
 
 class Section
 {

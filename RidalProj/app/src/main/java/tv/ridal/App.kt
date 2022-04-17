@@ -6,8 +6,7 @@ import android.content.SharedPreferences
 import android.content.res.Configuration
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
-import tv.ridal.utils.Locale
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 
 class App : Application()
 {
@@ -26,6 +25,8 @@ class App : Application()
                     INSTANCE = it
                 }
             }
+
+        val appContext get() = instance().applicationContext
     }
 
     // Volley's RequestQueue
@@ -49,9 +50,6 @@ class App : Application()
         INSTANCE = this
 
         Theme.initTheme()
-
-        Locale.setLocale(Locale.RU)
-
     }
 
 }

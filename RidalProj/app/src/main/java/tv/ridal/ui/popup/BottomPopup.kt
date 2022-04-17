@@ -1,15 +1,13 @@
 package tv.ridal.ui.popup
 
 import android.content.Context
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.ui.layout.Layout
 import tv.ridal.R
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 
 open class BottomPopup(context: Context) : BottomSheetDialog(context, R.style.BottomPopup)
 {

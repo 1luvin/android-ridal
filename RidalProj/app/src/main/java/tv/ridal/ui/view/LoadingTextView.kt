@@ -8,7 +8,7 @@ import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 
 class LoadingTextView(context: Context) : TextView(context)
 {

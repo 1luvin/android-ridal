@@ -5,9 +5,9 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import com.github.ybq.android.spinkit.style.Pulse
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.ui.layout.Layout
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 
 class LoadingPopup(context: Context) : Popup(context)
 {

@@ -14,12 +14,12 @@ import android.widget.*
 import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import com.github.ybq.android.spinkit.style.Pulse
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.ui.drawable.MultiDrawable
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.view.RTextView
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 import kotlin.math.max
 
 class ActionBar(context: Context) : FrameLayout(context)

@@ -10,13 +10,11 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.hdrezka.Loader
-import tv.ridal.ui.msg
-import tv.ridal.ui.setTextColor
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 import kotlin.math.ceil
 
 class MovieView(context: Context) : FrameLayout(context)

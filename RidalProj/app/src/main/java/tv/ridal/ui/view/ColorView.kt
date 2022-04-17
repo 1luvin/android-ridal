@@ -5,10 +5,10 @@ import android.content.Context
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.R
 import tv.ridal.ui.layout.Layout
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 
 class ColorView(context: Context) : FrameLayout(context)
 {

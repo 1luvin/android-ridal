@@ -1,4 +1,4 @@
-package tv.ridal.utils
+package tv.ridal.util
 
 import android.content.res.Configuration
 import android.graphics.*

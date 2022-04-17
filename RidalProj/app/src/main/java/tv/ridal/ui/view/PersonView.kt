@@ -13,13 +13,13 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import tv.ridal.App
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.hdrezka.Loader
 import tv.ridal.hdrezka.Movie
 import tv.ridal.hdrezka.Parser
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 
 class PersonView(context: Context) : FrameLayout(context)
 {

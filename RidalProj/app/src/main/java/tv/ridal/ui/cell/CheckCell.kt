@@ -9,11 +9,11 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.view.marginLeft
 import androidx.core.view.updateLayoutParams
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.R
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 import tv.ridal.ui.view.RTextView
 
 class CheckCell(context: Context) : FrameLayout(context)

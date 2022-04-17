@@ -157,10 +157,10 @@ class Parser
                         mi.ratings = ArrayList()
 
                         for (j in 0 until spans.size) {
-                            val rating = Movie.Rating().apply {
-                                whose = spans[j].getElementsByTag("a")[0].text()
-                                value = spans[j].getElementsByTag("span")[1].text()
-                            }
+                            val whose = spans[j].getElementsByTag("a")[0].text()
+                            val value = spans[j].getElementsByTag("span")[1].text()
+
+                            val rating = Movie.Rating(whose, value)
                             mi.ratings!!.add(rating)
                         }
                     }
@@ -172,28 +172,18 @@ class Parser
 
                         for (aTag in aTags)
                         {
-                            val list = Movie.List().apply {
-                                name = aTag.text()
-                                url = aTag.attr("href")
-                                if ( ! url!!.contains("https")) {
-                                    url = url!!.replace("http", "https")
-                                }
+                            val name = aTag.text()
+                            var url = aTag.attr("href")
+                            if ( ! url!!.contains("https")) {
+                                url = url.replace("http", "https")
                             }
+
+                            val list = Movie.NameUrl(name, url)
                             mi.inLists!!.add(list)
                         }
                     }
-                    HDRezka.SLOGAN -> {
-                        mi.slogan = tdData.text()
-                    }
                     HDRezka.RELEASE_DATE -> {
-                        val rDate = Movie.ReleaseDate()
-                        rDate.date = tdData.text()
-                        val words = rDate.date.split(" ")
-                        rDate.yearStartIndex = rDate.date.indexOf(words[2])
-                        val a: Element = tdData.getElementsByTag("a")[0]
-                        rDate.yearUrl = a.attr("href")
-
-                        mi.releaseDate = rDate
+                        mi.releaseYear = tdData.text().split(" ")[2]
                     }
                     HDRezka.COUNTRY -> {
                         val _as: Elements = tdData.getElementsByTag("a")
@@ -202,10 +192,10 @@ class Parser
                         mi.countries = ArrayList()
 
                         for (a in _as) {
-                            val country = Movie.Country().apply {
-                                name = a.text()
-                                url = a.attr("href")
-                            }
+                            val name = a.text()
+                            val url = a.attr("href")
+
+                            val country = Movie.NameUrl(name, url)
                             mi.countries!!.add(country)
                         }
                     }
@@ -218,10 +208,10 @@ class Parser
 
                         for (j in 0 until spans.size) {
                             val a: Element = spans[j].getElementsByTag("a")[0]
-                            val producer = Movie.Person().apply {
-                                name = a.text()
-                                url = a.attr("href")
-                            }
+                            val name = a.text()
+                            val url = a.attr("href")
+
+                            val producer = Movie.NameUrl(name, url)
                             mi.producers!!.add(producer)
                         }
                     }
@@ -232,10 +222,10 @@ class Parser
                         mi.genres = ArrayList()
 
                         for (a in _as) {
-                            val genre = Movie.Genre().apply {
-                                name = a.text()
-                                url = a.attr("href")
-                            }
+                            val name = a.text()
+                            val url = a.attr("href")
+
+                            val genre = Movie.NameUrl(name, url)
                             mi.genres!!.add(genre)
                         }
                     }
@@ -252,10 +242,10 @@ class Parser
                         mi.inCollections = ArrayList()
 
                         for (a in _as) {
-                            val collection = Movie.List().apply {
-                                name = a.text()
-                                url = a.attr("href")
-                            }
+                            val name = a.text()
+                            val url = a.attr("href")
+
+                            val collection = Movie.NameUrl(name, url)
                             mi.inCollections!!.add(collection)
                         }
                     }
@@ -270,20 +260,19 @@ class Parser
                             if (_as.size == 0) continue
 
                             val a: Element = _as[0]
-                            val actor = Movie.Person().apply {
-                                name = a.text()
-                                url = a.attr("href")
-                            }
+                            val name = a.text()
+                            val url = a.attr("href")
+
+                            val actor = Movie.NameUrl(name, url)
                             mi.actors!!.add(actor)
                         }
                     }
                 }
             }
 
-            mi.description = Movie.Description().apply {
-                title = doc.getElementsByClass("b-post__description_title")[0].text()
-                text = doc.getElementsByClass("b-post__description_text")[0].text()
-            }
+            val title = doc.getElementsByClass("b-post__description_title")[0].text()
+            val text = doc.getElementsByClass("b-post__description_text")[0].text()
+            mi.description = Movie.Description(title, text)
 
             return mi
         }

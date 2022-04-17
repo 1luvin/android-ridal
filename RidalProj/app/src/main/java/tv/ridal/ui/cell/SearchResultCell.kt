@@ -4,9 +4,9 @@ import android.content.Context
 import android.text.TextUtils
 import android.view.Gravity
 import android.widget.FrameLayout
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.ui.layout.Layout
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 import tv.ridal.ui.view.RTextView
 
 class SearchResultCell(context: Context) : FrameLayout(context)

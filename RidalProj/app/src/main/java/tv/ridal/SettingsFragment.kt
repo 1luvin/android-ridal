@@ -13,8 +13,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import tv.ridal.utils.Locale
-import tv.ridal.utils.Theme
+import tv.ridal.util.Locale
+import tv.ridal.util.Theme
 import tv.ridal.ui.actionbar.BigActionBar
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
@@ -23,7 +23,7 @@ import tv.ridal.ui.layout.VLinearLayout
 import tv.ridal.ui.view.ColorView
 import tv.ridal.ui.view.RTextView
 import tv.ridal.ui.setPaddings
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 
 class SettingsFragment : BaseSettingsFragment()
 {
@@ -39,9 +39,9 @@ class SettingsFragment : BaseSettingsFragment()
 
     private lateinit var themeSectionView: RTextView
     private val themeNames: Array<String> = arrayOf(
-        Locale.text(Locale.text_theme_asInSystem),
-        Locale.text(Locale.text_theme_light),
-        Locale.text(Locale.text_theme_dark)
+        Locale.string(R.string.theme_asInSystem),
+        Locale.string(R.string.theme_light),
+        Locale.string(R.string.theme_dark)
     )
     private lateinit var themeCheckGroup: SingleCheckGroup
 
@@ -93,7 +93,7 @@ class SettingsFragment : BaseSettingsFragment()
         actionBar = BigActionBar(context).apply {
             setPadding(0, Utils.dp(30), 0, 0)
 
-            title = Locale.text(Locale.text_sett)
+            title = Locale.string(R.string.settings)
         }
     }
 
@@ -116,7 +116,7 @@ class SettingsFragment : BaseSettingsFragment()
 
     private fun createThemeSection()
     {
-        themeSectionView = createSectionView( Locale.text(Locale.text_theme) )
+        themeSectionView = createSectionView( Locale.string(R.string.theme) )
 
         themeCheckGroup = SingleCheckGroup(context).apply {
             background = Theme.rect(
@@ -146,7 +146,7 @@ class SettingsFragment : BaseSettingsFragment()
 
     private fun createColorsSection()
     {
-        colorsSectionView = createSectionView( Locale.text(Locale.text_mainColor) )
+        colorsSectionView = createSectionView( Locale.string(R.string.mainColor) )
 
         colorsView = ColorsView()
 

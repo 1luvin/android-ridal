@@ -5,11 +5,11 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.R
-import tv.ridal.utils.Utils
+import tv.ridal.util.Utils
 import tv.ridal.ui.view.RTextView
 
 class FilterCell(context: Context) : FrameLayout(context)

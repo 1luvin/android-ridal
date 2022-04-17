@@ -1,4 +1,4 @@
-package tv.ridal.adapters
+package tv.ridal.adapter
 
 import android.view.View
 import android.view.ViewGroup

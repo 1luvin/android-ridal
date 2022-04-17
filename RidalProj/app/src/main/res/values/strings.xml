@@ -1,3 +1,137 @@
 <resources>
     <string name="app_name">Ridal</string>
+    <string name="app_share">"Привет, я использую ${App.APP_NAME} для просмотра кино. " +
+                            "Присоеденяйся! Скачать его можно здесь: ${App.WEBSITE}"</string>
+
+    <string name="catalog">Каталог</string>
+    <string name="search">Поиск</string>
+    <string name="search_hint">Фильм, сериал, мультфильм, аниме</string>
+
+    <string name="settings">Настройки</string>
+    <string name="theme">Тема</string>
+    <string name="theme_asInSystem">Как в системе</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Темная</string>
+    <string name="mainColor">Основной цвет</string>
+
+    <string name="films">Фильмы</string>
+    <string name="series">Сериалы</string>
+    <string name="cartoons">Мультфильмы</string>
+    <string name="anime">Аниме</string>
+
+    <string name="filters">Фильтры</string>
+    <string name="genre">Жанр</string>
+    <string name="allGenres">Все жанры</string>
+    <string name="sorting">Сортировка</string>
+    <string name="showResults">Показать результаты</string>
+    <string name="section">Раздел</string>
+
+    <string name="genre_western">Вестерны</string>
+    <string name="genre_arthouse">Арт-хаус</string>
+    <string name="genre_crime">Криминал</string>
+    <string name="genre_fiction">Фантастика</string>
+    <string name="genre_horror">Ужасы</string>
+    <string name="genre_erotic">Эротика</string>
+    <string name="genre_theatre">Театр</string>
+    <string name="genre_our">Наши</string>
+    <string name="genre_family">Семейные</string>
+    <string name="genre_action">Боевики</string>
+    <string name="genre_adventures">Приключения</string>
+    <string name="genre_comedy">Комедии</string>
+    <string name="genre_musical">Мюзиклы</string>
+    <string name="genre_kids">Детские</string>
+    <string name="genre_concert">Концерт</string>
+    <string name="genre_ukrainian">Украинские</string>
+    <string name="genre_fantasy">Фэнтези</string>
+    <string name="genre_military">Военные</string>
+    <string name="genre_drama">Драмы</string>
+    <string name="genre_melodrama">Мелодрамы</string>
+    <string name="genre_historical">Исторические</string>
+    <string name="genre_travel">Путешествия</string>
+    <string name="genre_standup">Стендап</string>
+    <string name="genre_foreign">Зарубежные</string>
+    <string name="genre_biographical">Биографические</string>
+    <string name="genre_detective">Детективы</string>
+    <string name="genre_sport">Спортивные</string>
+    <string name="genre_thriller">Триллеры</string>
+    <string name="genre_documentary">Документальные</string>
+    <string name="genre_cognitive">Познавательные</string>
+    <string name="genre_short">Короткометражные</string>
+
+    <string name="genre_realtv">Реальное ТВ</string>
+    <string name="genre_russian">Русские</string>
+    <string name="genre_telecasts">Телепередачи</string>
+    <string name="genre_musical2">Музыкальные</string>
+
+    <string name="genre_multseries">Мультсериалы</string>
+    <string name="genre_fairytale">Сказки</string>
+    <string name="genre_adult">Для взрослых</string>
+    <string name="genre_fullLength">Полнометражные</string>
+    <string name="genre_soyzmyltfilm">Советские</string>
+
+    <string name="genre_romance">Романтические</string>
+    <string name="genre_samurai">Самурайский боевик</string>
+    <string name="genre_parody">Пародия</string>
+    <string name="genre_kodomo">Кодомо</string>
+    <string name="genre_shounenai">Сёнэн-ай</string>
+    <string name="genre_school">Школа</string>
+    <string name="genre_shoujoai">Сёдзё-ай</string>
+    <string name="genre_ecchi">Этти</string>
+    <string name="genre_shoujo">Сёдзё</string>
+    <string name="genre_mahoushoujo">Махо-сёдзё</string>
+    <string name="genre_mystery">Мистические</string>
+    <string name="genre_fighting">Боевые искусства</string>
+    <string name="genre_everyday">Повседневность</string>
+    <string name="genre_shounen">Сёнэн</string>
+    <string name="genre_mecha">Меха</string>
+
+    <string name="sorting_last">Последние поступления</string>
+    <string name="sorting_popular">Популярные</string>
+    <string name="sorting_watching">Сейчас смотрят</string>
+
+    <string name="watch">Смотреть</string>
+    <string name="more">Больше</string>
+    <string name="actors">Актеры</string>
+    <string name="producers">Режиссеры</string>
+    <string name="inLists">Входит в списки</string>
+    <string name="inCollections">Входит в коллекции</string>
+    <string name="country">Страна</string>
+
+    <string name="translation">Озвучка</string>
+    <string name="season">Сезон</string>
+    <string name="episode">Серия</string>
+
 </resources>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!---->

@@ -9,7 +9,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
-import tv.ridal.utils.Theme
+import tv.ridal.util.Theme
 import tv.ridal.ui.layout.Layout
 import tv.ridal.R
 import tv.ridal.ui.listener.InstantPressListener

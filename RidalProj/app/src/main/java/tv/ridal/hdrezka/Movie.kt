@@ -13,22 +13,19 @@ data class Movie(val name: String, val posterUrl: String, val type: Type, val ur
         var ratings: ArrayList<Rating>? = null
         fun hasRatings() = ratings != null
         // Входит в списки
-        var inLists: ArrayList<List>? = null
+        var inLists: ArrayList<NameUrl>? = null
         fun hasInLists() = inLists != null
-        // Слоган
-        var slogan: String? = null
-        fun hasSlogan() = slogan != null
         // Дата выхода
-        var releaseDate: ReleaseDate? = null
-        fun hasReleaseDate() = releaseDate != null
+        var releaseYear: String? = null
+        fun hasReleaseYear() = releaseYear != null
         // Страны
-        var countries: ArrayList<Country>? = null
+        var countries: ArrayList<NameUrl>? = null
         fun hasCountries() = countries != null
         // Режиссеры
-        var producers: ArrayList<Person>? = null
+        var producers: ArrayList<NameUrl>? = null
         fun hasProducers() = producers != null
         // Жанры
-        var genres: ArrayList<Genre>? = null
+        var genres: ArrayList<NameUrl>? = null
         fun hasGenres() = genres != null
         // В переводе
         var inTranslations: String? = null
@@ -37,10 +34,10 @@ data class Movie(val name: String, val posterUrl: String, val type: Type, val ur
         var duration: String? = null
         fun hasDuration() = duration != null
         // Из коллекций
-        var inCollections: ArrayList<List>? = null
+        var inCollections: ArrayList<NameUrl>? = null
         fun hasInCollections() = inCollections != null
         // В ролях актеры
-        var actors: ArrayList<Person>? = null
+        var actors: ArrayList<NameUrl>? = null
         fun hasActors() = actors != null
         // Описание
         var description: Description? = null
@@ -48,48 +45,11 @@ data class Movie(val name: String, val posterUrl: String, val type: Type, val ur
 
     }
 
-    class Rating
-    {
-        var whose: String? = null
-        var value: String? = null
-    }
+    data class NameUrl(val name: String, val url: String)
 
-    class List
-    {
-        var name: String? = null
-        var url: String? = null
-    }
+    data class Rating(val whose: String, val value: String)
 
-    class ReleaseDate
-    {
-        lateinit var date: String
-        var yearStartIndex: Int = 0
-        lateinit var yearUrl: String
-    }
-
-    class Country
-    {
-        var name: String? = null
-        var url: String? = null
-    }
-
-    class Person
-    {
-        var name: String? = null
-        var url: String? = null
-    }
-
-    class Genre
-    {
-        var name: String? = null
-        var url: String? = null
-    }
-
-    class Description
-    {
-        var title: String? = null
-        var text: String? = null
-    }
+    data class Description(val title: String, val text: String)
 
 }
 

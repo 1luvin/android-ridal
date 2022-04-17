@@ -3,15 +3,11 @@
 
     <item
         android:id="@+id/navigation"
-        android:title="Navigation"
+        android:title="@string/catalog"
         android:icon="@drawable/nav"/>
     <item
         android:id="@+id/search"
-        android:title="Search"
+        android:title="@string/search"
         android:icon="@drawable/search"/>
-<!--    <item-->
-<!--        android:id="@+id/favourites"-->
-<!--        android:title="Favourites"-->
-<!--        android:icon="@drawable/favourites" />-->
 
 </menu>
