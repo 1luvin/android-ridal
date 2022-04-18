@@ -1,7 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE
+    resources
+    [<!ENTITY app_name "Ridal"><!ENTITY app_website "https://ridal.tv">]
+    >
+
 <resources>
-    <string name="app_name">Ridal</string>
-    <string name="app_share">"Привет, я использую ${App.APP_NAME} для просмотра кино. " +
-                            "Присоеденяйся! Скачать его можно здесь: ${App.WEBSITE}"</string>
+    <string name="app_name">&app_name;</string>
+    <string name="app_website">&app_website;</string>
+    <string name="app_share">"Привет, я использую &app_name; для просмотра кино. Присоеденяйся! Скачать его можно здесь: &app_website;"</string>
 
     <string name="catalog">Каталог</string>
     <string name="search">Поиск</string>
@@ -25,6 +32,7 @@
     <string name="sorting">Сортировка</string>
     <string name="showResults">Показать результаты</string>
     <string name="section">Раздел</string>
+    <string name="allSections">Все разделы</string>
 
     <string name="genre_western">Вестерны</string>
     <string name="genre_arthouse">Арт-хаус</string>
@@ -104,34 +112,4 @@
 </resources>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!---->
+    <!---->

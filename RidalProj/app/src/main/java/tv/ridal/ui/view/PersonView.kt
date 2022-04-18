@@ -25,10 +25,10 @@ class PersonView(context: Context) : FrameLayout(context)
 {
     private var requestQueue = App.instance().requestQueue
 
-    fun setPerson(person: Movie.Person)
+    fun setPerson(person: Movie.NameUrl)
     {
-        loadPhoto(person.url!!)
-        setName(person.name!!)
+        loadPhoto(person.url)
+        setName(person.name)
     }
 
     private var imageView: ImageView

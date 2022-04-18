@@ -1,5 +1,6 @@
 package tv.ridal.hdrezka
 
+import tv.ridal.R
 import tv.ridal.util.Locale
 
 class HDRezka
@@ -14,18 +15,16 @@ class HDRezka
         const val ANIME = "Аниме"
 
         val sectionNames: Array<String> = arrayOf(
-            Locale.text(Locale.text_films),
-            Locale.text(Locale.text_series),
-            Locale.text(Locale.text_cartoons),
-            Locale.text(Locale.text_anime)
+            Locale.string(R.string.films),
+            Locale.string(R.string.series),
+            Locale.string(R.string.cartoons),
+            Locale.string(R.string.anime)
         )
 
         const val RATINGS = "Рейтинги"
         const val IMDB = "IMDb"
         const val KP = "Кинопоиск"
-
         const val IN_LISTS = "Входит в списки"
-        const val SLOGAN = "Слоган"
         const val RELEASE_DATE = "Дата выхода"
         const val COUNTRY = "Страна"
         const val PRODUCER = "Режиссер"
@@ -53,7 +52,6 @@ class HDRezka
             URL_ANIME
         )
 
-
         // Секции
         const val url_films = "films/"
         const val url_series = "series/"
@@ -80,10 +78,10 @@ class HDRezka
         {
             return when (type)
             {
-                FILM -> Locale.text(Locale.text_films)
-                SERIAL -> Locale.text(Locale.text_series)
-                ANIME -> Locale.text(Locale.text_anime)
-                CARTOON -> Locale.text(Locale.text_cartoons)
+                FILM -> Locale.string(R.string.films)
+                SERIAL -> Locale.string(R.string.series)
+                CARTOON -> Locale.string(R.string.cartoons)
+                ANIME -> Locale.string(R.string.anime)
 
                 else -> "error_type"
             }

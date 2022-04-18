@@ -254,7 +254,7 @@ class SettingsFragment : BaseSettingsFragment()
                     }
 
                     val enable = toTheme == 0
-                    Utils.enableDarkStatusBar(requireActivity().window, enable)
+                    Theme.enableDarkStatusBar(requireActivity().window, enable)
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {

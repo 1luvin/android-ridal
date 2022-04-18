@@ -46,7 +46,7 @@ class SearchView(context: Context) : FrameLayout(context)
             isSingleLine = true
             ellipsize = TextUtils.TruncateAt.END
 
-            hint = Locale.text(Locale.hint_search)
+            hint = Locale.string(R.string.search_hint)
         }
         addView(textView, Layout.ezFrame(
             Layout.MATCH_PARENT, Layout.MATCH_PARENT,

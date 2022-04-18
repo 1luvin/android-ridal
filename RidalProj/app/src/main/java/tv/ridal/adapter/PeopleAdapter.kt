@@ -8,7 +8,7 @@ import tv.ridal.hdrezka.Movie
 import tv.ridal.ui.view.PersonView
 
 
-class PeopleAdapter(private val people: ArrayList<Movie.Person>) : RecyclerView.Adapter<PeopleAdapter.ViewHolder>()
+class PeopleAdapter(private val people: ArrayList<Movie.NameUrl>) : RecyclerView.Adapter<PeopleAdapter.ViewHolder>()
 {
     private var onPersonClick: ((Drawable) -> Unit)? = null
     fun onPersonClick(l: (Drawable) -> Unit)
@@ -28,7 +28,7 @@ class PeopleAdapter(private val people: ArrayList<Movie.Person>) : RecyclerView.
             }
         }
 
-        fun bind(current: Movie.Person)
+        fun bind(current: Movie.NameUrl)
         {
             val personView = itemView as PersonView
             personView.apply {

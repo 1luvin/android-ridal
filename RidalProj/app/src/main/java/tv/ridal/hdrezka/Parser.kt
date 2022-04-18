@@ -36,22 +36,22 @@ class Parser
                 // постер
                 val posterUrl = cardCover.getElementsByTag("img")[0].attr("src")
                 // тип на русском языке
-                var typeText = cardCover.getElementsByClass("entity")[0].text()
+                val typeText = cardCover.getElementsByClass("entity")[0].text()
                 var type: Movie.Type
                 /*
                     Типы "Мультфильм" или "Аниме" могут быть односерийные(фильм) или
                     многосерийные
                  */
-                if (typeText == HDRezka.FILM) {
-                    type = Movie.Type(typeText, false)
+                type = if (typeText == HDRezka.FILM) {
+                    Movie.Type(typeText, false)
                 } else if (typeText == HDRezka.SERIAL) {
-                    type = Movie.Type(typeText, true)
+                    Movie.Type(typeText, true)
                 } else {
                     val info = cardCover.getElementsByClass("info")
                     if (info.size == 0) {
-                        type = Movie.Type(typeText, false)
+                        Movie.Type(typeText, false)
                     } else {
-                        type = Movie.Type(typeText, true)
+                        Movie.Type(typeText, true)
                     }
                 }
                 // ссылка

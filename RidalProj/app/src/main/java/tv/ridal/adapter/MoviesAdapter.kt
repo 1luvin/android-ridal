@@ -8,7 +8,6 @@ import tv.ridal.CatalogFragment
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.view.MovieView
 import tv.ridal.hdrezka.Movie
-import tv.ridal.SearchFragment
 
 class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter<MoviesAdapter.ViewHolder>()
 {
@@ -53,12 +52,12 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
                 Layout.WRAP_CONTENT, Layout.WRAP_CONTENT
             )
         }
-        else if (AppActivity.currentFragment() is SearchFragment)
-        {
-            movieView.layoutParams = RecyclerView.LayoutParams(
-                Layout.MATCH_PARENT, Layout.MATCH_PARENT
-            )
-        }
+//        else if (AppActivity.currentFragment() is SearchFragment)
+//        {
+//            movieView.layoutParams = RecyclerView.LayoutParams(
+//                Layout.MATCH_PARENT, Layout.MATCH_PARENT
+//            )
+//        }
 
         return ViewHolder(movieView)
     }

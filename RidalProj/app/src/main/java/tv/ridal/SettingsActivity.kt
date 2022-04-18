@@ -68,7 +68,7 @@ class SettingsActivity : BaseActivity()
 
     private fun setupStatusBar()
     {
-        Utils.enableDarkStatusBar(window, ! Theme.isDark())
+        Theme.enableDarkStatusBar(window, ! Theme.isDark())
     }
 
 }

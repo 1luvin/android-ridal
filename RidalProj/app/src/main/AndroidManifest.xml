@@ -3,7 +3,6 @@
     package="tv.ridal">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -15,28 +14,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Ridal">
-
-<!--        Полноэкранное приложение-->
-        <meta-data android:name="android.max_aspect" android:value="100.0" />
+        <activity
+            android:name=".SearchActivity"
+            android:exported="false" />
+        <!-- Полноэкранное приложение -->
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="100.0" />
 
         <activity
             android:name=".AppActivity"
-            android:windowSoftInputMode="adjustPan"
-            >
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".SettingsActivity">
-
-        </activity>
-
-        <activity android:name=".PlayerActivity">
-
-        </activity>
-
+        <activity android:name=".SettingsActivity"></activity>
+        <activity android:name=".PlayerActivity"></activity>
     </application>
 
 </manifest>
