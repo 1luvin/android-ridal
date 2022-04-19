@@ -1,8 +1,6 @@
 package tv.ridal
 
 import android.animation.ValueAnimator
-import android.app.Activity
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +22,6 @@ import tv.ridal.hdrezka.Parser
 import tv.ridal.ui.actionbar.BigActionBar
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.layout.VLinearLayout
-import tv.ridal.ui.msg
 import tv.ridal.ui.recyclerview.GridSpacingItemDecoration
 import tv.ridal.ui.view.SearchView
 import tv.ridal.util.Locale
@@ -38,7 +35,7 @@ class SearchFragment : BaseAppFragment()
 
     private lateinit var rootFrame: FrameLayout
     private lateinit var scroll: StickyScrollView
-    private lateinit var rootLayout: LinearLayout
+    private lateinit var layout: LinearLayout
     private lateinit var actionBar: BigActionBar
     private lateinit var searchView: SearchView
 
@@ -71,7 +68,7 @@ class SearchFragment : BaseAppFragment()
         createSearchView()
         createMoviesView()
 
-        rootLayout = VLinearLayout(context).apply {
+        layout = VLinearLayout(context).apply {
             descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS // чтобы RecyclerView сам не скролился к верху
             addView(actionBar)
             addView(searchView, Layout.ezLinear(
@@ -84,7 +81,7 @@ class SearchFragment : BaseAppFragment()
         }
 
         createScroll()
-        scroll.addView(rootLayout)
+        scroll.addView(layout)
         rootFrame.addView(scroll)
     }
 
@@ -157,6 +154,10 @@ class SearchFragment : BaseAppFragment()
             )
 
             tag = "sticky"
+
+            setOnClickListener {
+                startFragment( SearchInputFragment() )
+            }
         }
     }
 

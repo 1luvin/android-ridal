@@ -13,10 +13,11 @@ import tv.ridal.util.Theme
 import tv.ridal.ui.layout.Layout
 import tv.ridal.R
 import tv.ridal.ui.listener.InstantPressListener
+import tv.ridal.ui.setTextColor
+import tv.ridal.util.Utils
 
 class ClearableInputView(context: Context) : FrameLayout(context)
 {
-
     var editText: EditText
 
     private var onTextChangeListener: (() -> Unit)? = null
@@ -42,7 +43,7 @@ class ClearableInputView(context: Context) : FrameLayout(context)
             background = null
             inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
 
-            setTextColor(Theme.color(Theme.color_text))
+            setTextColor( Theme.color_text )
             textSize = 18F
             typeface = Theme.typeface(Theme.tf_normal)
             setLines(1)
@@ -61,7 +62,7 @@ class ClearableInputView(context: Context) : FrameLayout(context)
                 override fun afterTextChanged(s: Editable?) {}
             })
         }
-        this.addView(editText, Layout.ezFrame(
+        addView(editText, Layout.ezFrame(
             Layout.MATCH_PARENT, Layout.WRAP_CONTENT,
             Gravity.START or Gravity.CENTER_VERTICAL,
             15, 0, 15 + 24 + 15, 0
@@ -85,7 +86,7 @@ class ClearableInputView(context: Context) : FrameLayout(context)
                 onTextClearListener?.invoke()
             }
         }
-        this.addView(clearButton, Layout.ezFrame(
+        addView(clearButton, Layout.ezFrame(
             24, 24,
             Gravity.END or Gravity.CENTER_VERTICAL,
             15, 0, 15, 0
@@ -133,6 +134,14 @@ class ClearableInputView(context: Context) : FrameLayout(context)
 
             start()
         }
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
+    {
+        super.onMeasure(
+            MeasureSpec.makeMeasureSpec( MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY ),
+            MeasureSpec.makeMeasureSpec( paddingTop + Utils.dp(50) + paddingBottom, MeasureSpec.EXACTLY )
+        )
     }
 
 }
