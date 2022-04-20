@@ -1,15 +1,20 @@
 package tv.ridal.ui.view
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.content.Context
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.view.Gravity
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import tv.ridal.R
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.listener.InstantPressListener
+import tv.ridal.ui.msg
 import tv.ridal.ui.setTextColor
 import tv.ridal.util.Locale
 import tv.ridal.util.Theme
@@ -20,6 +25,10 @@ class InputBar(context: Context) : FrameLayout(context)
     private var backButton: ImageView
     private var editText: EditText
     private var clearButton: ImageView
+
+    private var clearAnimator: ValueAnimator = ValueAnimator().apply {
+        duration = 150
+    }
 
     private var onBack: (() -> Unit)? = null
     fun onBack(l: () -> Unit)
@@ -37,6 +46,21 @@ class InputBar(context: Context) : FrameLayout(context)
     fun onTextClear(l: () -> Unit)
     {
         onTextClear = l
+    }
+
+    val currentText: String get() = editText.text.toString()
+
+    private var timer = ValueAnimator().apply {
+        duration = 300
+
+        addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?)
+            {
+                super.onAnimationEnd(animation)
+
+                //
+            }
+        })
     }
 
     init
@@ -73,18 +97,16 @@ class InputBar(context: Context) : FrameLayout(context)
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int)
                 {
-//                    if (s.isEmpty()) hideClearButton()
-//                    else showClearButton()
-//
-//                    onTextChangeListener?.invoke()
+                    showClearButton( s.isNotEmpty() )
+
+                    onTextChange?.invoke()
                 }
                 override fun afterTextChanged(s: Editable?) {}
             })
         }
         addView(editText, Layout.ezFrame(
             Layout.MATCH_PARENT, Layout.MATCH_PARENT,
-            Gravity.START,
-            50, 0, 0, 0
+            Gravity.START
         ))
 
         clearButton = ImageView(context).apply {
@@ -100,9 +122,9 @@ class InputBar(context: Context) : FrameLayout(context)
             setOnClickListener {
                 editText.text.clear()
 
-//                hideClearButton()
-//
-//                onTextClearListener?.invoke()
+                showClearButton(false)
+
+                onTextClear?.invoke()
             }
         }
         addView(clearButton, Layout.ezFrame(
@@ -115,7 +137,6 @@ class InputBar(context: Context) : FrameLayout(context)
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
     {
         val size = Utils.dp(50)
-
         super.onMeasure(
             MeasureSpec.makeMeasureSpec( MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY ),
             MeasureSpec.makeMeasureSpec( paddingTop + size + paddingBottom, MeasureSpec.EXACTLY )
@@ -131,16 +152,45 @@ class InputBar(context: Context) : FrameLayout(context)
         )
 
         val availableWidth = measuredWidth - backButton.measuredWidth - clearButton.measuredWidth
-
         editText.measure(
             MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.EXACTLY ),
             MeasureSpec.makeMeasureSpec( size, MeasureSpec.EXACTLY )
         )
     }
 
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int)
+    {
+        super.onLayout(changed, left, top, right, bottom)
+
+        editText.layout(
+            backButton.measuredWidth,
+            paddingTop,
+            backButton.measuredWidth + editText.measuredWidth,
+            measuredHeight - paddingBottom)
+    }
 
 
+    private fun showClearButton(show: Boolean)
+    {
+        val fromScale = clearButton.scaleX // == scaleY
+        val toScale = if (show) 1F else 0F
 
+        clearAnimator.apply {
+            cancel()
+            setFloatValues(fromScale, toScale)
+
+            addUpdateListener {
+                val value = it.animatedValue as Float
+
+                clearButton.apply {
+                    scaleX = value
+                    scaleY = value
+                }
+            }
+
+            start()
+        }
+    }
 
 }
 

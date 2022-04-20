@@ -7,8 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.widget.NestedScrollView
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.StringRequest
+import tv.ridal.hdrezka.Parser
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.layout.VLinearLayout
+import tv.ridal.ui.msg
 import tv.ridal.ui.view.ClearableInputView
 import tv.ridal.ui.view.InputBar
 import tv.ridal.util.Theme
@@ -25,6 +30,8 @@ class SearchInputFragment : BaseAppFragment()
     private lateinit var scroll: NestedScrollView
     private lateinit var layout: VLinearLayout
 
+    private val requestQueue: RequestQueue = App.instance().requestQueue
+
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -40,15 +47,7 @@ class SearchInputFragment : BaseAppFragment()
 
     private fun createUI()
     {
-        inputBar = InputBar(context).apply {
-            setPadding(0, Utils.dp(30), 0, 0)
-
-            setBackgroundColor(
-                Theme.overlayColor( Theme.color_bg, 0.04F )
-            )
-
-            measure(0, 0)
-        }
+        createInputBar()
         layout = VLinearLayout(context)
 
         scroll = NestedScrollView(context).apply {
@@ -70,6 +69,62 @@ class SearchInputFragment : BaseAppFragment()
         }
 
     }
+
+    private fun createInputBar()
+    {
+        inputBar = InputBar(context).apply {
+            setPadding(0, Utils.dp(30), 0, 0)
+
+            setBackgroundColor(
+                Theme.overlayColor( Theme.color_bg, 0.04F )
+            )
+
+            measure(0, 0)
+        }
+
+        inputBar.apply {
+            onBack {
+                finish()
+            }
+
+            onTextChange {
+                loadSearchResults()
+            }
+
+            onTextClear {
+                layout.removeAllViews()
+            }
+        }
+    }
+
+    private fun loadSearchResults()
+    {
+        val url = "https://rezka.ag/engine/ajax/search.php"
+        val request = object : StringRequest(
+            Request.Method.POST,
+            url,
+            { response ->
+                val results = Parser.parseSearchResults(response)
+
+                results?.forEach {
+                    msg(it.movieName)
+                }
+            },
+            {
+                println("ERROR!")
+            }
+        ) {
+            override fun getParams(): MutableMap<String, String>
+            {
+                return HashMap<String, String>().apply {
+                    put("q", inputBar.currentText)
+                }
+            }
+        }
+
+        requestQueue.add(request)
+    }
+
 }
 
 
