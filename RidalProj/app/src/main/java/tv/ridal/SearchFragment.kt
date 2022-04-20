@@ -33,6 +33,7 @@ class SearchFragment : BaseAppFragment()
     override val stableTag: String
         get() = "SearchFragment"
 
+
     private lateinit var rootFrame: FrameLayout
     private lateinit var scroll: StickyScrollView
     private lateinit var layout: LinearLayout
@@ -43,6 +44,7 @@ class SearchFragment : BaseAppFragment()
     private val movies: ArrayList<Movie> = ArrayList()
 
     private val requestQueue: RequestQueue = App.instance().requestQueue
+
 
     override fun onCreate(savedInstanceState: Bundle?)
     {

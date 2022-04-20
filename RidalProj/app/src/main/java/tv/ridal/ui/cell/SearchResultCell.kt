@@ -1,11 +1,14 @@
 package tv.ridal.ui.cell
 
 import android.content.Context
+import android.graphics.Color
 import android.text.TextUtils
 import android.view.Gravity
+import android.view.View
 import android.widget.FrameLayout
 import tv.ridal.util.Theme
 import tv.ridal.ui.layout.Layout
+import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.util.Utils
 import tv.ridal.ui.view.RTextView
 
@@ -32,14 +35,46 @@ class SearchResultCell(context: Context) : FrameLayout(context)
             field = value
 
             movieRatingView.text = value
-            if (movieRating != "") movieRatingView.setTextColor(colorForValue(value.toFloat()))
+            if (movieRating != "") movieRatingView.setTextColor( colorForValue(value.toFloat()) )
         }
 
     init
     {
-        movieRatingView = RTextView(context).apply {
-            setTextColor(Theme.color(Theme.color_main))
+        setPadding( Utils.dp(20), Utils.dp(8), Utils.dp(20), Utils.dp(8) )
+        setOnTouchListener( InstantPressListener(this) )
+
+        movieNameView = RTextView(context).apply {
+            setTextColor( Theme.color_text )
             textSize = 17F
+            typeface = Theme.typeface(Theme.tf_bold)
+            setLines(1)
+            maxLines = 1
+            isSingleLine = true
+            ellipsize = TextUtils.TruncateAt.END
+        }
+        addView(movieNameView, Layout.ezFrame(
+            Layout.MATCH_PARENT, Layout.WRAP_CONTENT,
+            Gravity.START or Gravity.TOP
+        ))
+
+        movieDataView = RTextView(context).apply {
+            setTextColor( Theme.color_text2 )
+            textSize = 15F
+            typeface = Theme.typeface(Theme.tf_normal)
+            setLines(1)
+            maxLines = 1
+            isSingleLine = true
+            ellipsize = TextUtils.TruncateAt.END
+        }
+        addView(movieDataView, Layout.ezFrame(
+            Layout.MATCH_PARENT, Layout.WRAP_CONTENT,
+            Gravity.START or Gravity.TOP,
+            0, 17 + 5, 0, 0
+        ))
+
+        movieRatingView = RTextView(context).apply {
+            setTextColor( Theme.color_main )
+            textSize = 18F
             typeface = Theme.typeface(Theme.tf_normal)
             setLines(1)
             maxLines = 1
@@ -48,55 +83,34 @@ class SearchResultCell(context: Context) : FrameLayout(context)
         }
         addView(movieRatingView, Layout.ezFrame(
             Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-            Gravity.END or Gravity.CENTER_VERTICAL,
-            20, 0, 20, 0
+            Gravity.END or Gravity.CENTER_VERTICAL
         ))
-
-        movieNameView = RTextView(context).apply {
-            setTextColor(Theme.color(Theme.color_text))
-            textSize = 17F
-            typeface = Theme.typeface(Theme.tf_bold)
-            setLines(1)
-            maxLines = 1
-            isSingleLine = true
-            ellipsize = TextUtils.TruncateAt.END
-        }
-        addView(movieNameView)
-
-        movieDataView = RTextView(context).apply {
-            setTextColor(Theme.color(Theme.color_text2))
-            textSize = 15F
-            typeface = Theme.typeface(Theme.tf_normal)
-            setLines(1)
-            maxLines = 1
-            isSingleLine = true
-            ellipsize = TextUtils.TruncateAt.END
-        }
-        addView(movieDataView)
-
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
     {
-        movieRatingView.measure(0, 0)
-
-        movieNameView.layoutParams = Layout.ezFrame(
-            Layout.MATCH_PARENT, Layout.WRAP_CONTENT,
-            Gravity.START or Gravity.TOP,
-            20, 7, movieRatingView.measuredWidth, 0
-        )
-
-        movieNameView.measure(0, 0)
-
-        movieDataView.layoutParams = Layout.ezFrame(
-            Layout.MATCH_PARENT, Layout.WRAP_CONTENT,
-            Gravity.START or Gravity.TOP,
-            20, 7 + 17 + 4, movieRatingView.measuredWidth, 0
-        )
-
         super.onMeasure(
-            MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(Utils.dp(50), MeasureSpec.EXACTLY)
+            MeasureSpec.makeMeasureSpec( MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY ),
+            0
+        )
+
+        val ratingWidth = if (movieRating != "") {
+            movieRatingView.measure(0, 0)
+            Utils.dp(15) + movieRatingView.measuredWidth
+        } else {
+            0
+        }
+
+        val availableWidth = measuredWidth - paddingLeft - ratingWidth - paddingRight
+
+        movieNameView.measure(
+            MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
+            0
+        )
+
+        movieDataView.measure(
+            MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
+            0
         )
     }
 

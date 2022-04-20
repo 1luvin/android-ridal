@@ -36,8 +36,8 @@ class InputBar(context: Context) : FrameLayout(context)
         onBack = l
     }
 
-    private var onTextChange: (() -> Unit)? = null
-    fun onTextChange(l: () -> Unit)
+    private var onTextChange: ((String) -> Unit)? = null
+    fun onTextChange(l: (String) -> Unit)
     {
         onTextChange = l
     }
@@ -50,7 +50,7 @@ class InputBar(context: Context) : FrameLayout(context)
 
     val currentText: String get() = editText.text.toString()
 
-    private var timer = ValueAnimator().apply {
+    private var timer = ValueAnimator.ofFloat(0F, 1F).apply {
         duration = 300
 
         addListener(object : AnimatorListenerAdapter() {
@@ -58,7 +58,7 @@ class InputBar(context: Context) : FrameLayout(context)
             {
                 super.onAnimationEnd(animation)
 
-                //
+                onTextChange?.invoke(currentText)
             }
         })
     }
@@ -97,9 +97,25 @@ class InputBar(context: Context) : FrameLayout(context)
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int)
                 {
-                    showClearButton( s.isNotEmpty() )
+                    if (s.isEmpty())
+                    {
+                        showClearButton(false)
+                        onTextClear?.invoke()
+                    }
+                    else
+                    {
+                        showClearButton(true)
 
-                    onTextChange?.invoke()
+                        if ( ! timer.isRunning)
+                        {
+                            timer.start()
+                        }
+                        else
+                        {
+                            timer.setCurrentFraction(0F) // restarting
+                        }
+                    }
+
                 }
                 override fun afterTextChanged(s: Editable?) {}
             })

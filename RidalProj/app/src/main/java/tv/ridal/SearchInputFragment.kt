@@ -10,12 +10,18 @@ import androidx.core.widget.NestedScrollView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
+import tv.ridal.hdrezka.HDRezka
+import tv.ridal.hdrezka.Movie
 import tv.ridal.hdrezka.Parser
+import tv.ridal.hdrezka.SearchResult
+import tv.ridal.ui.cell.PointerCell
+import tv.ridal.ui.cell.SearchResultCell
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.layout.VLinearLayout
 import tv.ridal.ui.msg
 import tv.ridal.ui.view.ClearableInputView
 import tv.ridal.ui.view.InputBar
+import tv.ridal.util.Locale
 import tv.ridal.util.Theme
 import tv.ridal.util.Utils
 
@@ -48,7 +54,9 @@ class SearchInputFragment : BaseAppFragment()
     private fun createUI()
     {
         createInputBar()
-        layout = VLinearLayout(context)
+        layout = VLinearLayout(context).apply {
+            setPadding(0, Utils.dp(8), 0, Utils.dp(8))
+        }
 
         scroll = NestedScrollView(context).apply {
             addView(layout)
@@ -61,7 +69,7 @@ class SearchInputFragment : BaseAppFragment()
                 Layout.MATCH_PARENT, Layout.WRAP_CONTENT
             ))
 
-            addView(scroll, Layout.ezFrame(
+            addView(scroll, Layout.frame(
                 Layout.MATCH_PARENT, Layout.WRAP_CONTENT,
                 Gravity.TOP,
                 0, inputBar.measuredHeight, 0, 0
@@ -88,7 +96,8 @@ class SearchInputFragment : BaseAppFragment()
             }
 
             onTextChange {
-                loadSearchResults()
+                layout.removeAllViews()
+                loadSearchResults(it)
             }
 
             onTextClear {
@@ -97,7 +106,8 @@ class SearchInputFragment : BaseAppFragment()
         }
     }
 
-    private fun loadSearchResults()
+
+    private fun loadSearchResults(searchText: String)
     {
         val url = "https://rezka.ag/engine/ajax/search.php"
         val request = object : StringRequest(
@@ -106,8 +116,8 @@ class SearchInputFragment : BaseAppFragment()
             { response ->
                 val results = Parser.parseSearchResults(response)
 
-                results?.forEach {
-                    msg(it.movieName)
+                results?.let {
+                    showSearchResults(it, searchText)
                 }
             },
             {
@@ -117,12 +127,75 @@ class SearchInputFragment : BaseAppFragment()
             override fun getParams(): MutableMap<String, String>
             {
                 return HashMap<String, String>().apply {
-                    put("q", inputBar.currentText)
+                    put("q", searchText)
                 }
             }
         }
 
         requestQueue.add(request)
+    }
+
+    private fun showSearchResults(results: ArrayList<SearchResult>, searchText: String)
+    {
+        for (i in results.indices)
+        {
+            val r = results[i]
+
+            val searchResultCell = SearchResultCell(context).apply {
+                movieName = r.movieName
+                movieData = r.movieData
+                movieRating = r.movieRating
+
+                setOnClickListener { _ ->
+                    openMovie(r)
+                }
+            }
+            layout.addView(searchResultCell, Layout.ezLinear(
+                Layout.MATCH_PARENT, Layout.WRAP_CONTENT
+            ))
+        }
+
+        val divider = View(context).apply {
+            setBackgroundColor( Theme.overlayColor(Theme.color_bg, 0.07F) )
+        }
+        layout.addView(divider, Layout.ezLinear(
+            Layout.MATCH_PARENT, 1,
+            0, 4, 0, 4
+        ))
+
+        val allResultsCell = PointerCell(context).apply {
+            text = Locale.string(R.string.viewAllResults)
+
+            setOnClickListener {
+                openMovies(searchText)
+            }
+        }
+        layout.addView(allResultsCell)
+    }
+
+    private fun openMovie(searchResult: SearchResult)
+    {
+        val movie = Movie(
+            searchResult.movieName,
+            "",
+            Movie.Type(HDRezka.FILM, false),
+            searchResult.movieUrl
+        )
+        startFragment(
+            MovieFragment.instance(movie)
+        )
+    }
+
+    private fun openMovies(searchText: String)
+    {
+        val args = MoviesFragment.Arguments().apply {
+            url = "https://rezka.ag/search/?do=search&subaction=search&q=${searchText}"
+            title = searchText
+            filters = HDRezka.Filters.NO_FILTERS
+        }
+        startFragment(
+            MoviesFragment.newInstance(args)
+        )
     }
 
 }

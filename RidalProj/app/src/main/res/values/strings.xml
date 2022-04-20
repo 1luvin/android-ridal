@@ -3,7 +3,7 @@
 <!DOCTYPE
     resources
     [<!ENTITY app_name "Ridal"><!ENTITY app_website "https://ridal.tv">]
-    >
+>
 
 <resources>
     <string name="app_name">&app_name;</string>
@@ -13,6 +13,7 @@
     <string name="catalog">Каталог</string>
     <string name="search">Поиск</string>
     <string name="search_hint">Фильм, сериал, мультфильм, аниме</string>
+    <string name="viewAllResults">Смотреть все результаты</string>
 
     <string name="settings">Настройки</string>
     <string name="theme">Тема</string>
