@@ -23,6 +23,9 @@ class PointerCell(context: Context) : FrameLayout(context)
 
             textView.text = text
         }
+    var textColor: Int
+        get() = textView.currentTextColor
+        set(value) = textView.setTextColor(value)
 
     init
     {

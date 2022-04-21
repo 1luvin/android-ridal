@@ -5,6 +5,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import tv.ridal.hdrezka.Streams.Stream
+import tv.ridal.ui.msg
 
 class Parser
 {
@@ -287,7 +288,7 @@ class Parser
             Результаты поиска
          */
 
-        fun parseSearchResults(doc: Document): ArrayList<SearchResult>?
+        fun parseSearchResults(doc: Document): Pair<ArrayList<SearchResult>, Boolean>?
         {
             val results = ArrayList<SearchResult>().apply {
                 ensureCapacity(5)
@@ -340,7 +341,6 @@ class Parser
 
                 if (d.contains(" - ...")) movieData += " - ..."
 
-
                 val movieRating = a.select(".rating").text()
                 val movieUrl = a.attr("href")
 
@@ -348,10 +348,13 @@ class Parser
                 results.add(result)
             }
 
-            return results
+            val hasMore = doc.getElementsByClass("b-search__live_all").size != 0
+            msg("${hasMore}")
+
+            return Pair(results, hasMore)
         }
 
-        fun parseSearchResults(html: String) : ArrayList<SearchResult>?
+        fun parseSearchResults(html: String) : Pair<ArrayList<SearchResult>, Boolean>?
         {
             return parseSearchResults(Jsoup.parse(html))
         }

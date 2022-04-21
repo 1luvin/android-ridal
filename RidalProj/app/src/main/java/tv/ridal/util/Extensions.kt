@@ -1,14 +1,21 @@
 package tv.ridal.ui
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import tv.ridal.util.Theme
 import tv.ridal.R
+import tv.ridal.ui.view.EditText
 
 // Log
 
@@ -39,6 +46,22 @@ fun TextView.setTextColor(colorKey: String)
 fun TextView.setTypeface(tfKey: String)
 {
     typeface = Theme.typeface(tfKey)
+}
+
+// EditText
+
+fun EditText.showKeyboard()
+{
+    post {
+        ViewCompat.getWindowInsetsController(this)?.show(WindowInsetsCompat.Type.ime())
+    }
+}
+
+fun EditText.hideKeyboard()
+{
+    post {
+        ViewCompat.getWindowInsetsController(this)?.hide(WindowInsetsCompat.Type.ime())
+    }
 }
 
 // Drawable

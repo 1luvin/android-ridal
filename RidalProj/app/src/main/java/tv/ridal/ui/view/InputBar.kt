@@ -8,14 +8,14 @@ import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.view.Gravity
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import tv.ridal.R
+import tv.ridal.ui.hideKeyboard
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.listener.InstantPressListener
-import tv.ridal.ui.msg
 import tv.ridal.ui.setTextColor
+import tv.ridal.ui.showKeyboard
 import tv.ridal.util.Locale
 import tv.ridal.util.Theme
 import tv.ridal.util.Utils
@@ -36,8 +36,14 @@ class InputBar(context: Context) : FrameLayout(context)
         onBack = l
     }
 
-    private var onTextChange: ((String) -> Unit)? = null
-    fun onTextChange(l: (String) -> Unit)
+    private var onStopTyping: ((String) -> Unit)? = null
+    fun onStopTyping(l: (String) -> Unit)
+    {
+        onStopTyping = l
+    }
+
+    private var onTextChange: (() -> Unit)? = null
+    fun onTextChange(l: () -> Unit)
     {
         onTextChange = l
     }
@@ -58,7 +64,7 @@ class InputBar(context: Context) : FrameLayout(context)
             {
                 super.onAnimationEnd(animation)
 
-                onTextChange?.invoke(currentText)
+                onStopTyping?.invoke(currentText)
             }
         })
     }
@@ -92,11 +98,14 @@ class InputBar(context: Context) : FrameLayout(context)
             isSingleLine = true
 
             hint = Locale.string(R.string.search_hint)
+            setHintTextColor( Theme.color(Theme.color_text2) )
 
             addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int)
                 {
+                    onTextChange?.invoke()
+
                     if (s.isEmpty())
                     {
                         showClearButton(false)
@@ -139,6 +148,7 @@ class InputBar(context: Context) : FrameLayout(context)
                 editText.text.clear()
 
                 showClearButton(false)
+                showKeyboard()
 
                 onTextClear?.invoke()
             }
@@ -206,6 +216,16 @@ class InputBar(context: Context) : FrameLayout(context)
 
             start()
         }
+    }
+
+    fun showKeyboard()
+    {
+        editText.showKeyboard()
+    }
+
+    fun hideKeyboard()
+    {
+        editText.hideKeyboard()
     }
 
 }

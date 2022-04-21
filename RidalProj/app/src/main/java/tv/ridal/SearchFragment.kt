@@ -94,15 +94,15 @@ class SearchFragment : BaseAppFragment()
 
             addOnStickyScrollViewListener { x, y, oldX, oldY ->
 
-                val H = actionBar.measuredHeight
+                val h = actionBar.measuredHeight
                 var start: Float = 0F
                 var end: Float = 0F
 
-                if ( H in oldY until y )
+                if ( h in oldY until y )
                 {
                     start = 1F
                 }
-                else if ( H in y until oldY )
+                else if ( h in y until oldY )
                 {
                     end = 1F
                 }
@@ -110,7 +110,7 @@ class SearchFragment : BaseAppFragment()
                 if (start + end == 0F) return@addOnStickyScrollViewListener
 
                 ValueAnimator.ofFloat(start, end).apply {
-                    duration = 150
+                    duration = 120
 
                     addUpdateListener {
                         val process = it.animatedValue as Float

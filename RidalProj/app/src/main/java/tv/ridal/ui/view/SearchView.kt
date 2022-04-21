@@ -47,6 +47,7 @@ class SearchView(context: Context) : FrameLayout(context)
             ellipsize = TextUtils.TruncateAt.END
 
             hint = Locale.string(R.string.search_hint)
+            setHintTextColor( Theme.color(Theme.color_text2) )
         }
         addView(textView, Layout.ezFrame(
             Layout.MATCH_PARENT, Layout.MATCH_PARENT,

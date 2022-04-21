@@ -1,7 +1,9 @@
 package tv.ridal.ui.cell
 
 import android.content.Context
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
@@ -9,14 +11,19 @@ import android.widget.FrameLayout
 import tv.ridal.util.Theme
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.listener.InstantPressListener
+import tv.ridal.ui.msg
 import tv.ridal.util.Utils
 import tv.ridal.ui.view.RTextView
 
-class SearchResultCell(context: Context) : FrameLayout(context)
+class SearchResultCell(context: Context, private val needDivider: Boolean) : FrameLayout(context)
 {
     private var movieNameView: RTextView
     private var movieDataView: RTextView
     private var movieRatingView: RTextView
+
+    private val dividerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Theme.overlayColor(Theme.color_bg, 0.1F)
+    }
 
     var movieName: String = ""
         set(value) {
@@ -42,6 +49,8 @@ class SearchResultCell(context: Context) : FrameLayout(context)
     {
         setPadding( Utils.dp(20), Utils.dp(8), Utils.dp(20), Utils.dp(8) )
         setOnTouchListener( InstantPressListener(this) )
+
+        setWillNotDraw(false)
 
         movieNameView = RTextView(context).apply {
             setTextColor( Theme.color_text )
@@ -112,6 +121,22 @@ class SearchResultCell(context: Context) : FrameLayout(context)
             MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
             0
         )
+    }
+
+    override fun onDraw(canvas: Canvas)
+    {
+        super.onDraw(canvas)
+
+        if (needDivider)
+        {
+            canvas.drawLine(
+                paddingLeft + 0F,
+                measuredHeight - Utils.dp(1F),
+                measuredWidth - paddingRight + 0F,
+                measuredHeight - Utils.dp(1F),
+                dividerPaint
+            )
+        }
     }
 
     // value: от 0 до 10
