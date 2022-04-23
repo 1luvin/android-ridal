@@ -38,7 +38,22 @@ class SearchInputFragment : BaseAppFragment()
     private lateinit var inputBar: InputBar
     private lateinit var frame: FrameLayout
     private lateinit var scroll: NestedScrollView
+
     private lateinit var layout: VLinearLayout
+    private var layoutAnimator: ValueAnimator = ValueAnimator().apply {
+        duration = 70
+
+        addUpdateListener {
+            val value = it.animatedValue as Float
+            val scale = 0.99F + 0.01F * value
+
+            layout.apply {
+                alpha = value
+                scaleX = scale
+                scaleY = scale
+            }
+        }
+    }
 
     private val requestQueue: RequestQueue = App.instance().requestQueue
     private val searchRequestTag: String = "searchRequestTag"
@@ -51,7 +66,7 @@ class SearchInputFragment : BaseAppFragment()
         createUI()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         return rootFrame
     }
@@ -130,18 +145,10 @@ class SearchInputFragment : BaseAppFragment()
             onTextClear {
                 if (layout.isEmpty()) return@onTextClear
 
-                ValueAnimator.ofFloat(1F, 0F).apply {
-                    duration = 70
+                if ( layoutAnimator.isRunning ) layoutAnimator.cancel()
 
-                    addUpdateListener {
-                        val value = it.animatedValue as Float
-
-                        layout.apply {
-                            alpha = value
-                            scaleX = 0.99F + 0.01F * value
-                            scaleY = 0.99F + 0.01F * value
-                        }
-                    }
+                layoutAnimator.apply {
+                    setFloatValues(layout.alpha, 0F)
 
                     addListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator?)
@@ -149,6 +156,8 @@ class SearchInputFragment : BaseAppFragment()
                             super.onAnimationEnd(animation)
 
                             layout.removeAllViews()
+
+                            removeListener(this)
                         }
                     })
 
@@ -227,62 +236,29 @@ class SearchInputFragment : BaseAppFragment()
 
         if ( layout.isEmpty() )
         {
-            ValueAnimator.ofFloat(0F, 1F).apply {
-                duration = 70
-
-                addUpdateListener {
-                    val value = it.animatedValue as Float
-
-                    layout.apply {
-                        alpha = value
-                        scaleX = 0.99F + 0.01F * value
-                        scaleY = 0.99F + 0.01F * value
-                    }
-                }
+            layoutAnimator.apply {
+                setFloatValues(0F, 1F)
 
                 addListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationStart(animation: Animator?)
                     {
                         super.onAnimationStart(animation)
 
-                        layout.apply {
-                            alpha = 0F
-                        }
-                    }
+                        layout.alpha = 0F
 
-                    override fun onAnimationEnd(animation: Animator?)
-                    {
-                        super.onAnimationEnd(animation)
-
-                        layout.removeAllViews()
                         views.forEach {
                             layout.addView(it)
                         }
 
-                        setFloatValues(0F, 1F)
-                        start()
-
                         removeListener(this)
                     }
                 })
-
-                start()
             }
         }
-        else
+        else // if ( layout.isNotEmpty() )
         {
-            ValueAnimator.ofFloat(1F, 0F).apply {
-                duration = 70
-
-                addUpdateListener {
-                    val value = it.animatedValue as Float
-
-                    layout.apply {
-                        alpha = value
-                        scaleX = 0.99F + 0.01F * value
-                        scaleY = 0.99F + 0.01F * value
-                    }
-                }
+            layoutAnimator.apply {
+                setFloatValues(1F, 0F)
 
                 addListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator?)
@@ -300,11 +276,10 @@ class SearchInputFragment : BaseAppFragment()
                         removeListener(this)
                     }
                 })
-
-                start()
             }
         }
 
+        layoutAnimator.start()
     }
 
     private fun openMovie(searchResult: SearchResult)

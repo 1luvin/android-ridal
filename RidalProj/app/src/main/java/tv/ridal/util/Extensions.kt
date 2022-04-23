@@ -36,6 +36,11 @@ fun View.setBackgroundColor(colorKey: String)
     setBackgroundColor( Theme.color(colorKey) )
 }
 
+fun View.measure()
+{
+    measure(0, 0)
+}
+
 // TextView
 
 fun TextView.setTextColor(colorKey: String)

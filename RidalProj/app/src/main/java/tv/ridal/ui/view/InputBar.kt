@@ -57,7 +57,7 @@ class InputBar(context: Context) : FrameLayout(context)
     val currentText: String get() = editText.text.toString()
 
     private var timer = ValueAnimator.ofFloat(0F, 1F).apply {
-        duration = 300
+        duration = 100
 
         addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?)

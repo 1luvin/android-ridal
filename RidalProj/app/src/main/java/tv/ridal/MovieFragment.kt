@@ -203,9 +203,8 @@ class MovieFragment : BaseAppFragment()
             /*
             изначально кнопка "Назад" белого цвета в независимости от выбранной темы
              */
-            actionButtonIcon = Theme.drawable(R.drawable.back)
-            actionButtonColor = Theme.COLOR_WHITE
-            onActionButtonClick {
+            addIosBack(type = ActionBar.IosBack.Type.ICON)
+            onBack {
                 finish()
             }
 
@@ -231,7 +230,6 @@ class MovieFragment : BaseAppFragment()
                     actionBar.apply {
                         showBackground(1)
                         showTitle()
-                        animateActionButtonColor( Theme.color(Theme.color_text2) )
                     }
                     watchFab.show()
                 }
@@ -241,7 +239,6 @@ class MovieFragment : BaseAppFragment()
                     actionBar.apply {
                         showBackground(0)
                         hideTitle()
-                        animateActionButtonColor( Theme.COLOR_WHITE )
                     }
                     watchFab.hide()
                 }
@@ -866,7 +863,6 @@ class MovieFragment : BaseAppFragment()
                 height = this@HeaderView.measuredHeight - Utils.dp(30 + 50)
             }
 
-            actionBar.measure(0, 0)
             movieNameHeightIndicator = measuredHeight - bottomPadding - actionBar.measuredHeight
         }
 
@@ -1337,8 +1333,8 @@ class MovieFragment : BaseAppFragment()
 
                     if ( hasTranslation() )
                     {
-                        actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
-                        onActionButtonClick {
+                        addIosBack( Locale.string(R.string.translation) )
+                        onBack {
                             backToTranslation()
                         }
                     }
@@ -1409,8 +1405,8 @@ class MovieFragment : BaseAppFragment()
                     title = Locale.string(R.string.episode)
                     menu = ActionBar.LoadingMenu(context)
 
-                    actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
-                    onActionButtonClick {
+                    addIosBack( Locale.string(R.string.season) )
+                    onBack {
                         backToSeason()
                     }
                 }

@@ -6,9 +6,11 @@
 >
 
 <resources>
+    <string name="back">Назад</string>
+
     <string name="app_name">&app_name;</string>
     <string name="app_website">&app_website;</string>
-    <string name="app_share">"Привет, я использую &app_name; для просмотра кино. Присоеденяйся! Скачать его можно здесь: &app_website;"</string>
+    <string name="app_share">Привет, я использую &app_name; для просмотра кино. Присоеденяйся! Скачать его можно здесь: &app_website;</string>
 
     <string name="catalog">Каталог</string>
     <string name="search">Поиск</string>

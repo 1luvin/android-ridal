@@ -33,6 +33,7 @@ import tv.ridal.ui.layout.SingleCheckGroup
 import tv.ridal.ui.popup.BottomPopup
 import tv.ridal.hdrezka.*
 import tv.ridal.ui.layout.VLinearLayout
+import tv.ridal.ui.measure
 import tv.ridal.util.Utils
 import tv.ridal.ui.msg
 import tv.ridal.ui.setBackgroundColor
@@ -185,11 +186,11 @@ class MoviesFragment : BaseAppFragment()
 
             if ( ! Theme.isDark() ) // если светлая тема
             {
-                setDivider( Theme.overlayColor(Theme.color_bg, 0.04F) )
+                elevation = Utils.dp(5F)
             }
 
-            actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
-            onActionButtonClick {
+            addIosBack()
+            onBack {
                 finish()
             }
 
@@ -792,13 +793,13 @@ class MoviesFragment : BaseAppFragment()
                 actionBar = ActionBar(context).apply {
                     title = Locale.string(R.string.genre)
 
-                    actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
-                    onActionButtonClick {
+                    addIosBack( Locale.string(R.string.filters) )
+                    onBack {
                         navigate(genreView!!, filtersView!!)
                     }
                 }
 
-                actionBar.measure(0, 0)
+                actionBar.measure()
             }
 
             private fun createScroll()
@@ -873,18 +874,16 @@ class MoviesFragment : BaseAppFragment()
             {
                 actionBar = ActionBar(context).apply {
                     title = Locale.string(R.string.sorting)
-                }
-                actionBar.measure(0, 0)
 
-                if (filtersView != null)
-                {
-                    actionBar.apply {
-                        actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
-                        onActionButtonClick {
-                            navigate(sortingView, filtersView!!)
+                    filtersView?.let {
+                        addIosBack( Locale.string(R.string.filters) )
+                        onBack {
+                            navigate(sortingView, it)
                         }
                     }
                 }
+
+                actionBar.measure()
             }
 
             private fun createScroll()
@@ -977,18 +976,16 @@ class MoviesFragment : BaseAppFragment()
             {
                 actionBar = ActionBar(context).apply {
                     title = Locale.string(R.string.section)
-                }
-                actionBar.measure(0, 0)
 
-                if (filtersView != null)
-                {
-                    actionBar.apply {
-                        actionButtonIcon = Theme.drawable(R.drawable.back, Theme.color_actionBar_back)
-                        onActionButtonClick {
-                            navigate(sectionView!!, filtersView!!)
+                    filtersView?.let {
+                        addIosBack( Locale.string(R.string.filters) )
+                        onBack {
+                            navigate(sectionView!!, it)
                         }
                     }
                 }
+
+                actionBar.measure()
             }
 
             private fun createScroll()

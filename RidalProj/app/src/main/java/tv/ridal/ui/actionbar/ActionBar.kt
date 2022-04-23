@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
@@ -12,15 +13,19 @@ import android.view.Gravity
 import android.view.View
 import android.widget.*
 import androidx.core.view.children
+import androidx.core.view.contains
 import androidx.core.view.updateLayoutParams
 import com.github.ybq.android.spinkit.style.Pulse
+import tv.ridal.R
 import tv.ridal.util.Theme
 import tv.ridal.ui.drawable.MultiDrawable
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
+import tv.ridal.ui.measure
+import tv.ridal.ui.msg
 import tv.ridal.ui.view.RTextView
+import tv.ridal.util.Locale
 import tv.ridal.util.Utils
-import kotlin.math.max
 
 class ActionBar(context: Context) : FrameLayout(context)
 {
@@ -29,74 +34,63 @@ class ActionBar(context: Context) : FrameLayout(context)
         const val actionBarHeightDp: Int = 50
     }
 
-    val actionBarHeight: Int = Utils.dp(actionBarHeightDp)
+    private var iosBack: IosBack? = null
+    private lateinit var titleView: RTextView
+    private var subtitleView: RTextView? = null
 
-    var divider: View? = null
-        private set
 
-    fun setDivider(color: Int, height: Int = Utils.dp(1), hide: Boolean = false)
+    fun addIosBack(text: String? = null, type: IosBack.Type = IosBack.Type.ICON_TEXT)
     {
-        if (divider == null)
-        {
-            divider = View(context).apply {
-                background = Theme.rect(color)
-            }
-            addView(divider, Layout.ezFrame(
-                Layout.MATCH_PARENT, height,
-                Gravity.BOTTOM
-            ))
+        iosBack?.let {
+            if ( contains(it) ) removeView(it)
         }
-        else
-        {
-            divider.apply {
-                updateLayoutParams<FrameLayout.LayoutParams> {
-                    this.height = height
-                }
-                background = Theme.rect(color)
+
+        iosBack = IosBack(context, text).apply {
+            this.type = type
+
+            setOnClickListener {
+                onBack?.invoke()
             }
         }
 
-        if (hide) divider!!.visibility = View.GONE
+        addView(iosBack, Layout.ezFrame(
+            Layout.WRAP_CONTENT, Layout.MATCH_PARENT,
+            Gravity.START
+        ))
     }
 
-    var actionButtonIcon: Drawable? = null
-        set(value) {
-            field = value
+    private var onBack: (() -> Unit)? = null
+    fun onBack(l: () -> Unit)
+    {
+        onBack = l
+    }
 
-            if (actionButtonView == null) createActionButtonView()
 
-            actionButtonView!!.setImageDrawable(actionButtonIcon)
-        }
-    var actionButtonColor: Int = Theme.color(Theme.color_text)
-        set(value) {
-            field = value
-
-            actionButtonView?.drawable?.setTint(actionButtonColor)
-        }
+    val actionBarHeight: Int = Utils.dp(actionBarHeightDp)
 
     var title: String = ""
         set(value) {
             field = value
-            if (titleView == null) createTitleView()
-            titleView!!.text = title
+
+            titleView.text = title
         }
     var titleColor: Int = Theme.color(Theme.color_text)
         set(value) {
             field = value
 
-            titleView?.setTextColor(titleColor)
+            titleView.setTextColor(titleColor)
         }
     var titleTypeface: Typeface = Theme.typeface(Theme.tf_bold)
         set(value) {
             field = value
 
-            titleView?.typeface = titleTypeface
+            titleView.typeface = titleTypeface
         }
-    var titleTextSize: Float = 20F
+    var titleTextSize: Float = 19F
         set(value) {
             field = value
 
-            titleView?.textSize = titleTextSize
+            titleView.textSize = titleTextSize
         }
 
     var subtitle: String = ""
@@ -124,42 +118,9 @@ class ActionBar(context: Context) : FrameLayout(context)
             ))
         }
 
-    private var actionButtonView: ImageView? = null
-    private var titleFrame: FrameLayout? = null
-    private var titleView: RTextView? = null
-    private var subtitleView: RTextView? = null
-
-    private fun createActionButtonView()
-    {
-        actionButtonView = ImageView(context).apply {
-            isClickable = true
-            setOnTouchListener(InstantPressListener(this))
-
-            scaleType = ImageView.ScaleType.CENTER
-
-            setOnClickListener {
-                actionButtonListener?.invoke()
-            }
-        }
-
-        addView(actionButtonView)
-    }
-
-    private var actionButtonListener: (() -> Unit)? = null
-    fun onActionButtonClick(l: () -> Unit)
-    {
-        actionButtonListener = l
-    }
 
     private fun createTitleView()
     {
-        titleFrame = FrameLayout(context).apply {
-            layoutParams = Layout.ezFrame(
-                Layout.MATCH_PARENT,
-                Layout.MATCH_PARENT
-            )
-        }
-
         titleView = RTextView(context).apply {
             setTextColor(Theme.color(Theme.color_text))
             setLines(1)
@@ -172,12 +133,10 @@ class ActionBar(context: Context) : FrameLayout(context)
             textSize = titleTextSize
         }
 
-        titleFrame!!.addView(titleView, Layout.ezFrame(
+        addView(titleView, Layout.ezFrame(
             Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
             Gravity.CENTER
         ))
-
-        this.addView(titleFrame)
     }
 
     private fun createSubtitleView()
@@ -191,36 +150,11 @@ class ActionBar(context: Context) : FrameLayout(context)
             isSingleLine = true
             ellipsize = TextUtils.TruncateAt.END
         }
-
-        titleView!!.apply {
-            textSize = 19F
-        }
-        titleView!!.layoutParams = Layout.ezFrame(
-            Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-            Gravity.TOP or Gravity.CENTER_HORIZONTAL,
-            0, 4, 0, 0
-
-        )
-
-        titleFrame!!.addView(subtitleView, Layout.ezFrame(
+        addView(subtitleView, Layout.ezFrame(
             Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
             Gravity.TOP or Gravity.CENTER_HORIZONTAL,
             0, 4 + titleTextSize.toInt() + 2, 0, 0
         ))
-    }
-
-    private fun changeActionBarContents(other: ActionBar)
-    {
-        val f_actionButtonColor = actionButtonColor
-        val t_actionButtonColor = other.actionButtonColor
-
-
-
-        ValueAnimator.ofFloat(0F, 1F).apply {
-            duration = 170
-
-            // доделать
-        }
     }
 
 
@@ -237,21 +171,6 @@ class ActionBar(context: Context) : FrameLayout(context)
 
         (background as MultiDrawable).apply {
             show(index)
-        }
-    }
-
-    fun animateActionButtonColor(color: Int)
-    {
-        ValueAnimator.ofInt(actionButtonColor, color).apply {
-            duration = 170
-
-            setEvaluator( ArgbEvaluator() )
-
-            addUpdateListener {
-                actionButtonColor = it.animatedValue as Int
-            }
-
-            start()
         }
     }
 
@@ -323,88 +242,162 @@ class ActionBar(context: Context) : FrameLayout(context)
         }
     }
 
-    fun hideDivider()
-    {
-        if (divider == null) return
-        if (divider!!.visibility == View.GONE) return
-
-        ValueAnimator.ofFloat(divider!!.alpha, 0F).apply {
-            duration = 170
-
-            addUpdateListener {
-                divider!!.alpha = it.animatedValue as Float
-            }
-
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
-                    super.onAnimationEnd(animation)
-
-                    divider!!.visibility = View.GONE
-                }
-            })
-
-            start()
-        }
-    }
-
-    fun showDivider()
-    {
-        if (divider == null) return
-        if (divider!!.visibility == View.VISIBLE) return
-
-        ValueAnimator.ofFloat(divider!!.alpha, 1F).apply {
-            duration = 170
-
-            addUpdateListener {
-                divider!!.alpha = it.animatedValue as Float
-            }
-
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationStart(animation: Animator?) {
-                    super.onAnimationStart(animation)
-
-                    divider!!.visibility = View.VISIBLE
-                }
-            })
-
-            start()
-        }
-    }
 
     init
     {
-
+        createTitleView()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
     {
-        var width1 = 0
-        actionButtonView?.apply {
-            layoutParams = Layout.frame(
-                actionBarHeight, actionBarHeight,
-                Gravity.START
-            )
-            width1 = actionBarHeight
-        }
-
-        var width2 = 0
-        menu?.apply {
-            measure(0, 0)
-            width2 = measuredWidth
-        }
-
-        val busyWidth = max(width1, width2)
-        titleFrame?.apply {
-            layoutParams = Layout.frame(
-                Layout.MATCH_PARENT, Layout.MATCH_PARENT,
-                Gravity.START,
-                busyWidth, 0, busyWidth, 0
-            )
-        }
-
         super.onMeasure(
-            MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(paddingTop + actionBarHeight + paddingBottom, MeasureSpec.EXACTLY))
+            MeasureSpec.makeMeasureSpec( MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY ),
+            MeasureSpec.makeMeasureSpec( paddingTop + actionBarHeight + paddingBottom, MeasureSpec.EXACTLY) )
+
+        var leftWidth = 0
+        iosBack?.let {
+            msg("${it.childCount}")
+//            it.measure()
+            leftWidth = it.measuredWidth
+        }
+
+        msg("\nLEFTW: ${leftWidth}")
+
+        var rightWidth = 0
+        menu?.let {
+            it.measure()
+            rightWidth = it.measuredWidth
+        }
+
+        msg("RIGHTW: ${rightWidth}")
+
+        var availableWidth = measuredWidth - leftWidth - rightWidth
+
+        val paint = Paint().apply {
+            typeface = Theme.typeface(Theme.tf_normal)
+            textSize = titleView.textSize
+        }
+        val textWidth = paint.measureText(title)
+
+        msg("TEXTW: ${textWidth}")
+        msg("AVAILABLE: ${availableWidth}\n")
+
+        if ( textWidth > availableWidth )
+        {
+            msg("\n\nXXD\n\n")
+//            iosBack?.apply {
+//                type = IosBack.Type.ICON
+//            }
+            // исправиль ошибку
+        }
+
+        titleView.measure(
+            MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
+            0
+        )
+
+        subtitleView?.measure(
+            MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
+            0
+        )
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int)
+    {
+        super.onLayout(changed, left, top, right, bottom)
+
+        subtitleView?.let {
+            titleView.apply {
+                updateLayoutParams<FrameLayout.LayoutParams> {
+                    gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+                    setMargins( 0, Utils.dp(4), 0, 0 )
+                }
+            }
+        }
+    }
+
+
+    class IosBack(context: Context, private val Text: String? = null) : LinearLayout(context)
+    {
+        var type: IosBack.Type = IosBack.Type.ICON_TEXT
+            set(value)
+            {
+                if (field == value) return
+                field = value
+
+                when (type)
+                {
+                    Type.ICON -> applyIcon()
+                    Type.ICON_TEXT -> applyIconText()
+                }
+            }
+
+        init
+        {
+            isClickable = true
+            setOnTouchListener( InstantPressListener(this) )
+
+            applyIconText()
+        }
+
+        private fun applyIconText()
+        {
+            removeAllViews()
+
+            setPadding( 0, 0, Utils.dp(10), 0 )
+
+            val backIcon = Theme.drawable(R.drawable.ios_back, Theme.mainColor)
+            val imageView = ImageView(context).apply {
+                scaleType = ImageView.ScaleType.CENTER
+
+                setImageDrawable(backIcon)
+            }
+            addView(imageView, Layout.ezLinear(
+                Utils.dp(12), Layout.WRAP_CONTENT,
+                Gravity.CENTER_VERTICAL
+            ))
+
+            val textView = RTextView(context).apply {
+                setTextColor( Theme.mainColor )
+                textSize = 17.5F
+                typeface = Theme.typeface(Theme.tf_normal)
+
+                this.text = Text ?: Locale.string(R.string.back)
+            }
+            addView(textView, Layout.ezLinear(
+                Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
+                Gravity.CENTER_VERTICAL
+            ))
+        }
+
+        private fun applyIcon()
+        {
+            removeAllViews()
+
+            setPadding( 0, 0, 0, 0 )
+
+            val imageView = ImageView(context).apply {
+                scaleType = ImageView.ScaleType.CENTER
+
+                setImageDrawable( Theme.drawable(R.drawable.back, Theme.mainColor) )
+            }
+            addView(imageView, Layout.ezLinear(
+                actionBarHeightDp, actionBarHeightDp
+            ))
+        }
+
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
+        {
+            super.onMeasure(
+                0,
+                MeasureSpec.makeMeasureSpec( Utils.dp(actionBarHeightDp), MeasureSpec.EXACTLY )
+            )
+        }
+
+        enum class Type
+        {
+            ICON_TEXT, ICON
+        }
     }
 
     open class Menu(context: Context) : LinearLayout(context)
