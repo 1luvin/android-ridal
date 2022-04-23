@@ -178,22 +178,22 @@ class ActionBar(context: Context) : FrameLayout(context)
 
     fun hideTitle(animated: Boolean = true)
     {
-        if (titleView!!.visibility == View.GONE) return
+        if (titleView.visibility == View.GONE) return
 
         if (animated)
         {
-            ValueAnimator.ofFloat(titleView!!.alpha, 0F).apply {
+            ValueAnimator.ofFloat(titleView.alpha, 0F).apply {
                 duration = 170
 
                 addUpdateListener {
-                    titleView!!.alpha = it.animatedValue as Float
+                    titleView.alpha = it.animatedValue as Float
                 }
 
                 addListener(object : AnimatorListenerAdapter(){
                     override fun onAnimationEnd(animation: Animator?) {
                         super.onAnimationEnd(animation)
 
-                        titleView!!.visibility = View.GONE
+                        titleView.visibility = View.GONE
                     }
                 })
 
@@ -202,7 +202,7 @@ class ActionBar(context: Context) : FrameLayout(context)
         }
         else
         {
-            titleView!!.apply {
+            titleView.apply {
                 alpha = 0F
                 visibility = View.GONE
             }
@@ -211,22 +211,22 @@ class ActionBar(context: Context) : FrameLayout(context)
 
     fun showTitle(animated: Boolean = true)
     {
-        if (titleView!!.visibility == View.VISIBLE) return
+        if (titleView.visibility == View.VISIBLE) return
 
         if (animated)
         {
-            ValueAnimator.ofFloat(titleView!!.alpha, 1F).apply {
+            ValueAnimator.ofFloat(titleView.alpha, 1F).apply {
                 duration = 170
 
                 addUpdateListener {
-                    titleView!!.alpha = it.animatedValue as Float
+                    titleView.alpha = it.animatedValue as Float
                 }
 
                 addListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationStart(animation: Animator?) {
                         super.onAnimationStart(animation)
 
-                        titleView!!.visibility = View.VISIBLE
+                        titleView.visibility = View.VISIBLE
                     }
                 })
 
@@ -235,7 +235,7 @@ class ActionBar(context: Context) : FrameLayout(context)
         }
         else
         {
-            titleView!!.apply {
+            titleView.apply {
                 alpha = 1F
                 visibility = View.VISIBLE
             }
@@ -256,20 +256,16 @@ class ActionBar(context: Context) : FrameLayout(context)
 
         var leftWidth = 0
         iosBack?.let {
-            msg("${it.childCount}")
+//            msg("${it.childCount}")
 //            it.measure()
             leftWidth = it.measuredWidth
         }
-
-        msg("\nLEFTW: ${leftWidth}")
 
         var rightWidth = 0
         menu?.let {
             it.measure()
             rightWidth = it.measuredWidth
         }
-
-        msg("RIGHTW: ${rightWidth}")
 
         var availableWidth = measuredWidth - leftWidth - rightWidth
 
@@ -278,9 +274,6 @@ class ActionBar(context: Context) : FrameLayout(context)
             textSize = titleView.textSize
         }
         val textWidth = paint.measureText(title)
-
-        msg("TEXTW: ${textWidth}")
-        msg("AVAILABLE: ${availableWidth}\n")
 
         if ( textWidth > availableWidth )
         {
@@ -353,7 +346,7 @@ class ActionBar(context: Context) : FrameLayout(context)
                 setImageDrawable(backIcon)
             }
             addView(imageView, Layout.ezLinear(
-                Utils.dp(12), Layout.WRAP_CONTENT,
+                Utils.dp(10), Layout.WRAP_CONTENT,
                 Gravity.CENTER_VERTICAL
             ))
 

@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -34,8 +33,8 @@ import tv.ridal.ui.popup.BottomPopup
 import tv.ridal.hdrezka.*
 import tv.ridal.ui.layout.VLinearLayout
 import tv.ridal.ui.measure
-import tv.ridal.util.Utils
 import tv.ridal.ui.msg
+import tv.ridal.util.Utils
 import tv.ridal.ui.setBackgroundColor
 import kotlin.math.abs
 
@@ -46,11 +45,8 @@ class MoviesFragment : BaseAppFragment()
 
     companion object
     {
-        fun newInstance(args: Arguments): MoviesFragment
-        {
-            return MoviesFragment().apply {
-                arguments = args
-            }
+        fun newInstance(args: Arguments) = MoviesFragment().apply {
+            arguments = args
         }
     }
 
@@ -67,10 +63,13 @@ class MoviesFragment : BaseAppFragment()
     }
 
     private var subtitle: String? = null
-        set(value) {
-            if (value == null) return
+        set(value)
+        {
             field = value
-            actionBar.subtitle = subtitle!!
+
+            subtitle?.let {
+                actionBar.subtitle = it
+            }
         }
     private fun updateSubtitle()
     {
@@ -111,16 +110,18 @@ class MoviesFragment : BaseAppFragment()
 
     private lateinit var rootFrame: FrameLayout
     private lateinit var actionBar: ActionBar
-    private lateinit var moviesFrame: FrameLayout
+
     private lateinit var moviesView: RecyclerView
+    private var heightIndicator: Int = 0 // !
+
     private lateinit var filtersButton: FloatingActionButton
 
     private val movies: ArrayList<Movie> = ArrayList()
 
     private var loading: Boolean = false
 
-    private val requestQueue: RequestQueue = Volley.newRequestQueue( App.instance() )
-    private val requestTagMovies: String = "MoviesFragment"
+    private val requestQueue: RequestQueue = App.instance().requestQueue
+    private val moviesTag: String = "moviesTag"
 
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -139,37 +140,39 @@ class MoviesFragment : BaseAppFragment()
         return rootFrame
     }
 
+    override fun onDestroy()
+    {
+        super.onDestroy()
+
+        requestQueue.cancelAll(moviesTag)
+    }
+
 
     private fun createUI()
     {
+        createActionBar()
+        createMoviesView()
+
         rootFrame = FrameLayout(context).apply {
             setBackgroundColor( Theme.color_bg )
-        }
 
-        createActionBar()
-        rootFrame.addView(
-            actionBar, Layout.ezFrame(
+            addView(actionBar, Layout.ezFrame(
                 Layout.MATCH_PARENT, Layout.WRAP_CONTENT,
                 Gravity.TOP
-            )
-        )
+            ))
+            actionBar.measure()
 
-        moviesFrame = FrameLayout(context)
-        rootFrame.addView(
-            moviesFrame, Layout.ezFrame(
+            addView(moviesView, Layout.frame(
                 Layout.MATCH_PARENT, Layout.MATCH_PARENT,
                 Gravity.TOP,
-                0, ActionBar.actionBarHeightDp + 30, 0, 0
-            )
-        )
-
-        createMoviesView()
-        moviesFrame.addView(moviesView)
+                0, actionBar.measuredHeight, 0, 0
+            ))
+        }
 
         if (arguments.filters != HDRezka.Filters.NO_FILTERS)
         {
             createFiltersButton()
-            moviesFrame.addView(
+            rootFrame.addView(
                 filtersButton, Layout.ezFrame(
                     Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
                     Gravity.END or Gravity.BOTTOM,
@@ -183,11 +186,7 @@ class MoviesFragment : BaseAppFragment()
     {
         actionBar = ActionBar(context).apply {
             setPadding(0, Utils.dp(30), 0, 0)
-
-            if ( ! Theme.isDark() ) // если светлая тема
-            {
-                elevation = Utils.dp(5F)
-            }
+            setBackgroundColor( Theme.color(Theme.color_bg) )
 
             addIosBack()
             onBack {
@@ -197,6 +196,95 @@ class MoviesFragment : BaseAppFragment()
             title = arguments.title
         }
     }
+
+    private fun createMoviesView()
+    {
+        moviesView = RecyclerView(context).apply {
+            edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
+                override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
+                    return EdgeEffect(view.context).apply { color = Theme.color(Theme.color_main) }
+                }
+            }
+
+            layoutManager = GridLayoutManager( context, 3 )
+            addItemDecoration( GridSpacingItemDecoration(3, Utils.dp(15)) )
+
+            adapter = MoviesAdapter(movies).apply {
+                onMovieClick {
+                    startFragment( MovieFragment.instance(it) )
+                }
+            }
+
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    val scrollY = computeVerticalScrollOffset()
+                    val range = computeVerticalScrollRange()
+
+                    if ( heightIndicator == 0 ) {
+                        heightIndicator = range / 2
+                    }
+
+                    if ( arguments.filters != HDRezka.Filters.NO_FILTERS )
+                    {
+                        if ( abs(dy) > Utils.dp(2) )
+                        {
+                            filtersButton.apply {
+                                if ( dy > 0 ) hide()
+                                else show()
+                            }
+                        }
+
+                        if ( scrollY == 0 || scrollY == range) {
+                            filtersButton.show()
+                        }
+                    }
+
+                    actionBar.elevation = if ( scrollY > 0 ) {
+                        Utils.dp(5F)
+                    } else {
+                        0F
+                    }
+
+                    if (scrollY > range - heightIndicator)
+                    {
+                        if ( ! loading)
+                        {
+                            loadMovies()
+                        }
+                    }
+                }
+            })
+        }
+    }
+
+    private fun createFiltersButton()
+    {
+        filtersButton = FloatingActionButton(context).apply {
+            setOnTouchListener( InstantPressListener(this) )
+
+            backgroundTintList = ColorStateList.valueOf( Theme.color(Theme.color_main) )
+
+            setImageDrawable( Theme.drawable(R.drawable.sett) )
+            imageTintList = ColorStateList.valueOf( Theme.COLOR_WHITE )
+
+            setOnClickListener {
+                filtersPopup.show()
+            }
+        }
+    }
+
+    private fun createFiltersPopup()
+    {
+        filtersPopup = FiltersPopup().apply {
+            onNewFilters {
+                clearMovies()
+                loadMovies()
+            }
+        }
+    }
+
 
     private fun checkFilters()
     {
@@ -224,70 +312,6 @@ class MoviesFragment : BaseAppFragment()
         }
 
         createFiltersPopup()
-    }
-
-    private fun createFiltersPopup()
-    {
-        filtersPopup = FiltersPopup().apply {
-            onNewFilters {
-                clearMovies()
-                loadMovies()
-            }
-        }
-    }
-
-    private fun createMoviesView()
-    {
-        moviesView = RecyclerView(requireContext()).apply {
-            edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
-                override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
-                    return EdgeEffect(view.context).apply { color = Theme.color(Theme.color_main) }
-                }
-            }
-            clipToPadding = false
-
-            layoutManager = GridLayoutManager(requireContext(), 3)
-            addItemDecoration(GridSpacingItemDecoration(3, Utils.dp(15)))
-
-            adapter = MoviesAdapter(movies).apply {
-                onMovieClick {
-                    val movieFragment = MovieFragment.instance(it)
-                    startFragment(movieFragment)
-                }
-            }
-
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-
-                    val offset = recyclerView.computeVerticalScrollOffset()
-                    val range = recyclerView.computeVerticalScrollRange()
-                    if (offset > range / 2)
-                    {
-                        if ( ! loading)
-                        {
-                            loadMovies()
-                        }
-                    }
-                }
-            })
-        }
-    }
-
-    private fun createFiltersButton()
-    {
-        filtersButton = FloatingActionButton(context).apply {
-            setOnTouchListener( InstantPressListener(this) )
-
-            backgroundTintList = ColorStateList.valueOf(Theme.color(Theme.color_main))
-
-            setImageDrawable(Theme.drawable(R.drawable.sett))
-            imageTintList = ColorStateList.valueOf(Theme.COLOR_WHITE)
-
-            setOnClickListener {
-                filtersPopup.show()
-            }
-        }
     }
 
     private fun loadMovies()
@@ -319,9 +343,7 @@ class MoviesFragment : BaseAppFragment()
             }
         }
 
-        msg(url)
-
-        val moviesRequest = StringRequest(
+        val request = StringRequest(
             Request.Method.GET, url,
             { response ->
                 loading = false
@@ -338,10 +360,10 @@ class MoviesFragment : BaseAppFragment()
                 println("ERROR!")
             }
         ).apply {
-            tag = requestTagMovies
+            tag = moviesTag
         }
 
-        requestQueue.add(moviesRequest)
+        requestQueue.add(request)
     }
 
     private fun clearMovies()
@@ -864,7 +886,6 @@ class MoviesFragment : BaseAppFragment()
                 {
                     // проверить на нулл !!
                     if (filtersView != null) sortingCheckGroup.check( filtersView!!.sortingCell.filterValue, false )
-                    sortingCheckGroup.moveCheckedOnTop()
 
                     scroll.scrollTo(0, 0)
                 }
@@ -953,7 +974,6 @@ class MoviesFragment : BaseAppFragment()
                 {
                     // проверить на нулл !!
                     sectionsCheckGroup.check( filtersView!!.sectionCell!!.filterValue, false )
-                    sectionsCheckGroup.moveCheckedOnTop()
 
                     scroll.scrollTo(0, 0)
                 }
