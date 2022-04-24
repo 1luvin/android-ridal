@@ -45,7 +45,7 @@ class HDRezka
         val URL_ANIME
             get() = url_base + "animation/"
 
-        val section_urls: Array<String> = arrayOf(
+        val sectionUrls: Array<String> = arrayOf(
             URL_FILMS,
             URL_SERIES,
             URL_CARTOONS,

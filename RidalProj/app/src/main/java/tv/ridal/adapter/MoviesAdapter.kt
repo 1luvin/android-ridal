@@ -17,8 +17,6 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
         onMovieClick = l
     }
 
-    var hasViewAll: Boolean = false
-
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
     {
         init
@@ -37,7 +35,7 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
             movieView.apply {
                 posterUrl = current.posterUrl
                 movieName = current.name
-                movieType = current.type.ruType
+                setDetailText(current.type.ruType)
             }
         }
     }
@@ -52,35 +50,16 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
                 Layout.WRAP_CONTENT, Layout.WRAP_CONTENT
             )
         }
-//        else if (AppActivity.currentFragment() is SearchFragment)
-//        {
-//            movieView.layoutParams = RecyclerView.LayoutParams(
-//                Layout.MATCH_PARENT, Layout.MATCH_PARENT
-//            )
-//        }
 
         return ViewHolder(movieView)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int)
     {
-        if (hasViewAll && position == itemCount - 1)
-        {
-
-        }
-        else
-        {
-            holder.bind( movies[position] )
-        }
+        holder.bind( movies[position] )
     }
 
-    override fun getItemCount(): Int
-    {
-        var count = movies.size
-        if (hasViewAll) count++
-
-        return count
-    }
+    override fun getItemCount(): Int = movies.size
 }
 
 

@@ -5,6 +5,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import tv.ridal.hdrezka.Streams.Stream
+import tv.ridal.ui.amount
 import tv.ridal.ui.msg
 
 class Parser
@@ -32,33 +33,47 @@ class Parser
 
                 val cardCover = movieCard.getElementsByClass("b-content__inline_item-cover")[0]
                 val cardLink = movieCard.getElementsByClass("b-content__inline_item-link")[0]
-                // название
+                // Название
                 val name = cardLink.getElementsByTag("a")[0].text()
-                // постер
+                // Ссылка
+                val url = cardLink.getElementsByTag("a")[0].attr("href")
+                // Постер
                 val posterUrl = cardCover.getElementsByTag("img")[0].attr("src")
-                // тип на русском языке
-                val typeText = cardCover.getElementsByClass("entity")[0].text()
+                // Тип, Тип (рейтинг)
+                val entity = cardCover.getElementsByClass("entity")[0]
+
+                val iText = entity.ownText().replace(" ", "")
                 var type: Movie.Type
                 /*
                     Типы "Мультфильм" или "Аниме" могут быть односерийные(фильм) или
                     многосерийные
                  */
-                type = if (typeText == HDRezka.FILM) {
-                    Movie.Type(typeText, false)
-                } else if (typeText == HDRezka.SERIAL) {
-                    Movie.Type(typeText, true)
+                type = if (iText == HDRezka.FILM) {
+                    Movie.Type(iText, false)
+                } else if (iText == HDRezka.SERIAL) {
+                    Movie.Type(iText, true)
                 } else {
                     val info = cardCover.getElementsByClass("info")
-                    if (info.size == 0) {
-                        Movie.Type(typeText, false)
-                    } else {
-                        Movie.Type(typeText, true)
+                    Movie.Type(iText, info.size != 0)
+                }
+
+                var rating: String? = null
+
+                val innerI = entity.getElementsByClass("b-category-bestrating rating-grey-string")
+                if ( innerI.size != 0 )
+                {
+                    val text = innerI[0].ownText()
+                    if ( text.contains('.') )
+                    {
+                        rating = text.amount()
                     }
                 }
-                // ссылка
-                val url = cardLink.getElementsByTag("a")[0].attr("href")
 
-                val movie = Movie(name, posterUrl, type, url)
+                val movie = Movie(name, url).apply {
+                    this.posterUrl = posterUrl
+                    this.type = type
+                    this.rating = rating
+                }
                 movies.add(movie)
             }
 

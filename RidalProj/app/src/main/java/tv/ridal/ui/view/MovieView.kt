@@ -14,33 +14,29 @@ import tv.ridal.util.Theme
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.hdrezka.Loader
+import tv.ridal.ui.amount
 import tv.ridal.util.Utils
 import kotlin.math.ceil
 
 class MovieView(context: Context) : FrameLayout(context)
 {
+    companion object
+    {
+        const val TYPE_MOVIE_TYPE: Int = 0
+        const val TYPE_RATING: Int = 1
+    }
+
     private var posterView: ImageView
+    private var detailView: TextView
+    private var movieNameView: TextView
+
+
     var posterUrl: String = ""
         set(value) {
             field = value
 
             Loader.loadImage(posterUrl, this::onPosterLoaded)
         }
-
-    private fun onPosterLoaded(poster: Drawable?)
-    {
-        if (poster == null) return
-
-        val rawBitmap = (poster as BitmapDrawable).bitmap
-
-        val resizedBitmap = Bitmap.createScaledBitmap(rawBitmap, posterWidthPx, posterHeightPx, false)
-
-        posterDrawable = RoundedBitmapDrawableFactory.create(resources, resizedBitmap).apply {
-            cornerRadius = Utils.dp(6F)
-        }
-
-        posterView.setImageDrawable(posterDrawable)
-    }
 
     private var posterDrawable: Drawable? = null
     private var posterWidthPx = Utils.dp(113)
@@ -65,24 +61,48 @@ class MovieView(context: Context) : FrameLayout(context)
 
     private var posterHeightPx = Utils.dp(170)
 
-    private var movieTypeView: TextView
-    var movieType: String = ""
+    var detailText: String = ""
         set(value) {
             field = value
 
-            movieTypeView.text = movieType
+            //xd
         }
 
-    private var gradientPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    fun setDetailText(text: String, type: Int = TYPE_MOVIE_TYPE)
+    {
+        when (type)
+        {
+            TYPE_MOVIE_TYPE -> detailView.text = text
+            TYPE_RATING -> detailView.text = text.amount()
+        }
+    }
+
+
+    private var gradientPaint = Paint( Paint.ANTI_ALIAS_FLAG )
     private var gradient: LinearGradient
 
-    private var movieNameView: TextView
     var movieName: String? = null
         set(value) {
             field = value
 
             movieNameView.text = movieName
         }
+
+    private fun onPosterLoaded(poster: Drawable?)
+    {
+        if (poster == null) return
+
+        val rawBitmap = (poster as BitmapDrawable).bitmap
+
+        val resizedBitmap = Bitmap.createScaledBitmap(rawBitmap, posterWidthPx, posterHeightPx, false)
+
+        posterDrawable = RoundedBitmapDrawableFactory.create(resources, resizedBitmap).apply {
+            cornerRadius = Utils.dp(6F)
+        }
+
+        posterView.setImageDrawable(posterDrawable)
+    }
+
 
     init
     {
@@ -101,7 +121,7 @@ class MovieView(context: Context) : FrameLayout(context)
             Gravity.START or Gravity.TOP
         ))
 
-        movieTypeView = TextView(context).apply {
+        detailView = TextView(context).apply {
             setPadding(Utils.dp(5), Utils.dp(2), Utils.dp(5), Utils.dp(2))
 
             background = Theme.rect(
@@ -111,14 +131,14 @@ class MovieView(context: Context) : FrameLayout(context)
                 )
             )
 
-            setTextColor( Theme.COLOR_WHITE )
+            setTextColor( Color.WHITE )
             textSize = 13F
             typeface = Theme.typeface(Theme.tf_bold)
             setLines(1)
             maxLines = 1
             isSingleLine = true
         }
-        addView(movieTypeView, Layout.frame(
+        addView(detailView, Layout.frame(
             Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
             Gravity.END or Gravity.TOP
         ))
@@ -126,14 +146,14 @@ class MovieView(context: Context) : FrameLayout(context)
         gradient = LinearGradient(
             0F, posterHeightPx + 0F, 0F, posterHeightPx / 2F,
             Theme.color(Theme.color_bg),
-            Theme.COLOR_TRANSPARENT,
+            Color.TRANSPARENT,
             Shader.TileMode.CLAMP
         )
         gradientPaint.shader = gradient
 
         movieNameView = RTextView(context).apply {
             setTextColor( Theme.color_text )
-            textSize = 16F
+            textSize = 15.2F
             typeface = Theme.typeface(Theme.tf_bold)
             setLines(1)
             maxLines = 1
@@ -151,11 +171,11 @@ class MovieView(context: Context) : FrameLayout(context)
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
 
-        if (widthMode == MeasureSpec.UNSPECIFIED)
+        if ( widthMode == MeasureSpec.UNSPECIFIED )
         {
             posterWidthPx = Utils.dp(113)
         }
-        else if (widthMode == MeasureSpec.EXACTLY)
+        else if ( widthMode == MeasureSpec.EXACTLY )
         {
             posterWidthPx = width
         }
@@ -163,19 +183,18 @@ class MovieView(context: Context) : FrameLayout(context)
         val nameHeight = Utils.dp(30)
 
         super.onMeasure(
-            MeasureSpec.makeMeasureSpec(posterWidthPx, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(posterHeightPx + nameHeight, MeasureSpec.EXACTLY)
+            MeasureSpec.makeMeasureSpec( posterWidthPx, MeasureSpec.EXACTLY ),
+            MeasureSpec.makeMeasureSpec( posterHeightPx + nameHeight, MeasureSpec.EXACTLY )
         )
 
-        var availableWidth = measuredWidth - Utils.dp(20)
-        movieTypeView.measure(
+        val availableWidth = measuredWidth - Utils.dp(20)
+        detailView.measure(
             MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
             0
         )
 
-        availableWidth = measuredWidth
         movieNameView.measure(
-            MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
+            MeasureSpec.makeMeasureSpec( measuredWidth, MeasureSpec.AT_MOST ),
             MeasureSpec.makeMeasureSpec( nameHeight, MeasureSpec.AT_MOST )
         )
     }
@@ -184,7 +203,12 @@ class MovieView(context: Context) : FrameLayout(context)
     {
         super.dispatchDraw(canvas)
 
-        canvas.drawRect(0F, posterHeightPx / 2F, posterWidthPx + 0F, posterHeightPx + Utils.dp(1F), gradientPaint)
+        canvas.drawRect(
+            0F,
+            posterHeightPx / 2F,
+            posterWidthPx + 0F,
+            posterHeightPx + Utils.dp(1F),
+            gradientPaint)
     }
 
 }

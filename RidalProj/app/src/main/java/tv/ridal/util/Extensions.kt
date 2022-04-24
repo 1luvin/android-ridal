@@ -24,6 +24,12 @@ fun msg(msg: String)
     Log.d("msg", msg)
 }
 
+// String
+
+// Extracts first float number found in string
+fun String.amount(): String = substring(indexOfFirst { it.isDigit() }, indexOfLast { it.isDigit() } + 1)
+    .filter { it.isDigit() || it == '.' }
+
 // View
 
 fun View.setPaddings(padding: Int)

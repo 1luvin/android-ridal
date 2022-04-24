@@ -2,7 +2,6 @@ package tv.ridal
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Rect
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
@@ -28,6 +27,8 @@ import tv.ridal.util.Utils
 import tv.ridal.ui.*
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.listener.InstantPressListener
+import tv.ridal.ui.recyclerview.EdgeColorEffect
+import tv.ridal.ui.recyclerview.SpacingItemDecoration
 import tv.ridal.ui.view.RTextView
 
 class CatalogFragment : BaseAppFragment()
@@ -35,13 +36,19 @@ class CatalogFragment : BaseAppFragment()
     override val stableTag: String
         get() = "CatalogFragment"
 
+
     private lateinit var rootLayout: FrameLayout
     private lateinit var scroll: NestedScrollView
-    private lateinit var scrollLayout: LinearLayout
+    private lateinit var layout: LinearLayout
     private lateinit var actionBar: BigActionBar
     private val sectionViews: ArrayList<SectionView> = ArrayList()
 
     private val requestQueue: RequestQueue = App.instance().requestQueue
+
+    private val sectionUrls: Array<String> by lazy {
+        HDRezka.sectionUrls
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -57,28 +64,34 @@ class CatalogFragment : BaseAppFragment()
         return rootLayout
     }
 
+
     private fun createUI()
     {
-        rootLayout = FrameLayout(requireContext()).apply {
-            setBackgroundColor( Theme.color_bg )
-        }
-
-        scroll = NestedScrollView(requireContext()).apply {
-            isVerticalScrollBarEnabled = false
-        }
-        scrollLayout = VLinearLayout(requireContext())
-        scroll.addView(scrollLayout)
-
-        rootLayout.addView(scroll)
-
         createActionBar()
-        scrollLayout.addView(actionBar)
 
-        for (i in HDRezka.section_urls.indices)
-        {
-            val view = SectionView(requireContext())
-            sectionViews.add(view)
-            scrollLayout.addView(view)
+        layout = VLinearLayout( requireContext() ).apply {
+            addView(actionBar)
+
+            post {
+                for (i in sectionUrls.indices)
+                {
+                    val view = SectionView( requireContext() )
+                    sectionViews.add(view)
+                    layout.addView(view)
+                }
+            }
+        }
+
+        scroll = NestedScrollView( requireContext() ).apply {
+            isVerticalScrollBarEnabled = false
+
+            addView(layout)
+        }
+
+        rootLayout = FrameLayout( requireContext() ).apply {
+            setBackgroundColor( Theme.color_bg )
+
+            addView(scroll)
         }
     }
 
@@ -117,9 +130,9 @@ class CatalogFragment : BaseAppFragment()
 
     private fun loadSections()
     {
-        val urls = HDRezka.section_urls
+        val urls = HDRezka.sectionUrls
 
-        val sectionNames = listOf(
+        val sectionNames = arrayOf(
             Locale.string(R.string.films),
             Locale.string(R.string.series),
             Locale.string(R.string.cartoons),
@@ -136,19 +149,10 @@ class CatalogFragment : BaseAppFragment()
                         sectionName = sectionNames[i]
                         sectionSubtext = Parser.parseSectionMoviesSize(response)
 
-                        movies.addAll( Parser.parseMovies(response, 10)!! )
-                        updateMovies()
+                        setMovies( Parser.parseMovies(response, 10)!! )
 
                         onOpen {
-                            val args = MoviesFragment.Arguments().apply {
-                                title = sectionView.sectionName
-                                url = urls[i]
-
-                                filters = HDRezka.Filters.GENRE_SORTING
-                            }
-                            startFragment(
-                                MoviesFragment.newInstance(args)
-                            )
+                            startMoviesFragment(sectionName, urls[i])
                         }
 
                         onMovieClick {
@@ -160,12 +164,29 @@ class CatalogFragment : BaseAppFragment()
                     println("ERROR!")
                 }
             )
+
             requestQueue.add(request)
         }
     }
 
+    private fun startMoviesFragment(title: String, url: String)
+    {
+        val args = MoviesFragment.Arguments().apply {
+            this.title = title
+            this.url = url
+            filters = HDRezka.Filters.GENRE_SORTING
+        }
+
+        startFragment( MoviesFragment.newInstance(args) )
+    }
+
+
     inner class SectionView(context: Context) : VLinearLayout(context)
     {
+        private lateinit var headerCell: SectionCell
+        private lateinit var moviesView: RecyclerView
+        private lateinit var moviesAdapter: RecyclerView.Adapter<MoviesAdapter.ViewHolder>
+
         private var onOpen: (() -> Unit)? = null
         fun onOpen(l: () -> Unit)
         {
@@ -192,16 +213,13 @@ class CatalogFragment : BaseAppFragment()
                 headerCell.sectionSubtext = sectionSubtext
             }
 
-        var movies: ArrayList<Movie> = ArrayList()
-            private set
-        fun updateMovies()
+
+        private val movies: ArrayList<Movie> = ArrayList()
+        fun setMovies(movies: ArrayList<Movie>)
         {
+            this.movies.addAll(movies)
             moviesAdapter.notifyDataSetChanged()
         }
-
-        private lateinit var headerCell: SectionCell
-        private lateinit var moviesView: RecyclerView
-        private lateinit var moviesAdapter: RecyclerView.Adapter<MoviesAdapter.ViewHolder>
 
         init
         {
@@ -230,29 +248,10 @@ class CatalogFragment : BaseAppFragment()
         private fun createMoviesView()
         {
             moviesView = RecyclerView(context).apply {
-                setPadding(Utils.dp(5), Utils.dp(5), Utils.dp(5), Utils.dp(5))
+                setPadding( Utils.dp(20), Utils.dp(5), Utils.dp(20), Utils.dp(5) )
                 clipToPadding = false
-
-                edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
-                    override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
-                        return EdgeEffect(view.context).apply { color = Theme.color(Theme.color_main) }
-                    }
-                }
-
-                addItemDecoration(object : RecyclerView.ItemDecoration() {
-                    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State)
-                    {
-                        super.getItemOffsets(outRect, view, parent, state)
-
-                        val position = parent.getChildAdapterPosition(view)
-                        val size = adapter!!.itemCount
-
-                        outRect.left = Utils.dp(15)
-
-                        if (position == size - 1)
-                            outRect.right = Utils.dp(15)
-                    }
-                })
+                edgeEffectFactory = EdgeColorEffect( Theme.mainColor )
+                addItemDecoration( SpacingItemDecoration( Utils.dp(13) ) )
 
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
@@ -271,20 +270,20 @@ class CatalogFragment : BaseAppFragment()
     inner class SectionCell(context: Context) : FrameLayout(context)
     {
         private var sectionNameView: TextView
+        private var sectionSubtextView: TextView
+        private var pointerImage: ImageView
+
         var sectionName: String = ""
             set(value) {
                 field = value
                 sectionNameView.text = sectionName
             }
 
-        private var sectionSubtextView: TextView
         var sectionSubtext: String = ""
             set(value) {
                 field = value
                 sectionSubtextView.text = sectionSubtext
             }
-
-        private var pointerImage: ImageView
 
         init
         {
@@ -309,6 +308,7 @@ class CatalogFragment : BaseAppFragment()
             sectionSubtextView = RTextView(context).apply {
                 setTextColor( Theme.color_text2 )
                 textSize = 14F
+                setTypeface( Theme.tf_normal )
                 setLines(1)
                 maxLines = 1
                 isSingleLine = true

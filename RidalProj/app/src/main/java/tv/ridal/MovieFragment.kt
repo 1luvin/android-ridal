@@ -520,14 +520,14 @@ class MovieFragment : BaseAppFragment()
 
                     setOnClickListener {
                         val args = MoviesFragment.Arguments().apply {
-                            title = HDRezka.getSectionNameByMovieType(movie.type.ruType)
+                            title = HDRezka.getSectionNameByMovieType(movie.type!!.ruType)
                             url = genre.url
 
                             filters = HDRezka.Filters.GENRE_SORTING
 
                             applyGenre = genre.name
                         }
-                        startFragment(MoviesFragment.newInstance(args))
+                        startFragment( MoviesFragment.newInstance(args) )
                     }
                 }
                 layout.addView(genreCell)

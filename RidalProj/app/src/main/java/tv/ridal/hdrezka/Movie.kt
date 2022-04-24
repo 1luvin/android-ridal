@@ -1,8 +1,12 @@
 package tv.ridal.hdrezka
 
 
-data class Movie(val name: String, val posterUrl: String, val type: Type, val url: String)
+data class Movie(val name: String, val url: String)
 {
+    var posterUrl: String? = null
+    var type: Movie.Type? = null
+    var rating: String? = null
+
     data class Type(val ruType: String, val isSerial: Boolean)
 
     class Info

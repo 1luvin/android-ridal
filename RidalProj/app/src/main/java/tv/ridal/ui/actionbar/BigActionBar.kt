@@ -11,10 +11,15 @@ import android.widget.TextView
 import tv.ridal.util.Theme
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
+import tv.ridal.ui.measure
 import tv.ridal.util.Utils
 
 class BigActionBar(context: Context) : FrameLayout(context)
 {
+    private val barHeight: Int = Utils.dp(90)
+    private val horizontalPadding: Int = Utils.dp(20)
+    private val menuIndent: Int = Utils.dp(15)
+
     private var titleView: TextView
 
     var title: String = ""
@@ -22,8 +27,6 @@ class BigActionBar(context: Context) : FrameLayout(context)
             field = value
 
             titleView.text = title
-
-            titleView.measure(0, 0)
         }
     var titleColor: Int = Theme.color(Theme.color_text)
         set(value) {
@@ -33,21 +36,26 @@ class BigActionBar(context: Context) : FrameLayout(context)
         }
 
     var menu: BigActionBar.Menu? = null
-        set(value) {
-            value ?: return
+        set(value)
+        {
+            menu?.let {
+                removeView(it)
+            }
+
             field = value
 
-//            menu!!.measure(0, 0)
-//            val menuWidth = menu!!.measuredWidth
-
-            this.addView(menu!!, Layout.ezFrame(
-                Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-                Gravity.END or Gravity.CENTER_VERTICAL
-            ))
+            menu?.let {
+                addView(it, Layout.ezFrame(
+                    Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
+                    Gravity.END or Gravity.CENTER_VERTICAL
+                ))
+            }
         }
 
     init
     {
+        setPadding(horizontalPadding, 0, horizontalPadding, 0)
+
         titleView = TextView(context).apply {
             setTextColor(titleColor)
             textSize = 36F
@@ -57,38 +65,40 @@ class BigActionBar(context: Context) : FrameLayout(context)
             isSingleLine = true
             ellipsize = TextUtils.TruncateAt.END
         }
-        addView(titleView, Layout.ezFrame(
-            Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-            Gravity.START or Gravity.CENTER_VERTICAL,
-            25, 0, 25, 0
+        addView(titleView, Layout.frame(
+            Layout.MATCH_PARENT, Layout.WRAP_CONTENT,
+            Gravity.START or Gravity.CENTER_VERTICAL
         ))
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
     {
-        if (menu != null)
-        {
-            menu!!.measure(0, 0)
-            val menuWidth = menu!!.measuredWidth
+        super.onMeasure(
+            MeasureSpec.makeMeasureSpec( MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY ),
+            MeasureSpec.makeMeasureSpec( paddingTop + barHeight + paddingBottom, MeasureSpec.EXACTLY )
+        )
 
-            titleView.layoutParams = Layout.ezFrame(
-                Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
+        menu?.let {
+            it.measure()
+
+            titleView.layoutParams = Layout.frame(
+                Layout.MATCH_PARENT, Layout.WRAP_CONTENT,
                 Gravity.START or Gravity.CENTER_VERTICAL,
-                25, 0, Utils.px(menuWidth), 0
+                0, 0, menuIndent + it.measuredWidth, 0
             )
         }
+    }
 
-        setMeasuredDimension(
-            MeasureSpec.getSize(widthMeasureSpec),
-            paddingTop + Utils.dp(90) + paddingBottom
-        )
+    override fun setPadding(left: Int, top: Int, right: Int, bottom: Int)
+    {
+        super.setPadding(horizontalPadding, top, horizontalPadding, bottom)
     }
 
     class Menu(context: Context) : LinearLayout(context)
     {
         init
         {
-            setPadding(Utils.dp(15), 0, Utils.dp(25), 0)
+
         }
 
         fun addItem(drawable: Drawable, onClick: (() -> Unit)? = null)
@@ -96,16 +106,16 @@ class BigActionBar(context: Context) : FrameLayout(context)
             val itemView = createItemView().apply {
                 setImageDrawable(drawable)
 
-                if (onClick != null) {
-                    setOnClickListener {
-                        onClick.invoke()
+                onClick?.let {
+                    setOnClickListener { _ ->
+                        it.invoke()
                     }
                 }
             }
 
             addView(itemView, Layout.ezLinear(
                 40, 40,
-                if (itemsCount() != 0) 15 else 0, 0, 0, 0
+                if (itemsCount() != 0) 13 else 0, 0, 0, 0
             ))
         }
 
@@ -113,31 +123,20 @@ class BigActionBar(context: Context) : FrameLayout(context)
         {
             return ImageView(context).apply {
                 isClickable = true
-                setOnTouchListener(InstantPressListener(this))
+                setOnTouchListener( InstantPressListener(this) )
 
-                background = Theme.rect( Theme.overlayColor(Theme.color_bg), radii = FloatArray(4).apply {
-                    fill( Utils.dp(10F) )
-                } )
+                background = Theme.rect(
+                    Theme.overlayColor(Theme.color_bg, 0.04F),
+                    radii = FloatArray(4).apply {
+                        fill( Utils.dp(10F) )
+                    }
+                )
 
                 scaleType = ImageView.ScaleType.CENTER
             }
         }
 
-        private fun itemsCount(): Int = this.childCount
-
-        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
-        {
-            var width = paddingLeft + Utils.dp(40) * itemsCount()
-            if (itemsCount() > 1) {
-                width += Utils.dp(15) * (itemsCount() - 1)
-            }
-            width += paddingRight
-
-            super.onMeasure(
-                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec), MeasureSpec.UNSPECIFIED)
-            )
-        }
+        private fun itemsCount(): Int = childCount
     }
 
 }
