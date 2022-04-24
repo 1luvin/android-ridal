@@ -3,13 +3,28 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable-v24/pointer_forward_mini.xml" value="0.2265" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/back.xml" value="0.2265" />
         <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/bottom_popup.xml" value="0.2215" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/close.xml" value="0.2265" />
         <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/done.xml" value="0.223" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/done_bold.xml" value="0.2265" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/favourites.xml" value="0.2265" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/folder_new.xml" value="0.2265" />
         <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.2245" />
         <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/imdb.xml" value="0.222" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/invite.xml" value="0.2265" />
         <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/ios_back.xml" value="0.2265" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/kp.xml" value="0.2265" />
         <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/loading_popup.xml" value="0.2215" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/nav.xml" value="0.2265" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/play.xml" value="0.2265" />
         <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/pointer_forward.xml" value="0.2265" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/refresh.xml" value="0.2265" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/remove.xml" value="0.2265" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/search.xml" value="0.2265" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/sett.xml" value="0.2265" />
+        <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/drawable/time.xml" value="0.2265" />
         <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/layout/activity_application.xml" value="0.34479166666666666" />
         <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/layout/layout_bottom_sheet.xml" value="0.34479166666666666" />
         <entry key="..\:/__PRIVATE/AndroidProjects/Ridal/RidalProj/app/src/main/res/menu/bottom.xml" value="0.34479166666666666" />

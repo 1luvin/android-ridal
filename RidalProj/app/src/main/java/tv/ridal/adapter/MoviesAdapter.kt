@@ -2,12 +2,15 @@ package tv.ridal.adapter
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import tv.ridal.AppActivity
 import tv.ridal.CatalogFragment
+import tv.ridal.MoviesFragment
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.view.MovieView
 import tv.ridal.hdrezka.Movie
+import tv.ridal.ui.msg
 
 class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter<MoviesAdapter.ViewHolder>()
 {
@@ -33,9 +36,11 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
         {
             val movieView = itemView as MovieView
             movieView.apply {
-                posterUrl = current.posterUrl
+                current.posterUrl?.let {
+                    posterUrl = it
+                }
                 movieName = current.name
-                setDetailText(current.type.ruType)
+//                setDetailText(current.type.ruType)
             }
         }
     }

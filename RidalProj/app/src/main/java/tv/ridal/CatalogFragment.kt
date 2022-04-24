@@ -156,7 +156,7 @@ class CatalogFragment : BaseAppFragment()
                         }
 
                         onMovieClick {
-                            startFragment( MovieFragment.instance(it) )
+                            startFragment( MovieFragment.newInstance(it) )
                         }
                     }
                 },

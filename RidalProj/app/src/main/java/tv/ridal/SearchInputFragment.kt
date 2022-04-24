@@ -286,12 +286,10 @@ class SearchInputFragment : BaseAppFragment()
     {
         val movie = Movie(
             searchResult.movieName,
-            "",
-            Movie.Type(HDRezka.FILM, false),
             searchResult.movieUrl
         )
         startFragment(
-            MovieFragment.instance(movie)
+            MovieFragment.newInstance(movie)
         )
     }
 

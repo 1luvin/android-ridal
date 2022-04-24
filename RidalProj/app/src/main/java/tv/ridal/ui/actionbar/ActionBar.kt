@@ -8,6 +8,7 @@ import android.content.Context
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
@@ -158,31 +159,31 @@ class ActionBar(context: Context) : FrameLayout(context)
     }
 
 
-    fun setBackgrounds(layers: Array<out Drawable>)
+    fun enableOnlyBackButton(enable: Boolean, animated: Boolean = true)
     {
-        background = MultiDrawable(layers).apply {
-            crossfadeDuration = 170
+        if ( background !is MultiDrawable )
+        {
+            background = MultiDrawable(
+                arrayOf(
+                    background,
+                    Theme.rect(
+                        Theme.Fill( intArrayOf(Theme.alphaColor(Theme.COLOR_BLACK, 0.5F), Theme.COLOR_TRANSPARENT), GradientDrawable.Orientation.TOP_BOTTOM )
+                    )
+                ),
+                show = if (enable) 1 else 0
+            )
         }
-    }
 
-    fun showBackground(index: Int)
-    {
-        if (background !is MultiDrawable) return
-
+        // background
         (background as MultiDrawable).apply {
-            show(index)
+            if (animated) crossfadeDuration = 170
+            show( if (enable) 1 else 0, animated )
         }
-    }
-
-
-
-    fun hideTitle(animated: Boolean = true)
-    {
-        if (titleView.visibility == View.GONE) return
-
+        // title
+        val toAlpha = if (enable) 0F else 1F
         if (animated)
         {
-            ValueAnimator.ofFloat(titleView.alpha, 0F).apply {
+            ValueAnimator.ofFloat(titleView.alpha, toAlpha).apply {
                 duration = 170
 
                 addUpdateListener {
@@ -190,10 +191,16 @@ class ActionBar(context: Context) : FrameLayout(context)
                 }
 
                 addListener(object : AnimatorListenerAdapter(){
+                    override fun onAnimationStart(animation: Animator?)
+                    {
+                        super.onAnimationStart(animation)
+
+                        if ( ! enable) titleView.visibility = View.VISIBLE
+                    }
                     override fun onAnimationEnd(animation: Animator?) {
                         super.onAnimationEnd(animation)
 
-                        titleView.visibility = View.GONE
+                        if (enable) titleView.visibility = View.GONE
                     }
                 })
 
@@ -203,41 +210,8 @@ class ActionBar(context: Context) : FrameLayout(context)
         else
         {
             titleView.apply {
-                alpha = 0F
-                visibility = View.GONE
-            }
-        }
-    }
-
-    fun showTitle(animated: Boolean = true)
-    {
-        if (titleView.visibility == View.VISIBLE) return
-
-        if (animated)
-        {
-            ValueAnimator.ofFloat(titleView.alpha, 1F).apply {
-                duration = 170
-
-                addUpdateListener {
-                    titleView.alpha = it.animatedValue as Float
-                }
-
-                addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationStart(animation: Animator?) {
-                        super.onAnimationStart(animation)
-
-                        titleView.visibility = View.VISIBLE
-                    }
-                })
-
-                start()
-            }
-        }
-        else
-        {
-            titleView.apply {
-                alpha = 1F
-                visibility = View.VISIBLE
+                alpha = toAlpha
+                visibility = if (enable) View.GONE else View.VISIBLE
             }
         }
     }

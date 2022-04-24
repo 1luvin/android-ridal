@@ -107,6 +107,13 @@ class AppActivity : BaseActivity()
                 Theme.color(Theme.color_bottomNavBg)
             )
 
+            itemRippleColor = ColorStateList.valueOf(
+                Theme.alphaColor(
+                    Theme.mainColor,
+                    0.05F
+                )
+            )
+
             itemIconTintList = ColorStateList(
                 arrayOf(
                     intArrayOf(-android.R.attr.state_checked),
@@ -118,15 +125,19 @@ class AppActivity : BaseActivity()
                 )
             )
 
-            itemRippleColor = ColorStateList.valueOf(
-                Theme.alphaColor(
-                    Theme.mainColor,
-                    0.05F
+            itemTextColor = ColorStateList(
+                arrayOf(
+                    intArrayOf(-android.R.attr.state_checked),
+                    intArrayOf(android.R.attr.state_checked)
+                ),
+                intArrayOf(
+                    Theme.color(Theme.color_bottomNavIcon_inactive),
+                    Theme.color(Theme.color_bottomNavIcon_active),
                 )
             )
         }
 
-        onBackPressedDispatcher.addCallback(this) { if (!multiStackNavigator.pop()) finish() }
+        onBackPressedDispatcher.addCallback(this) { if ( ! multiStackNavigator.pop() ) finish() }
     }
 
     override fun onResume()

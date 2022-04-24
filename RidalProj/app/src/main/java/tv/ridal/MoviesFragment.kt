@@ -33,7 +33,6 @@ import tv.ridal.ui.popup.BottomPopup
 import tv.ridal.hdrezka.*
 import tv.ridal.ui.layout.VLinearLayout
 import tv.ridal.ui.measure
-import tv.ridal.ui.msg
 import tv.ridal.util.Utils
 import tv.ridal.ui.setBackgroundColor
 import kotlin.math.abs
@@ -200,6 +199,9 @@ class MoviesFragment : BaseAppFragment()
     private fun createMoviesView()
     {
         moviesView = RecyclerView(context).apply {
+            setPadding( Utils.dp(7), 0, Utils.dp(7), 0 )
+            clipToPadding = false
+
             edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
                 override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
                     return EdgeEffect(view.context).apply { color = Theme.color(Theme.color_main) }
@@ -207,11 +209,11 @@ class MoviesFragment : BaseAppFragment()
             }
 
             layoutManager = GridLayoutManager( context, 3 )
-            addItemDecoration( GridSpacingItemDecoration(3, Utils.dp(15)) )
+            addItemDecoration( GridSpacingItemDecoration(3, Utils.dp(13)) )
 
             adapter = MoviesAdapter(movies).apply {
                 onMovieClick {
-                    startFragment( MovieFragment.instance(it) )
+                    startFragment( MovieFragment.newInstance(it) )
                 }
             }
 

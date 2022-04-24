@@ -1,12 +1,7 @@
 package tv.ridal
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
-import android.animation.ValueAnimator
-import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
@@ -14,11 +9,8 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.*
-import android.view.animation.DecelerateInterpolator
-import android.webkit.JavascriptInterface
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.*
+import androidx.core.view.contains
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,36 +23,24 @@ import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import tv.ridal.util.Locale
 import tv.ridal.util.Theme
 import tv.ridal.hdrezka.HDRezka
 import tv.ridal.ui.layout.Layout
 import tv.ridal.hdrezka.Movie
-import tv.ridal.hdrezka.Pager
 import tv.ridal.hdrezka.Parser
-import tv.ridal.hdrezka.Streams.FilmStreamData
-import tv.ridal.hdrezka.Streams.SeriesStreamData
-import tv.ridal.hdrezka.Streams.Stream
-import tv.ridal.hdrezka.Streams.StreamData
 import tv.ridal.ui.actionbar.ActionBar
 import tv.ridal.adapter.PeopleAdapter
 import tv.ridal.ui.cell.PointerCell
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.VLinearLayout
-import tv.ridal.ui.popup.BottomPopup
-import tv.ridal.ui.popup.LoadingPopup
 import tv.ridal.ui.recyclerview.SpacingItemDecoration
 import tv.ridal.ui.popup.ImagePopup
+import tv.ridal.ui.recyclerview.EdgeColorEffect
 import tv.ridal.ui.view.RTextView
 import tv.ridal.util.Utils
 import tv.ridal.ui.setBackgroundColor
 import tv.ridal.ui.view.DropdownTextLayout
-import kotlin.math.abs
 import kotlin.random.Random
 
 class MovieFragment : BaseAppFragment()
@@ -68,23 +48,19 @@ class MovieFragment : BaseAppFragment()
     override val stableTag: String
         get() = "Movie${Random.nextInt()}"
 
+
     companion object
     {
-        fun instance(movie: Movie) = MovieFragment().apply {
+        fun newInstance(movie: Movie) = MovieFragment().apply {
             this.movie = movie
         }
     }
 
-    private lateinit var movie: Movie
-    private lateinit var movieInfo: Movie.Info
-
-    private val requestQueue: RequestQueue = App.instance().requestQueue
-    private val requestTag: String = stableTag
 
     private lateinit var rootFrame: FrameLayout
     private lateinit var actionBar: ActionBar
     private lateinit var scroll: NestedScrollView
-    private lateinit var scrollLayout: LinearLayout
+    private lateinit var layout: LinearLayout
 
     private lateinit var headerView: HeaderView
     private var actorsView: RecyclerView? = null
@@ -93,13 +69,11 @@ class MovieFragment : BaseAppFragment()
     private lateinit var watchButton: Button
     private lateinit var watchFab: FloatingActionButton
 
-    private var watchSettingsPopup: WatchSettingsPopup? = null
-    private lateinit var webView: WebView
-    private lateinit var webViewInterface: JSInterface
-    private var document: Document? = null
+    private lateinit var movie: Movie
+    private lateinit var movieInfo: Movie.Info
 
-
-    private val loadingPopup: LoadingPopup = LoadingPopup(context)
+    private val requestQueue: RequestQueue = App.instance().requestQueue
+    private val requestTag: String = stableTag
 
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -113,62 +87,43 @@ class MovieFragment : BaseAppFragment()
         createUI()
     }
 
-    override fun onDestroy()
-    {
-        super.onDestroy()
-
-        enableDarkStatusBar( ! Theme.isDark() )
-
-        requestQueue.cancelAll(requestTag)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         return rootFrame
     }
 
-
-    private fun loadMovieInfo()
+    override fun onDestroy()
     {
-        val request = StringRequest(Request.Method.GET, movie.url,
-            { response ->
-                movieInfo = Parser.parseMovieInfo(response)
-                fillMovieInfo()
-            },
-            {
-                println("ERROR!")
-            }
-        ).apply {
-            tag = requestTag
-        }
+        super.onDestroy()
 
-        requestQueue.add(request)
+        requestQueue.cancelAll(requestTag)
+
+        enableDarkStatusBar( ! Theme.isDark() )
     }
+
 
     private fun createUI()
     {
-        rootFrame = FrameLayout(context).apply {
-            setBackgroundColor( Theme.color_bg )
-        }
-
-        createScroll()
-        scrollLayout = VLinearLayout(context)
-        scroll.addView(scrollLayout)
-
         headerView = HeaderView()
         createWatchButtons()
-        scrollLayout.apply {
+        layout = VLinearLayout(context).apply {
             addView(headerView)
+
             addView(watchButton, Layout.ezLinear(
-                Layout.MATCH_PARENT, 46,
+                Layout.MATCH_PARENT, 44,
                 Gravity.CENTER_HORIZONTAL,
                 20, 10, 20, 15
             ))
         }
 
+        createScroll()
+        scroll.addView(layout)
+
         createActionBar()
 
-        rootFrame.apply {
+        rootFrame = FrameLayout(context).apply {
+            setBackgroundColor( Theme.color_bg )
+
             addView(scroll)
 
             addView(actionBar, Layout.ezFrame(
@@ -187,33 +142,16 @@ class MovieFragment : BaseAppFragment()
     {
         actionBar = ActionBar(context).apply {
             setPadding(0, Utils.dp(30), 0, 0)
-            /*
-            2 background служат для того чтобы менять их в зависимости от положения на экране
-            для того чтобы ActionBar не закрывал постер, background делаем прозрачным
-            когда пользователь проскролливает постер, background делаем цветным
-             */
-            setBackgrounds(
-                arrayOf(
-                    Theme.rect(
-                        Theme.Fill( intArrayOf(Theme.alphaColor(Theme.COLOR_BLACK, 0.5F), Theme.COLOR_TRANSPARENT), GradientDrawable.Orientation.TOP_BOTTOM )
-                    ),
-                    Theme.rect( Theme.color_actionBar_bg )
-                )
-            )
-            /*
-            изначально кнопка "Назад" белого цвета в независимости от выбранной темы
-             */
+
+            background = Theme.rect( Theme.color_bg )
+            enableOnlyBackButton(enable = true, animated = false)
+
             addIosBack(type = ActionBar.IosBack.Type.ICON)
             onBack {
                 finish()
             }
 
             title = movie.name
-            /*
-            сразу прячем title, так как его нужно показывать только тогда,
-            когда пользователь проскролит постер
-             */
-            hideTitle(false)
         }
     }
 
@@ -228,8 +166,7 @@ class MovieFragment : BaseAppFragment()
                 {
                     enableDarkStatusBar( ! Theme.isDark() )
                     actionBar.apply {
-                        showBackground(1)
-                        showTitle()
+                        enableOnlyBackButton(false)
                     }
                     watchFab.show()
                 }
@@ -237,8 +174,7 @@ class MovieFragment : BaseAppFragment()
                 {
                     enableDarkStatusBar(false)
                     actionBar.apply {
-                        showBackground(0)
-                        hideTitle()
+                        enableOnlyBackButton(true)
                     }
                     watchFab.hide()
                 }
@@ -265,29 +201,20 @@ class MovieFragment : BaseAppFragment()
             iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
 
             letterSpacing = 0.0F
-            setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.5F)
+            setTextSize( TypedValue.COMPLEX_UNIT_DIP, 16.5F )
             isAllCaps = false
             typeface = Theme.typeface(Theme.tf_bold)
-            setTextColor(Theme.COLOR_WHITE)
-            text = Locale.string(R.string.watch)
+            setTextColor( Color.WHITE )
 
-            setOnClickListener {
-                onWatch()
-            }
+            text = Locale.string(R.string.watch)
         }
 
         watchFab = FloatingActionButton(context).apply {
-            setOnTouchListener( InstantPressListener(this) )
+            backgroundTintList = ColorStateList.valueOf( Theme.mainColor )
+            rippleColor = Color.TRANSPARENT
 
-            backgroundTintList = ColorStateList.valueOf(Theme.color(Theme.color_main))
-            rippleColor = Theme.COLOR_TRANSPARENT
-
-            setImageDrawable(Theme.drawable(R.drawable.play))
-            imageTintList = ColorStateList.valueOf(Theme.COLOR_WHITE)
-
-            setOnClickListener {
-                onWatch()
-            }
+            setImageDrawable( Theme.drawable(R.drawable.play) )
+            imageTintList = ColorStateList.valueOf( Color.WHITE )
 
             hide()
         }
@@ -296,17 +223,13 @@ class MovieFragment : BaseAppFragment()
     private fun createPeopleView(people: ArrayList<Movie.NameUrl>) : RecyclerView
     {
         return RecyclerView(context).apply {
-            setPadding(Utils.dp(8), 0, Utils.dp(8), 0)
+            setPadding( Utils.dp(20), 0, Utils.dp(20), 0 )
             clipToPadding = false
 
-            edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
-                override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
-                    return EdgeEffect(view.context).apply { color = Theme.color(Theme.color_main) }
-                }
-            }
+            edgeEffectFactory = EdgeColorEffect( Theme.mainColor )
 
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            addItemDecoration( SpacingItemDecoration(Utils.dp(12), Utils.dp(5), Utils.dp(10)) )
+            addItemDecoration( SpacingItemDecoration( Utils.dp(11) ) )
 
             adapter = PeopleAdapter(people).apply {
                 onPersonClick {
@@ -319,6 +242,24 @@ class MovieFragment : BaseAppFragment()
         }
     }
 
+
+    private fun loadMovieInfo()
+    {
+        val request = StringRequest(Request.Method.GET, movie.url,
+            { response ->
+                movieInfo = Parser.parseMovieInfo(response)
+                fillMovieInfo()
+            },
+            {
+                println("ERROR!")
+            }
+        ).apply {
+            tag = requestTag
+        }
+
+        requestQueue.add(request)
+    }
+
     private fun fillMovieInfo()
     {
         // постер
@@ -327,7 +268,7 @@ class MovieFragment : BaseAppFragment()
         {
             val request = ImageRequest.Builder(context)
                 .data(posterUrl)
-                .crossfade(200)
+                .crossfade(170)
                 .target(object : TransitionTarget {
                     override val drawable: Drawable?
                         get() = headerView.posterView.drawable
@@ -377,7 +318,7 @@ class MovieFragment : BaseAppFragment()
                 collapseLines = 3
             }
 
-            scrollLayout.addView(dropdownLayout, Layout.frame(
+            layout.addView(dropdownLayout, Layout.frame(
                 Layout.MATCH_PARENT, Layout.WRAP_CONTENT
             ))
         }
@@ -388,12 +329,12 @@ class MovieFragment : BaseAppFragment()
             actorsView = createPeopleView(movieInfo.actors!!)
 
             val actorsSection = SectionView( Locale.string(R.string.actors) ).apply {
-                setLayout(
+                setView(
                     actorsView!!
                 )
             }
 
-            scrollLayout.addView(actorsSection)
+            layout.addView(actorsSection)
         }
 
         // Режиссеры
@@ -402,12 +343,12 @@ class MovieFragment : BaseAppFragment()
             producersView = createPeopleView(movieInfo.producers!!)
 
             val producersSection = SectionView( Locale.string(R.string.producers) ).apply {
-                setLayout(
+                setView(
                     producersView!!
                 )
             }
 
-            scrollLayout.addView(producersSection)
+            layout.addView(producersSection)
         }
 
         // Входит в списки
@@ -436,10 +377,10 @@ class MovieFragment : BaseAppFragment()
             val section = SectionView( Locale.string(R.string.inLists) ).apply {
                 setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.04F) )
 
-                setLayout(layout)
+                setView(layout)
             }
 
-            scrollLayout.addView(section)
+            this.layout.addView(section)
         }
 
         // Входит в коллекции
@@ -468,10 +409,10 @@ class MovieFragment : BaseAppFragment()
             val section = SectionView( Locale.string(R.string.inCollections) ).apply {
                 setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.04F) )
 
-                setLayout(layout)
+                setView(layout)
             }
 
-            scrollLayout.addView(section)
+            this.layout.addView(section)
         }
 
         // Страна
@@ -500,10 +441,10 @@ class MovieFragment : BaseAppFragment()
             val countriesSection = SectionView( Locale.string(R.string.country) ).apply {
                 setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.04F) )
 
-                setLayout(layout)
+                setView(layout)
             }
 
-            scrollLayout.addView(countriesSection)
+            this.layout.addView(countriesSection)
         }
 
         // Жанры
@@ -536,72 +477,19 @@ class MovieFragment : BaseAppFragment()
             val genresSection = SectionView( Locale.string(R.string.genre) ).apply {
                 setBackgroundColor( Theme.darkenColor(Theme.color_bg, 0.04F) )
 
-                setLayout(layout)
+                setView(layout)
             }
 
-            scrollLayout.addView(genresSection)
+            this.layout.addView(genresSection)
         }
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    private fun createWebView()
+
+    private fun enableDarkStatusBar(enable: Boolean)
     {
-        loadingPopup.show()
-
-        webViewInterface = JSInterface().apply {
-            onLoaded {
-                document = Jsoup.parse(it)
-                (context as AppActivity).runOnUiThread {
-                    loadingPopup.dismiss()
-                    onWatch()
-                }
-            }
-        }
-
-        webView = WebView(context).apply {
-            settings.javaScriptEnabled = true
-            addJavascriptInterface(webViewInterface, "HTMLOUT")
-
-            webViewClient = object : WebViewClient() {
-                override fun onPageFinished(view: WebView?, url: String?) {
-                    webView.loadUrl("javascript:window.HTMLOUT.processHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');")
-                }
-            }
-
-            loadUrl(movie.url)
-        }
+        Theme.enableDarkStatusBar( (context as AppActivity).window, enable )
     }
 
-    inner class JSInterface
-    {
-        @JavascriptInterface
-        fun processHTML(html: String)
-        {
-            onLoadListener?.invoke(html)
-        }
-
-        private var onLoadListener: ((html: String) -> Unit)? = null
-        fun onLoaded(l: (html: String) -> Unit)
-        {
-            onLoadListener = l
-        }
-    }
-
-    private fun onWatch()
-    {
-        if (document == null)
-        {
-            createWebView()
-            return
-        }
-
-        if (watchSettingsPopup == null)
-        {
-            watchSettingsPopup = WatchSettingsPopup()
-        }
-
-        watchSettingsPopup!!.show()
-    }
 
     inner class HeaderView : FrameLayout(context)
     {
@@ -866,6 +754,7 @@ class MovieFragment : BaseAppFragment()
             movieNameHeightIndicator = measuredHeight - bottomPadding - actionBar.measuredHeight
         }
 
+
         inner class RatingView(private val rating: Movie.Rating) : LinearLayout(context)
         {
             private val COLOR_IMDB: Int = 0xFFF3C31B.toInt()
@@ -881,10 +770,10 @@ class MovieFragment : BaseAppFragment()
                 setPadding(Utils.dp(7), Utils.dp(5), Utils.dp(7), Utils.dp(5))
 
                 var drawable: Drawable? = null
-                if (rating.whose!! == HDRezka.IMDB)
+                if (rating.whose == HDRezka.IMDB)
                 {
                     background = Theme.rect(COLOR_IMDB, radii = FloatArray(4).apply {
-                        fill(Utils.dp(19F))
+                        fill( Utils.dp(19F) )
                     })
 
                     drawable = Theme.drawable(R.drawable.imdb)
@@ -892,7 +781,7 @@ class MovieFragment : BaseAppFragment()
                 else if (rating.whose == HDRezka.KP)
                 {
                     background = Theme.rect(COLOR_KP, radii = FloatArray(4).apply {
-                        fill(Utils.dp(19F))
+                        fill( Utils.dp(19F) )
                     })
 
                     drawable = Theme.drawable(R.drawable.kp)
@@ -936,7 +825,7 @@ class MovieFragment : BaseAppFragment()
             {
                 setPadding(Utils.dp(20), 0, Utils.dp(7), Utils.dp(10))
 
-                val drawable = Theme.drawable(R.drawable.time, Theme.COLOR_WHITE)
+                val drawable = Theme.drawable(R.drawable.time, Color.WHITE)
                 val iv = ImageView(context).apply {
                     setImageDrawable(drawable)
                 }
@@ -970,7 +859,19 @@ class MovieFragment : BaseAppFragment()
 
         init
         {
-            sectionNameView = createSectionText(sectionName)
+            sectionNameView = RTextView(context).apply {
+                setPadding(Utils.dp(20), Utils.dp(15), Utils.dp(20), Utils.dp(5))
+
+                textSize = 20F
+                typeface = Theme.typeface(Theme.tf_bold)
+                setTextColor( Theme.color_text )
+                setLines(1)
+                maxLines = 1
+                isSingleLine = true
+                ellipsize = TextUtils.TruncateAt.END
+
+                text = sectionName
+            }
             addView(sectionNameView)
 
             container = FrameLayout(context)
@@ -979,513 +880,12 @@ class MovieFragment : BaseAppFragment()
             ))
         }
 
-        fun setLayout(layout: View)
+        fun setView(view: View)
         {
-            if (container.childCount > 0) container.removeAllViews()
-            container.addView(layout)
-        }
-    }
-
-    inner class WatchSettingsPopup : BottomPopup(context)
-    {
-        private lateinit var popupView: FrameLayout
-
-        private var translationView: TranslationView? = null
-        private fun hasTranslation() : Boolean = translationView != null
-        private var seasonView: SeasonView? = null
-
-        private var parsingDocument: Document
-
-        private lateinit var streamData: StreamData
-
-        init
-        {
-            isDraggable = false
-
-            parsingDocument = document!!.clone()
-
-            createStreamData()
-            createUI()
+            if ( contains(view) ) removeView(view)
+            addView(view)
         }
 
-        override fun show()
-        {
-            super.show()
-
-            popupView.apply {
-                removeAllViews()
-                updateLayoutParams<FrameLayout.LayoutParams> {
-                    height = Layout.WRAP_CONTENT
-                }
-                if (translationView != null) {
-                    translationView = TranslationView()
-                    addView(translationView)
-                } else if (seasonView != null) {
-                    seasonView = SeasonView()
-                    addView(seasonView)
-                }
-            }
-        }
-
-        private fun createStreamData()
-        {
-            streamData = if ( ! movie.type.isSerial) {
-                FilmStreamData()
-            } else SeriesStreamData()
-        }
-
-        private fun createUI()
-        {
-            popupView = FrameLayout(context).apply {
-                background = Theme.rect(
-                    Theme.color_bg, radii = floatArrayOf(
-                        Utils.dp(12F), Utils.dp(12F), Utils.dp(12F), Utils.dp(12F)
-                    ))
-            }
-            // Фильм, Мультфильм (односерийный), Аниме (односерийное)
-            if (
-                movie.type.ruType == HDRezka.FILM ||
-                (movie.type.ruType == HDRezka.CARTOON && ! movie.type.isSerial) ||
-                (movie.type.ruType == HDRezka.ANIME && ! movie.type.isSerial)
-            )
-            {
-                // если есть озвучки
-                if ( Pager.isTranslatorsExist(document!!) )
-                {
-                    translationView = TranslationView()
-                    popupView.addView(translationView)
-                }
-                else // если нет озвучек
-                {
-
-                }
-            }
-            else // Сериал, Мультфильм (многосерийный), Аниме (многосерийное)
-            {
-                // если есть озвучки
-                if (Pager.isTranslatorsExist(document!!))
-                {
-                    translationView = TranslationView()
-                    popupView.addView(translationView)
-                }
-                else // если нет озвучек
-                {
-                    goToSeason()
-                }
-            }
-
-            val w = Utils.displayWidth - Utils.dp(12) * 2
-            setContentView(popupView, FrameLayout.LayoutParams(
-                w, Layout.WRAP_CONTENT,
-                Gravity.CENTER_HORIZONTAL
-            ).apply {
-                setMargins(0, 0, 0, Utils.dp(12))
-            })
-        }
-
-        private fun goToSeason()
-        {
-            // если Сериал без озвучек, ищем id озвучки самостоятельно
-            if ( ! Pager.isTranslatorsExist(document!!) )
-            {
-                val translatorId = Parser.parseTranslatorId(document!!.html())
-                streamData.translatorId = translatorId
-            }
-
-            // имея id озвучки создаем соответствующий url и отправляем запрос
-            // после успешного ответа создаем SeasonView
-            // если имеются озвучки -> переходим от экрана TranslationView к SeasonView используя анимацию
-            // в противном случае -> просто добавляем SeasonView
-
-            webView.apply {
-                webViewInterface.apply {
-                    onLoaded {
-                        parsingDocument = Jsoup.parse(it)
-
-                        (context as AppActivity).runOnUiThread {
-                            seasonView = SeasonView()
-                            if (translationView != null) {
-                                navigate(translationView!!, seasonView!!)
-                                translationView!!.actionBar.hideLoading()
-                            } else {
-                                popupView.addView(seasonView)
-                            }
-                        }
-                    }
-                }
-                loadUrl("javascript:(function(){document.querySelectorAll('[data-translator_id=\"${streamData.translatorId}\"]')[0].click();})()")
-            }
-        }
-
-        private fun navigate(fromView: View, toView: View, animated: Boolean = true)
-        {
-            toView.measure(0, 0)
-            val endHeight = toView.measuredHeight
-
-            if ( ! animated)
-            {
-                fromView.apply {
-                    alpha = 0F
-                    visibility = View.GONE
-                }
-                toView.apply {
-                    alpha = 1F
-                    visibility = View.VISIBLE
-                }
-
-                popupView.apply {
-                    updateLayoutParams<FrameLayout.LayoutParams> {
-                        height = endHeight
-                    }
-
-                    removeView(fromView)
-                    popupView.addView(toView, Layout.ezFrame(
-                        Layout.MATCH_PARENT, Layout.WRAP_CONTENT,
-                        Gravity.TOP
-                    ))
-                }
-
-                return
-            }
-
-            fromView.measure(0 ,0)
-            val startHeight = fromView.measuredHeight
-
-            val alphaAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
-                addUpdateListener {
-                    val animatedAlpha = it.animatedValue as Float
-                    toView.alpha = animatedAlpha
-                    fromView.alpha = 1F - animatedAlpha
-                }
-            }
-
-            val heightAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
-                addUpdateListener {
-                    val animatedHeight = it.animatedValue as Int
-                    popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                        height = animatedHeight
-                    }
-                }
-            }
-
-            AnimatorSet().apply {
-                duration = 320L + abs(endHeight - startHeight) / 40
-                interpolator = DecelerateInterpolator(1.1F)
-
-                addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationStart(animation: Animator?) {
-                        super.onAnimationStart(animation)
-
-                        popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                            height = fromView.measuredHeight
-                        }
-
-                        toView.apply {
-                            alpha = 0F
-                            visibility = View.VISIBLE
-                        }
-
-                        popupView.addView(toView, Layout.ezFrame(
-                            Layout.MATCH_PARENT, Layout.WRAP_CONTENT,
-                            Gravity.TOP
-                        ))
-                    }
-
-                    override fun onAnimationEnd(animation: Animator?) {
-                        super.onAnimationEnd(animation)
-
-                        popupView.updateLayoutParams<FrameLayout.LayoutParams> {
-                            height = Layout.WRAP_CONTENT
-                        }
-
-                        fromView.apply {
-                            visibility = View.GONE
-                        }
-
-                        popupView.removeView(fromView)
-                    }
-                })
-
-                playTogether(
-                    alphaAnimator,
-                    heightAnimator
-                )
-
-                start()
-            }
-        }
-
-        private fun createLayout(layout: VLinearLayout, actionBar: ActionBar, cells: List<PointerCell>)
-        {
-            layout.apply {
-                addView(actionBar)
-
-                for (cell in cells)
-                {
-                    addView(cell, Layout.ezLinear(
-                        Layout.MATCH_PARENT, 50
-                    ))
-                }
-
-                addView(View(context), Layout.ezLinear(
-                    Layout.MATCH_PARENT, 12
-                ))
-            }
-        }
-
-        inner class TranslationView() : VLinearLayout(context)
-        {
-            lateinit var actionBar: ActionBar
-
-            init
-            {
-                createUI()
-            }
-
-            private fun createUI()
-            {
-                createActionBar()
-
-                val cells = ArrayList<PointerCell>()
-                // Фильм, Мультфильм (односерийный), Аниме (односерийное)
-                if (
-                    movie.type.ruType == HDRezka.FILM ||
-                    (movie.type.ruType == HDRezka.CARTOON && ! movie.type.isSerial) ||
-                    (movie.type.ruType == HDRezka.ANIME && ! movie.type.isSerial)
-                )
-                {
-                    Parser.parseFilmTranslators(document!!).forEach {
-                        val cell = PointerCell(context).apply {
-                            text = it.name
-                            setOnClickListener {
-                                println(text)
-                            }
-                        }
-                        cells.add(cell)
-                    }
-                }
-                else // Сериал, Мультфильм (многосерийный), Аниме (многосерийное)
-                {
-                    Parser.parseSeriesTranslators(document!!).forEach {
-                        val cell = PointerCell(context).apply {
-                            text = it.name
-
-                            val tid = it.translatorId
-                            setOnClickListener {
-                                streamData.translatorId = tid
-                                actionBar.showLoading()
-                                goToSeason()
-                            }
-                        }
-                        cells.add(cell)
-                    }
-                }
-
-                createLayout(this, actionBar, cells)
-            }
-
-            private fun createActionBar()
-            {
-                actionBar = ActionBar(context).apply {
-                    title = Locale.string(R.string.translation)
-                    menu = ActionBar.LoadingMenu(context)
-                }
-            }
-        }
-
-        inner class SeasonView() : VLinearLayout(context)
-        {
-            private lateinit var actionBar: ActionBar
-
-            init
-            {
-                createUI()
-            }
-
-            private fun createUI()
-            {
-                createActionBar()
-
-                val cells = ArrayList<PointerCell>()
-                Parser.parseSeasons(parsingDocument).forEach {
-                    val cell = PointerCell(context).apply {
-                        text = it.title
-
-                        val sid = it.id
-                        setOnClickListener {
-                            (streamData as SeriesStreamData).apply {
-                                season = sid
-                            }
-                            goToEpisode()
-                        }
-                    }
-                    cells.add(cell)
-                }
-
-                createLayout(this, actionBar, cells)
-            }
-
-            private fun createActionBar()
-            {
-                actionBar = ActionBar(context).apply {
-                    title = Locale.string(R.string.season)
-                    menu = ActionBar.LoadingMenu(context)
-
-                    if ( hasTranslation() )
-                    {
-                        addIosBack( Locale.string(R.string.translation) )
-                        onBack {
-                            backToTranslation()
-                        }
-                    }
-                }
-            }
-
-            private fun backToTranslation()
-            {
-                navigate(this, translationView!!)
-            }
-
-            private fun goToEpisode()
-            {
-                // показываем индикатор загрузки
-                actionBar.showLoading()
-
-                val url = updateUrl()
-                val request = StringRequest(Request.Method.GET, url,
-                    { response ->
-                        // прячем индикатор загрузки
-                        actionBar.hideLoading()
-                        // обновляем документ
-                        parsingDocument = Jsoup.parse(response)
-                        // переходим к выбору серии
-                        val episodeView = EpisodeView()
-                        navigate(this, episodeView)
-                    },
-                    {
-                        println("ERROR!")
-                    }
-                )
-                requestQueue.add(request)
-            }
-        }
-
-        inner class EpisodeView : VLinearLayout(context)
-        {
-            private lateinit var actionBar: ActionBar
-
-            init
-            {
-                createActionBar()
-
-                val cells = ArrayList<PointerCell>()
-                Parser.parseEpisodes(parsingDocument).forEach {
-                    val cell = PointerCell(context).apply {
-                        text = it.title
-
-                        val eid = it.id
-                        val en = it.number
-                        setOnClickListener {
-                            (streamData as SeriesStreamData).apply {
-                                id = eid
-                                episode = en
-                            }
-                            goWatch()
-                        }
-                    }
-                    cells.add(cell)
-                }
-
-                createLayout(this, actionBar, cells)
-            }
-
-            private fun createActionBar()
-            {
-                actionBar = ActionBar(context).apply {
-                    title = Locale.string(R.string.episode)
-                    menu = ActionBar.LoadingMenu(context)
-
-                    addIosBack( Locale.string(R.string.season) )
-                    onBack {
-                        backToSeason()
-                    }
-                }
-            }
-
-            private fun backToSeason()
-            {
-                navigate(this, seasonView!!)
-            }
-        }
-
-        private fun updateUrl() : String
-        {
-            val data = streamData as SeriesStreamData
-            var url = movie.url
-            url += "#t:"
-            url += streamData.translatorId
-
-            url += "-s:"
-            if (data.season != "") url += data.season
-            else url += "1"
-
-            url += "-e:"
-            if (data.episode != "") url += data.episode
-            else url += "1"
-
-            return url
-        }
-
-        private fun goWatch()
-        {
-            val data = streamData as SeriesStreamData
-            println(data.id)
-            println(data.translatorId)
-            println(data.season)
-            println(data.episode)
-
-            GlobalScope.launch(Dispatchers.IO) {
-                val doc = Jsoup.connect(Stream.REQUEST_URL)
-                    .data("id", data.id)
-                    .data("translator_id", data.translatorId)
-                    .data("season", data.season)
-                    .data("episode", data.episode)
-                    .data("action", "get_stream")
-                    .post()
-
-                println(doc.html())
-
-                val streams = Parser.parseStreams(doc.html())
-                val intent = Intent(context, PlayerActivity::class.java)
-                val bundle = Bundle().apply {
-                    putParcelableArrayList("key", streams)
-                }
-                intent.putExtras(bundle)
-                context.startActivity(intent)
-            }
-        }
-    }
-
-    private fun createSectionText(text: String) : RTextView
-    {
-        return RTextView(context).apply {
-            setPadding(Utils.dp(20), Utils.dp(15), Utils.dp(20), Utils.dp(5))
-
-            textSize = 20F
-            typeface = Theme.typeface(Theme.tf_bold)
-            setTextColor( Theme.color_text )
-            setLines(1)
-            maxLines = 1
-            isSingleLine = true
-            ellipsize = TextUtils.TruncateAt.END
-
-            this.text = text
-        }
-    }
-
-    private fun enableDarkStatusBar(enable: Boolean)
-    {
-        Theme.enableDarkStatusBar( (context as AppActivity).window, enable )
     }
 }
 

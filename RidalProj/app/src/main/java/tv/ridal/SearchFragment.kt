@@ -166,6 +166,10 @@ class SearchFragment : BaseAppFragment()
     private fun createMoviesView()
     {
         moviesView = RecyclerView(context).apply {
+            setPadding( Utils.dp(7), 0, Utils.dp(7), 0 )
+            clipToPadding = false
+
+
             edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
                 override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
                     return EdgeEffect(view.context).apply { color = Theme.color(Theme.color_main) }
@@ -173,7 +177,7 @@ class SearchFragment : BaseAppFragment()
             }
 
             layoutManager = GridLayoutManager(context, 3)
-            addItemDecoration( GridSpacingItemDecoration(3, Utils.dp(15)) )
+            addItemDecoration( GridSpacingItemDecoration(3, Utils.dp(13)) )
 
             adapter = MoviesAdapter(movies)
         }

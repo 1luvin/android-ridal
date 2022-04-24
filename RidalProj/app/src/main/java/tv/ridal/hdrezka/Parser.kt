@@ -12,7 +12,6 @@ class Parser
 {
     companion object
     {
-
         /*
             Фильмы, сериалы, мультфильмы, аниме
          */
@@ -82,60 +81,8 @@ class Parser
 
         fun parseMovies(html: String, size: Int = HDRezka.PAGE_CAPACITY): ArrayList<Movie>?
         {
-            return parseMovies(Jsoup.parse(html), size)
+            return parseMovies( Jsoup.parse(html), size )
         }
-
-
-        /*
-            Подборки
-         */
-
-//        fun parseCollections(doc: Document): ArrayList<Collection>? {
-//            val collectionCardsBox = doc.getElementsByClass("b-content__collections_list clearfix")
-//            if (collectionCardsBox.size > 0) {
-//                val collectionCards =
-//                    collectionCardsBox[0].getElementsByClass("b-content__collections_item")
-//                if (collectionCards.size > 0) {
-//                    val collections = ArrayList<Collection>()
-//                    collections.ensureCapacity(36)
-//                    for (collectionCard in collectionCards) {
-//                        val a = collectionCard.getElementsByTag("a")[0]
-//                        // название
-//                        val name = a.text()
-//                        // постер
-//                        val posterURL = collectionCard.getElementsByTag("img")[0].attr("src")
-//                        // тип
-//                        var type: String = ""
-//                        val types =
-//                            listOf(HDRezka.FILMS, HDRezka.SERIES, HDRezka.CARTOONS, HDRezka.ANIME)
-//                        for (t in types) {
-//                            if (name.contains(t, true)) {
-//                                type = t
-//                                break
-//                            }
-//                        }
-//                        if (type == "") {
-//                            if (name == "Как это было (ВОВ)") {
-//                                type = HDRezka.SERIES
-//                            } else {
-//                                type = HDRezka.FILMS
-//                            }
-//                        }
-//                        // ссылка
-//                        val url = a.attr("href")
-//
-//                        val collection = Collection(name, posterURL, type, url)
-//                        collections.add(collection)
-//                    }
-//                    return collections
-//                }
-//            }
-//            return null
-//        }
-
-//        fun parseCollections(html: String): ArrayList<Collection>? {
-//            return parseCollections(Jsoup.parse(html))
-//        }
 
 
         /*
@@ -295,7 +242,7 @@ class Parser
 
         fun parseMovieInfo(html: String) : Movie.Info
         {
-            return parseMovieInfo(Jsoup.parse(html))
+            return parseMovieInfo( Jsoup.parse(html) )
         }
 
 
@@ -371,7 +318,7 @@ class Parser
 
         fun parseSearchResults(html: String) : Pair<ArrayList<SearchResult>, Boolean>?
         {
-            return parseSearchResults(Jsoup.parse(html))
+            return parseSearchResults( Jsoup.parse(html) )
         }
 
 
@@ -394,167 +341,7 @@ class Parser
 
         fun parseSectionMoviesSize(html: String) : String
         {
-            return parseSectionMoviesSize(Jsoup.parse(html))
-        }
-
-        /*
-            Стримы
-         */
-
-        fun parseFilmTranslators(doc: Document) : ArrayList<Stream.FilmTranslator>
-        {
-            val translators = ArrayList<Stream.FilmTranslator>()
-
-            val ul = doc.getElementById("translators-list")
-            val lis = ul.getElementsByClass("b-translator__item")
-            var li: Element
-            for (i in 0 until lis.size)
-            {
-                li = lis[i]
-                val name = li.attr("title")
-                val data_id = li.attr("data-id")
-                val data_translator_id = li.attr("data-translator_id")
-                val data_camrip = li.attr("data-camrip")
-                val data_ads = li.attr("data-ads")
-                val data_director = li.attr("data-director")
-
-                val filmTranslator = Stream.FilmTranslator(
-                    name,
-                    data_id,
-                    data_translator_id,
-                    data_camrip,
-                    data_ads,
-                    data_director
-                )
-
-                translators.add(filmTranslator)
-            }
-
-            return translators
-        }
-
-        fun parseSeriesTranslators(doc: Document) : ArrayList<Stream.SeriesTranslator>
-        {
-            val translators = ArrayList<Stream.SeriesTranslator>()
-
-            val ul = doc.getElementById("translators-list")
-            val lis: Elements = ul.getElementsByClass("b-translator__item")
-            var title: String
-            var li: Element
-            for (i in 0 until lis.size)
-            {
-                li = lis[i]
-
-                title = li.attr("title")
-                val imgs = li.getElementsByTag("img")
-                if (imgs.size > 0)
-                {
-                    title += "(${imgs[0].attr("title")})"
-                }
-
-                val translator = Stream.SeriesTranslator().apply {
-                    name = title
-                    translatorId = li.attr("data-translator_id")
-                }
-
-                translators.add(translator)
-            }
-
-            return translators
-        }
-
-        fun parseSeasons(doc: Document) : ArrayList<Stream.Season>
-        {
-            val seasons = ArrayList<Stream.Season>()
-
-            val ul = doc.getElementById("simple-seasons-tabs")
-            val lis = ul.getElementsByTag("li")
-            for (li in lis)
-            {
-                val season = Stream.Season().apply {
-                    title = li.text()
-                    id = li.attr("data-tab_id")
-                }
-
-                seasons.add(season)
-            }
-
-            return seasons
-        }
-
-        fun parseEpisodes(doc: Document) : ArrayList<Stream.Episode>
-        {
-            val episodes = ArrayList<Stream.Episode>()
-
-            val div = doc.getElementById("simple-episodes-tabs")
-            val uls = div.getElementsByTag("ul")
-            for (i in uls.indices)
-            {
-                if (uls[i].attr("style") != "display: none;") {
-                    val lis = uls[i].getElementsByTag("li")
-                    for (j in lis.indices) {
-                        val li = lis[j]
-
-                        val title = li.text()
-                        val number = Regex("[0-9]+").findAll(title)
-                            .map(MatchResult::value)
-                            .toList()[0]
-
-                        episodes.add( Stream.Episode(title, number, li.attr("data-id")) )
-                    }
-                }
-            }
-
-            return episodes
-        }
-
-        fun parseTranslatorId(html: String) : String
-        {
-            var id = ""
-            for (i in 0 until html.length - 23)
-            {
-                if (html[i] == 'C' && html[i + 1] == 'D' && html[i + 2] == 'N') {
-                    var k = i + 23
-                    while (html[k] != ',') {
-                        id += html[k]
-                        k++
-                    }
-                    break
-                }
-            }
-
-            return id
-        }
-
-
-        fun parseStreams(html: String) : ArrayList<Stream>
-        {
-            val streams = ArrayList<Stream>()
-
-            val qualities = arrayOf("360p", "480p", "720p", "1080p", "1080p Ultra", "1440p", "2160p")
-            var q_it = 0
-            var i = 0
-            while (i < html.length - 2) {
-                if (html[i] == 'h' && html[i + 1] == 't' && html[i + 2] == 't') {
-                    val tmp = StringBuilder()
-                    var k = i
-                    while (true) {
-                        if (html[k] == ' ' || html[k] == ',' || html[k] == '\"') break
-                        tmp.append(html[k])
-                        k++
-                    }
-                    i = k
-                    var temp = tmp.toString()
-                    if ( ! temp.contains("m3u8") && temp.contains("mp4")) {
-                        temp = temp.replace("\\\\".toRegex(), "")
-                        streams.add( Stream(qualities[q_it], temp) )
-                        q_it++
-                    }
-                }
-                i++
-            }
-
-            return streams
+            return parseSectionMoviesSize( Jsoup.parse(html) )
         }
 
 
