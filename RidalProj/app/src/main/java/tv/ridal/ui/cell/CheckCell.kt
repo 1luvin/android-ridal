@@ -20,6 +20,15 @@ class CheckCell(context: Context) : FrameLayout(context)
 {
     private var checkView: ImageView
     private var checkDrawable: Drawable
+    private var textView: RTextView
+
+    private var stateAnimator: ValueAnimator? = null
+    private val ANIM_DURATION: Long = 190L
+    private val textX: Int = Utils.dp(20)
+    private val textXChecked: Int = Utils.dp(15 + 24 + 10)
+
+    private val cellHeight: Int = Utils.dp(43)
+
 
     var checkColor: Int = Theme.color(Theme.color_main)
         set(value) {
@@ -28,8 +37,6 @@ class CheckCell(context: Context) : FrameLayout(context)
             checkDrawable = Theme.drawable(R.drawable.done, checkColor)
             checkView.setImageDrawable(checkDrawable)
         }
-
-    private var textView: RTextView
 
     var text: String = ""
         set(value) {
@@ -56,14 +63,9 @@ class CheckCell(context: Context) : FrameLayout(context)
             }
         }
 
-    private val textX: Int = Utils.dp(20)
-    private val textXChecked: Int = Utils.dp(15 + 24 + 10)
 
     var isChecked: Boolean = false
         private set
-
-    private var stateAnimator: ValueAnimator? = null
-    private val ANIM_DURATION: Long = 190L
 
     init
     {
@@ -104,13 +106,12 @@ class CheckCell(context: Context) : FrameLayout(context)
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
     {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-
-        setMeasuredDimension(
-            MeasureSpec.getSize(widthMeasureSpec),
-            Utils.dp(44)
+        super.onMeasure(
+            MeasureSpec.makeMeasureSpec( MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY ),
+            MeasureSpec.makeMeasureSpec( cellHeight, MeasureSpec.EXACTLY )
         )
     }
+
 
     fun setChecked(checked: Boolean, animated: Boolean = true)
     {

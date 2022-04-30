@@ -1,6 +1,7 @@
 package tv.ridal.ui.actionbar
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.view.Gravity
@@ -16,8 +17,9 @@ import tv.ridal.util.Utils
 
 class BigActionBar(context: Context) : FrameLayout(context)
 {
-    private val barHeight: Int = Utils.dp(90)
     private val horizontalPadding: Int = Utils.dp(20)
+    private val topPadding: Int = Utils.dp(50)
+    private val bottomPadding: Int = Utils.dp(10)
     private val menuIndent: Int = Utils.dp(15)
 
     private var titleView: TextView
@@ -54,7 +56,7 @@ class BigActionBar(context: Context) : FrameLayout(context)
 
     init
     {
-        setPadding(horizontalPadding, 0, horizontalPadding, 0)
+        super.setPadding(horizontalPadding, topPadding, horizontalPadding, bottomPadding)
 
         titleView = TextView(context).apply {
             setTextColor(titleColor)
@@ -73,10 +75,11 @@ class BigActionBar(context: Context) : FrameLayout(context)
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
     {
-        super.onMeasure(
-            MeasureSpec.makeMeasureSpec( MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY ),
-            MeasureSpec.makeMeasureSpec( paddingTop + barHeight + paddingBottom, MeasureSpec.EXACTLY )
-        )
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+//        super.onMeasure(
+//            MeasureSpec.makeMeasureSpec( MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY ),
+//            MeasureSpec.makeMeasureSpec( topPadding + MeasureSpec.getSize(heightMeasureSpec) + bottomPadding, MeasureSpec.EXACTLY )
+//        )
 
         menu?.let {
             it.measure()
@@ -91,7 +94,7 @@ class BigActionBar(context: Context) : FrameLayout(context)
 
     override fun setPadding(left: Int, top: Int, right: Int, bottom: Int)
     {
-        super.setPadding(horizontalPadding, top, horizontalPadding, bottom)
+        super.setPadding(horizontalPadding, topPadding + top, horizontalPadding, bottomPadding + bottom)
     }
 
     class Menu(context: Context) : LinearLayout(context)

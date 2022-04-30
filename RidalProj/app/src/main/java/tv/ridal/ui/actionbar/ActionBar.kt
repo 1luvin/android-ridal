@@ -2,7 +2,6 @@ package tv.ridal.ui.actionbar
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Paint
@@ -13,20 +12,21 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
 import android.widget.*
-import androidx.core.view.children
 import androidx.core.view.contains
 import androidx.core.view.updateLayoutParams
-import com.github.ybq.android.spinkit.style.Pulse
 import tv.ridal.R
 import tv.ridal.util.Theme
 import tv.ridal.ui.drawable.MultiDrawable
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.measure
+import tv.ridal.ui.asInt
 import tv.ridal.ui.msg
+import tv.ridal.ui.setPaddings
 import tv.ridal.ui.view.RTextView
 import tv.ridal.util.Locale
 import tv.ridal.util.Utils
+import kotlin.math.max
 
 class ActionBar(context: Context) : FrameLayout(context)
 {
@@ -38,33 +38,20 @@ class ActionBar(context: Context) : FrameLayout(context)
     private var iosBack: IosBack? = null
     private lateinit var titleView: RTextView
     private var subtitleView: RTextView? = null
-
-
-    fun addIosBack(text: String? = null, type: IosBack.Type = IosBack.Type.ICON_TEXT)
-    {
-        iosBack?.let {
-            if ( contains(it) ) removeView(it)
-        }
-
-        iosBack = IosBack(context, text).apply {
-            this.type = type
-
-            setOnClickListener {
-                onBack?.invoke()
+    var menu: ActionBar.Menu? = null
+        set(value) {
+            menu?.let {
+                removeView(it)
             }
+
+            field = value
+            if (menu == null) return
+
+            addView(menu!!, Layout.frame(
+                Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
+                Gravity.END or Gravity.CENTER_VERTICAL
+            ))
         }
-
-        addView(iosBack, Layout.ezFrame(
-            Layout.WRAP_CONTENT, Layout.MATCH_PARENT,
-            Gravity.START
-        ))
-    }
-
-    private var onBack: (() -> Unit)? = null
-    fun onBack(l: () -> Unit)
-    {
-        onBack = l
-    }
 
 
     val actionBarHeight: Int = Utils.dp(actionBarHeightDp)
@@ -102,23 +89,32 @@ class ActionBar(context: Context) : FrameLayout(context)
             subtitleView!!.text = subtitle
         }
 
-    var menu: ActionBar.Menu? = null
-        set(value) {
-            value ?: return
-            field = value
 
-            // если меню уже имеется
-            if ( children.contains(menu as View) )
-            {
-                removeView(menu)
-            }
-
-            addView(menu!!, Layout.frame(
-                Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-                Gravity.END or Gravity.CENTER_VERTICAL
-            ))
+    fun addIosBack(text: String? = null, type: IosBack.Type = IosBack.Type.ICON_TEXT)
+    {
+        iosBack?.let {
+            if ( contains(it) ) removeView(it)
         }
 
+        iosBack = IosBack(context, text).apply {
+            this.type = type
+
+            setOnClickListener {
+                onBack?.invoke()
+            }
+        }
+
+        addView(iosBack, Layout.ezFrame(
+            Layout.WRAP_CONTENT, Layout.MATCH_PARENT,
+            Gravity.START
+        ))
+    }
+
+    private var onBack: (() -> Unit)? = null
+    fun onBack(l: () -> Unit)
+    {
+        onBack = l
+    }
 
     private fun createTitleView()
     {
@@ -159,6 +155,7 @@ class ActionBar(context: Context) : FrameLayout(context)
     }
 
 
+    private val ANIM_DURATION: Long = 170
     fun enableOnlyBackButton(enable: Boolean, animated: Boolean = true)
     {
         if ( background !is MultiDrawable )
@@ -167,37 +164,42 @@ class ActionBar(context: Context) : FrameLayout(context)
                 arrayOf(
                     background,
                     Theme.rect(
-                        Theme.Fill( intArrayOf(Theme.alphaColor(Theme.COLOR_BLACK, 0.5F), Theme.COLOR_TRANSPARENT), GradientDrawable.Orientation.TOP_BOTTOM )
+                        Theme.Fill(
+                            intArrayOf( Theme.alphaColor(Theme.COLOR_BLACK, 0.5F), Theme.COLOR_TRANSPARENT ),
+                            GradientDrawable.Orientation.TOP_BOTTOM
+                        )
                     )
                 ),
-                show = if (enable) 1 else 0
+                show = enable.asInt()
             )
         }
 
-        // background
+        // Background
         (background as MultiDrawable).apply {
-            if (animated) crossfadeDuration = 170
-            show( if (enable) 1 else 0, animated )
+            if (animated) crossfadeDuration = ANIM_DURATION
+            show( enable.asInt(), animated )
         }
-        // title
+
+        // Title
         val toAlpha = if (enable) 0F else 1F
         if (animated)
         {
             ValueAnimator.ofFloat(titleView.alpha, toAlpha).apply {
-                duration = 170
+                duration = ANIM_DURATION
 
                 addUpdateListener {
                     titleView.alpha = it.animatedValue as Float
                 }
 
-                addListener(object : AnimatorListenerAdapter(){
+                addListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationStart(animation: Animator?)
                     {
                         super.onAnimationStart(animation)
 
                         if ( ! enable) titleView.visibility = View.VISIBLE
                     }
-                    override fun onAnimationEnd(animation: Animator?) {
+                    override fun onAnimationEnd(animation: Animator?)
+                    {
                         super.onAnimationEnd(animation)
 
                         if (enable) titleView.visibility = View.GONE
@@ -230,8 +232,7 @@ class ActionBar(context: Context) : FrameLayout(context)
 
         var leftWidth = 0
         iosBack?.let {
-//            msg("${it.childCount}")
-//            it.measure()
+            it.measure()
             leftWidth = it.measuredWidth
         }
 
@@ -241,21 +242,25 @@ class ActionBar(context: Context) : FrameLayout(context)
             rightWidth = it.measuredWidth
         }
 
-        var availableWidth = measuredWidth - leftWidth - rightWidth
+        val busyWidth = max(leftWidth, rightWidth)
+
+        var availableWidth = measuredWidth - busyWidth * 2
 
         val paint = Paint().apply {
-            typeface = Theme.typeface(Theme.tf_normal)
+            typeface = Theme.typeface(Theme.tf_bold)
             textSize = titleView.textSize
         }
-        val textWidth = paint.measureText(title)
+        val titleWidth = paint.measureText(title)
+        paint.typeface = Theme.typeface(Theme.tf_normal)
+        val subtitleWidth = paint.measureText(subtitle)
+        val textWidth = max(titleWidth, subtitleWidth)
 
-        if ( textWidth > availableWidth )
-        {
-            msg("\n\nXXD\n\n")
-//            iosBack?.apply {
-//                type = IosBack.Type.ICON
-//            }
-            // исправиль ошибку
+        iosBack?.let {
+            it.type = if ( textWidth > availableWidth ) {
+                IosBack.Type.ICON
+            } else {
+                IosBack.Type.ICON_TEXT
+            }
         }
 
         titleView.measure(
@@ -273,12 +278,40 @@ class ActionBar(context: Context) : FrameLayout(context)
     {
         super.onLayout(changed, left, top, right, bottom)
 
+        var leftMargin = 0
+        iosBack?.let {
+            leftMargin = it.measuredWidth
+            println(leftMargin)
+        }
+
+        var topMargin = 0
         subtitleView?.let {
-            titleView.apply {
-                updateLayoutParams<FrameLayout.LayoutParams> {
-                    gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-                    setMargins( 0, Utils.dp(4), 0, 0 )
-                }
+            topMargin = Utils.dp(4)
+        }
+
+        var rightMargin = 0
+        menu?.let {
+            rightMargin = it.measuredWidth
+        }
+
+        var widthMargin = max(leftMargin, rightMargin)
+
+        var gravity = Gravity.CENTER
+        subtitleView?.let {
+            gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+        }
+
+        titleView.apply {
+            updateLayoutParams<FrameLayout.LayoutParams> {
+                this.gravity = gravity
+                setMargins( widthMargin, topMargin, widthMargin, this.bottomMargin )
+            }
+        }
+
+        subtitleView?.apply {
+            updateLayoutParams<FrameLayout.LayoutParams> {
+                this.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+                setMargins( widthMargin, this.topMargin, widthMargin, this.bottomMargin  )
             }
         }
     }
@@ -341,7 +374,7 @@ class ActionBar(context: Context) : FrameLayout(context)
         {
             removeAllViews()
 
-            setPadding( 0, 0, 0, 0 )
+            setPaddings(0)
 
             val imageView = ImageView(context).apply {
                 scaleType = ImageView.ScaleType.CENTER
@@ -371,7 +404,7 @@ class ActionBar(context: Context) : FrameLayout(context)
     {
         init
         {
-            setPadding(Utils.dp(15), 0, Utils.dp(6), 0)
+            setPadding( Utils.dp(15), 0, Utils.dp(6), 0 )
         }
 
         fun addItem(drawable: Drawable, onClick: (() -> Unit)? = null)
@@ -419,56 +452,6 @@ class ActionBar(context: Context) : FrameLayout(context)
                 MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec), MeasureSpec.UNSPECIFIED)
             )
         }
-    }
-
-    class LoadingMenu(context: Context) : Menu(context)
-    {
-        private var loadingView: ProgressBar
-
-        init
-        {
-            setPadding(Utils.dp(15), 0, 0, 0)
-
-            loadingView = ProgressBar(context).apply {
-                indeterminateDrawable = Pulse().apply {
-                    color = Theme.color(Theme.color_main)
-                }
-
-                visibility = View.GONE // загрузка скрыта по умолчанию
-            }
-
-            addView(loadingView, Layout.ezLinear(
-                24, 24
-            ))
-        }
-
-        fun showLoading()
-        {
-            loadingView.apply {
-                visibility = View.VISIBLE
-            }
-        }
-
-        fun stopLoading()
-        {
-            loadingView.apply {
-                visibility = View.GONE
-            }
-        }
-    }
-
-    fun showLoading()
-    {
-        if (menu == null || menu !is LoadingMenu) return
-
-        (menu as LoadingMenu).showLoading()
-    }
-
-    fun hideLoading()
-    {
-        if (menu == null || menu !is LoadingMenu) return
-
-        (menu as LoadingMenu).stopLoading()
     }
 
 }

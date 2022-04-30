@@ -111,7 +111,7 @@ class CatalogFragment : BaseAppFragment()
         actionBar = BigActionBar(context).apply {
             setPadding(0, Utils.dp(30), 0, 0)
 
-            title = App.APP_NAME
+            title = Locale.string(R.string.catalog)
 
             this.menu = menu
         }

@@ -30,7 +30,15 @@ fun msg(msg: String)
 fun String.amount(): String = substring(indexOfFirst { it.isDigit() }, indexOfLast { it.isDigit() } + 1)
     .filter { it.isDigit() || it == '.' }
 
-// View
+/*
+    Boolean
+ */
+
+fun Boolean.asInt() = if (this) 1 else 0
+
+/*
+    View
+ */
 
 fun View.setPaddings(padding: Int)
 {
@@ -64,14 +72,14 @@ fun TextView.setTypeface(tfKey: String)
 fun EditText.showKeyboard()
 {
     post {
-        ViewCompat.getWindowInsetsController(this)?.show(WindowInsetsCompat.Type.ime())
+        ViewCompat.getWindowInsetsController(this)?.show( WindowInsetsCompat.Type.ime() )
     }
 }
 
 fun EditText.hideKeyboard()
 {
     post {
-        ViewCompat.getWindowInsetsController(this)?.hide(WindowInsetsCompat.Type.ime())
+        ViewCompat.getWindowInsetsController(this)?.hide( WindowInsetsCompat.Type.ime() )
     }
 }
 
