@@ -50,6 +50,14 @@ class Utils
             return ceil(value / density).toInt()
         }
 
+        fun px(value: Float) : Float
+        {
+            if (value == 0F) {
+                return 0F
+            }
+            return ceil(value / density)
+        }
+
         fun mapToFloat(v: Int, start: Int, end: Int) : Float
         {
             return (v - start) * 1F / (end - start)

@@ -36,6 +36,8 @@ class ActionBar(context: Context) : FrameLayout(context)
     }
 
     private var iosBack: IosBack? = null
+    var staticIosBackType: Boolean = false
+
     private lateinit var titleView: RTextView
     private var subtitleView: RTextView? = null
     var menu: ActionBar.Menu? = null
@@ -246,20 +248,23 @@ class ActionBar(context: Context) : FrameLayout(context)
 
         var availableWidth = measuredWidth - busyWidth * 2
 
-        val paint = Paint().apply {
-            typeface = Theme.typeface(Theme.tf_bold)
-            textSize = titleView.textSize
-        }
-        val titleWidth = paint.measureText(title)
-        paint.typeface = Theme.typeface(Theme.tf_normal)
-        val subtitleWidth = paint.measureText(subtitle)
-        val textWidth = max(titleWidth, subtitleWidth)
+        if ( ! staticIosBackType )
+        {
+            val paint = Paint().apply {
+                typeface = Theme.typeface(Theme.tf_bold)
+                textSize = titleView.textSize
+            }
+            val titleWidth = paint.measureText(title)
+            paint.typeface = Theme.typeface(Theme.tf_normal)
+            val subtitleWidth = paint.measureText(subtitle)
+            val textWidth = max(titleWidth, subtitleWidth)
 
-        iosBack?.let {
-            it.type = if ( textWidth > availableWidth ) {
-                IosBack.Type.ICON
-            } else {
-                IosBack.Type.ICON_TEXT
+            iosBack?.let {
+                it.type = if ( textWidth > availableWidth ) {
+                    IosBack.Type.ICON
+                } else {
+                    IosBack.Type.ICON_TEXT
+                }
             }
         }
 
@@ -325,12 +330,16 @@ class ActionBar(context: Context) : FrameLayout(context)
                 if (field == value) return
                 field = value
 
+                if ( isTypeConstant ) return
+
                 when (type)
                 {
                     Type.ICON -> applyIcon()
                     Type.ICON_TEXT -> applyIconText()
                 }
             }
+
+        var isTypeConstant: Boolean = false
 
         init
         {

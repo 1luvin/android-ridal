@@ -30,6 +30,9 @@ class DropdownTextLayout(context: Context) : FrameLayout(context)
     private var startHeight: Int = 0 // !
     private var endHeight: Int = 0 // !
 
+    private val DROP_DURATION: Long = 300
+
+
     init
     {
         expandTextView = RTextView(context).apply {
@@ -47,6 +50,7 @@ class DropdownTextLayout(context: Context) : FrameLayout(context)
         ))
     }
 
+
     override fun onAttachedToWindow()
     {
         super.onAttachedToWindow()
@@ -57,11 +61,11 @@ class DropdownTextLayout(context: Context) : FrameLayout(context)
             ))
 
             expandTextView.apply {
-                setPadding(Utils.dp(20), 0, it.paddingRight, it.paddingBottom)
+                setPadding( Utils.dp(20), 0, it.paddingRight, it.paddingBottom )
 
                 background = Theme.rect( Theme.color_bg )
 
-                textSize = 16.5F
+                textSize = it.textSize
                 typeface = it.typeface
 
                 bringToFront()
@@ -88,7 +92,7 @@ class DropdownTextLayout(context: Context) : FrameLayout(context)
     private fun drop()
     {
         ValueAnimator.ofFloat(0F, 1.05F, 1F).apply {
-            duration = 300
+            duration = DROP_DURATION
 
             addUpdateListener {
                 val process = it.animatedValue as Float

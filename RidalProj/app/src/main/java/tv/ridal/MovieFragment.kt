@@ -141,12 +141,13 @@ class MovieFragment : BaseAppFragment()
     private fun createActionBar()
     {
         actionBar = ActionBar(context).apply {
-            setPadding(0, Utils.dp(30), 0, 0)
+            setPadding( 0, Utils.dp(30), 0, 0 )
 
             background = Theme.rect( Theme.color_bg )
             enableOnlyBackButton(enable = true, animated = false)
 
             addIosBack(type = ActionBar.IosBack.Type.ICON)
+            staticIosBackType = true
             onBack {
                 finish()
             }

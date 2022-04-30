@@ -5,6 +5,10 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.res.Configuration
+import android.graphics.Canvas
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.TextUtils
@@ -20,6 +24,7 @@ import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.layout.SingleCheckGroup
 import tv.ridal.ui.layout.VLinearLayout
+import tv.ridal.ui.msg
 import tv.ridal.ui.view.ColorView
 import tv.ridal.ui.view.RTextView
 import tv.ridal.ui.setPaddings
@@ -88,6 +93,7 @@ class SettingsFragment : BaseSettingsFragment()
         return rootLayout
     }
 
+
     private fun createActionBar()
     {
         actionBar = BigActionBar(context).apply {
@@ -100,10 +106,10 @@ class SettingsFragment : BaseSettingsFragment()
     private fun createSectionView(text: String) : RTextView
     {
         return RTextView(context).apply {
-            setPadding(Utils.dp(20 + 15), Utils.dp(13), Utils.dp(20), Utils.dp(10))
+            setPadding( Utils.dp(20), Utils.dp(13), Utils.dp(20), Utils.dp(10) )
 
-            textSize = 20F
-            typeface = Theme.typeface(Theme.tf_bold)
+            textSize = 18F
+            typeface = Theme.typeface(Theme.tf_normal)
             setTextColor( Theme.color_text2 )
             setLines(1)
             maxLines = 1
@@ -282,28 +288,26 @@ class SettingsFragment : BaseSettingsFragment()
         val leftGradientOri: GradientDrawable.Orientation = GradientDrawable.Orientation.LEFT_RIGHT
         lateinit var rightGradientView: View
         val rightGradientOri: GradientDrawable.Orientation = GradientDrawable.Orientation.RIGHT_LEFT
-        private val gradientWidth: Int = Utils.dp(30)
+        private val gradientWidth: Int = Utils.dp(20)
+
 
         init
         {
-            isClickable = true
-            setOnTouchListener( InstantPressListener(this) )
-
             background = Theme.rect(
-                Theme.overlayColor(Theme.color_bg, 0.04F),
+                Theme.overlayColor( Theme.color_bg, 0.04F ),
                 radii = FloatArray(4).apply {
-                    fill(Utils.dp(15F))
+                    fill( Utils.dp(15F) )
                 }
             )
 
             createUI()
         }
 
+
         private fun createUI()
         {
-            createScroll()
-
             createColorsLayout()
+            createScroll()
             horizontalScroll.addView(layout)
             addView(horizontalScroll)
 
@@ -314,11 +318,11 @@ class SettingsFragment : BaseSettingsFragment()
 
             addView(leftGradientView, Layout.frame(
                 gradientWidth, Layout.MATCH_PARENT,
-                Gravity.LEFT
+                Gravity.START
             ))
             addView(rightGradientView, Layout.frame(
                 gradientWidth, Layout.MATCH_PARENT,
-                Gravity.RIGHT
+                Gravity.END
             ))
         }
 
@@ -332,10 +336,7 @@ class SettingsFragment : BaseSettingsFragment()
                     color = colors[i]
 
                     setOnClickListener {
-                        if ( ! it.isSelected)
-                        {
-                            selectColor(color)
-                        }
+                        if ( ! it.isSelected) selectColor(color)
                     }
                 }
                 colorViews.add(colorView)
@@ -382,20 +383,19 @@ class SettingsFragment : BaseSettingsFragment()
                 setPaddings( Utils.dp(15) )
                 clipToPadding = false
 
-                isSmoothScrollingEnabled = false
                 isHorizontalScrollBarEnabled = false
                 overScrollMode = View.OVER_SCROLL_NEVER
 
                 setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-                    // TODO: странная дичь со scrollRange
-                    val range = computeHorizontalScrollRange() - Utils.dp(30)
+                    val maxScrollX = (Utils.dp(15) * 2) + (Utils.dp(80) * colors.size) + (Utils.dp(10) * (colors.size - 1)) - width
+
                     if (scrollX < gradientWidth)
                     {
                         leftGradientView.alpha = scrollX / gradientWidth.toFloat()
                     }
-                    else if (scrollX > range - gradientWidth)
+                    else if (scrollX > maxScrollX - gradientWidth)
                     {
-                        rightGradientView.alpha = 1F - Utils.mapToFloat(scrollX, (range - gradientWidth), range)
+                        rightGradientView.alpha = 1F - Utils.mapToFloat(scrollX, (maxScrollX - gradientWidth), maxScrollX)
                     }
                     else
                     {
