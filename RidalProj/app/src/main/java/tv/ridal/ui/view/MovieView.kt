@@ -61,13 +61,6 @@ class MovieView(context: Context) : FrameLayout(context)
 
     private var posterHeightPx = Utils.dp(170)
 
-    var detailText: String = ""
-        set(value) {
-            field = value
-
-            //xd
-        }
-
     fun setDetailText(text: String, type: Int = TYPE_MOVIE_TYPE)
     {
         when (type)

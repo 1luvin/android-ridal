@@ -40,24 +40,10 @@ class Parser
                 val posterUrl = cardCover.getElementsByTag("img")[0].attr("src")
                 // Тип, Тип (рейтинг)
                 val entity = cardCover.getElementsByClass("entity")[0]
-
                 val iText = entity.ownText().replace(" ", "")
-                var type: Movie.Type
-                /*
-                    Типы "Мультфильм" или "Аниме" могут быть односерийные(фильм) или
-                    многосерийные
-                 */
-                type = if (iText == HDRezka.FILM) {
-                    Movie.Type(iText, false)
-                } else if (iText == HDRezka.SERIAL) {
-                    Movie.Type(iText, true)
-                } else {
-                    val info = cardCover.getElementsByClass("info")
-                    Movie.Type(iText, info.size != 0)
-                }
+                val type = iText
 
                 var rating: String? = null
-
                 val innerI = entity.getElementsByClass("b-category-bestrating rating-grey-string")
                 if ( innerI.size != 0 )
                 {

@@ -40,7 +40,9 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
                     posterUrl = it
                 }
                 movieName = current.name
-//                setDetailText(current.type.ruType)
+                current.type?.let {
+                    setDetailText(it)
+                }
             }
         }
     }
