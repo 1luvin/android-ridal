@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
@@ -199,7 +200,7 @@ class MoviesFragment : BaseAppFragment()
     private fun createMoviesView()
     {
         moviesView = RecyclerView(context).apply {
-            setPadding( Utils.dp(7), 0, Utils.dp(7), 0 )
+            setPadding( Utils.dp(10), 0, Utils.dp(10), 0 )
             clipToPadding = false
 
             edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
@@ -209,7 +210,7 @@ class MoviesFragment : BaseAppFragment()
             }
 
             layoutManager = GridLayoutManager( context, 3 )
-            addItemDecoration( GridSpacingItemDecoration(3, Utils.dp(13)) )
+            addItemDecoration( GridSpacingItemDecoration(3, Utils.dp(10)) )
 
             adapter = MoviesAdapter(movies).apply {
                 onMovieClick {
@@ -375,7 +376,7 @@ class MoviesFragment : BaseAppFragment()
         moviesView.adapter!!.notifyDataSetChanged()
     }
 
-    inner class FiltersPopup() : BottomPopup(context)
+    inner class FiltersPopup : BottomPopup(context)
     {
         private lateinit var popupView: FrameLayout
 
@@ -405,9 +406,9 @@ class MoviesFragment : BaseAppFragment()
             // создание контейнера для View с фильтрами
             popupView = FrameLayout(context).apply {
                 background = Theme.rect(
-                    Theme.color_bg, radii = floatArrayOf(
-                        Utils.dp(12F), Utils.dp(12F), Utils.dp(12F), Utils.dp(12F)
-                    ))
+                    Theme.color_bg, radii = FloatArray(4).apply {
+                        fill( Utils.dp(15F) )
+                    })
             }
 
             if (arguments.filters != HDRezka.Filters.SORTING)
@@ -477,7 +478,7 @@ class MoviesFragment : BaseAppFragment()
                 w, Layout.WRAP_CONTENT,
                 Gravity.CENTER_HORIZONTAL
             ).apply {
-                setMargins(0, 0, 0, Utils.dp(12))
+                setMargins( 0, 0, 0, Utils.dp(12) )
             })
         }
 
@@ -591,12 +592,12 @@ class MoviesFragment : BaseAppFragment()
 
                 background = null
 
-                this.text = Locale.string(R.string.showResults)
-
-                setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17F)
+                setTextSize( TypedValue.COMPLEX_UNIT_DIP, 17F )
                 isAllCaps = false
                 typeface = Theme.typeface(Theme.tf_bold)
-                setTextColor(Theme.mainColor)
+                setTextColor( Theme.mainColor )
+
+                text = Locale.string(R.string.showResults)
 
                 setOnClickListener {
                     val isFiltersChanged = applyNewFilters()
@@ -610,30 +611,29 @@ class MoviesFragment : BaseAppFragment()
 
             val divider = View(context).apply {
                 background = Theme.rect(
-                    Theme.overlayColor(Theme.color_bg, 0.07F)
+                    Theme.overlayColor( Theme.color_bg, 0.07F )
                 )
             }
 
             bottomLayout = FrameLayout(context).apply {
                 addView(showResultsButton, Layout.ezFrame(
-                    Layout.MATCH_PARENT, 60,
-                    Gravity.BOTTOM,
-                    20, 0, 20, 0
+                    Layout.MATCH_PARENT, 56
                 ))
 
-                addView(divider, Layout.frame(
-                    Layout.MATCH_PARENT, Utils.dp(1),
+                addView(divider, Layout.ezFrame(
+                    Layout.MATCH_PARENT, 1,
                     Gravity.TOP
                 ))
 
-                measure(0, 0)
+                measure()
             }
         }
+
 
         private fun applyNewFilters(): Boolean
         {
             var changed = false
-            if (hasGenres())
+            if ( hasGenres() )
             {
                 val newGenre = genreView!!.currentGenre()
                 if (activeGenre != newGenre) {
@@ -642,7 +642,7 @@ class MoviesFragment : BaseAppFragment()
                 }
             }
 
-            if (hasSections())
+            if ( hasSections() )
             {
                 val newSection = sectionView!!.currentSection()
                 if (activeSection != newSection) {
@@ -659,6 +659,33 @@ class MoviesFragment : BaseAppFragment()
 
             return changed
         }
+
+        private fun checkDefaultFilters(): Boolean
+        {
+            if ( hasGenres() ) {
+                if ( activeGenre != genreNames!![0] ) {
+                    activeGenre = genreNames!![0]
+                    return false
+                }
+            }
+
+            if ( hasSections() ) {
+                if ( activeSection != sections!![0] ) {
+                    activeSection = sections!![0]
+                    return false
+                }
+            }
+
+            if ( hasSortings() ) {
+                if ( activeSorting != sortings!![0] ) {
+                    activeSorting = sortings!![0]
+                    return false
+                }
+            }
+
+            return true
+        }
+
 
         private fun onFiltersOpen()
         {
@@ -695,6 +722,7 @@ class MoviesFragment : BaseAppFragment()
         {
             newFiltersListener = l
         }
+
 
         inner class FiltersView : VLinearLayout(context)
         {
@@ -755,23 +783,13 @@ class MoviesFragment : BaseAppFragment()
                     title = Locale.string(R.string.filters)
 
                     menu = ActionBar.Menu(context).apply {
-                        addItem(Theme.drawable(R.drawable.refresh, Theme.color_text)) {
-                            if (hasGenres())
-                            {
-                                activeGenre = genreNames!![0]
-                            }
-                            if (hasSections())
-                            {
-                                activeSection = sections!![0]
-                            }
-                            if (hasSortings())
-                            {
-                                activeSorting = sortings!![0]
+                        addItem( Theme.drawable( R.drawable.refresh, Theme.color_text ) ) {
+
+                            if ( ! checkDefaultFilters() ) {
+                                newFiltersListener?.invoke()
                             }
 
-                            newFiltersListener?.invoke()
-                            // Закрываем Фильтры
-                            dismiss()
+                            this@FiltersPopup.dismiss()
                         }
                     }
                 }

@@ -105,15 +105,8 @@ class MovieFragment : BaseAppFragment()
     private fun createUI()
     {
         headerView = HeaderView()
-        createWatchButtons()
         layout = VLinearLayout(context).apply {
             addView(headerView)
-
-            addView(watchButton, Layout.ezLinear(
-                Layout.MATCH_PARENT, 44,
-                Gravity.CENTER_HORIZONTAL,
-                20, 10, 20, 15
-            ))
         }
 
         createScroll()
@@ -128,12 +121,6 @@ class MovieFragment : BaseAppFragment()
 
             addView(actionBar, Layout.ezFrame(
                 Layout.MATCH_PARENT, Layout.WRAP_CONTENT
-            ))
-
-            addView(watchFab, Layout.ezFrame(
-                Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-                Gravity.BOTTOM or Gravity.END,
-                0, 0, 12, 12
             ))
         }
     }
@@ -169,7 +156,6 @@ class MovieFragment : BaseAppFragment()
                     actionBar.apply {
                         enableOnlyBackButton(false)
                     }
-                    watchFab.show()
                 }
                 else if (limitHeight in scrollY until oldScrollY)
                 {
@@ -177,47 +163,8 @@ class MovieFragment : BaseAppFragment()
                     actionBar.apply {
                         enableOnlyBackButton(true)
                     }
-                    watchFab.hide()
                 }
             }
-        }
-    }
-
-    private fun createWatchButtons()
-    {
-        watchButton = MaterialButton(context).apply {
-            gravity = Gravity.CENTER
-            setOnTouchListener( InstantPressListener(this) )
-
-            backgroundTintList = null
-            background = Theme.rect(
-                Theme.color_main,
-                radii = FloatArray(4).apply {
-                    fill(Utils.dp(7F))
-                }
-            )
-
-            icon = Theme.drawable(R.drawable.play)
-            iconTint = ColorStateList.valueOf(Theme.COLOR_WHITE)
-            iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
-
-            letterSpacing = 0.0F
-            setTextSize( TypedValue.COMPLEX_UNIT_DIP, 16.5F )
-            isAllCaps = false
-            typeface = Theme.typeface(Theme.tf_bold)
-            setTextColor( Color.WHITE )
-
-            text = Locale.string(R.string.watch)
-        }
-
-        watchFab = FloatingActionButton(context).apply {
-            backgroundTintList = ColorStateList.valueOf( Theme.mainColor )
-            rippleColor = Color.TRANSPARENT
-
-            setImageDrawable( Theme.drawable(R.drawable.play) )
-            imageTintList = ColorStateList.valueOf( Color.WHITE )
-
-            hide()
         }
     }
 
@@ -302,7 +249,7 @@ class MovieFragment : BaseAppFragment()
         if ( movieInfo.hasDescription() )
         {
             val tv = RTextView(context).apply {
-                setPadding(Utils.dp(20), 0, Utils.dp(20), 0)
+                setPadding( Utils.dp(20), Utils.dp(10), Utils.dp(20), 0 )
 
                 setTextColor( Theme.color_text )
                 typeface = Theme.typeface(Theme.tf_normal)
@@ -462,7 +409,7 @@ class MovieFragment : BaseAppFragment()
 
                     setOnClickListener {
                         val args = MoviesFragment.Arguments().apply {
-                            title = HDRezka.getSectionNameByMovieType(movie.type!!.ruType)
+                            title = HDRezka.getSectionNameByMovieType(movie.type!!)
                             url = genre.url
 
                             filters = HDRezka.Filters.GENRE_SORTING

@@ -44,7 +44,7 @@ class Parser
                 val type = iText
 
                 var rating: String? = null
-                val innerI = entity.getElementsByClass("b-category-bestrating rating-grey-string")
+                val innerI = entity.getElementsByClass("b-category-bestrating")
                 if ( innerI.size != 0 )
                 {
                     val text = innerI[0].ownText()

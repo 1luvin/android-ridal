@@ -40,8 +40,11 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
                     posterUrl = it
                 }
                 movieName = current.name
-                current.type?.let {
-                    setDetailText(it)
+
+                detailText = if (current.rating != null) {
+                    current.rating!!
+                } else {
+                    current.type!!
                 }
             }
         }

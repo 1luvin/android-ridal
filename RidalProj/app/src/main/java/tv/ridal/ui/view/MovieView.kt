@@ -14,21 +14,14 @@ import tv.ridal.util.Theme
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.hdrezka.Loader
-import tv.ridal.ui.amount
 import tv.ridal.util.Utils
 import kotlin.math.ceil
 
 class MovieView(context: Context) : FrameLayout(context)
 {
-    companion object
-    {
-        const val TYPE_MOVIE_TYPE: Int = 0
-        const val TYPE_RATING: Int = 1
-    }
-
-    private var posterView: ImageView
-    private var detailView: TextView
-    private var movieNameView: TextView
+    private lateinit var posterView: ImageView
+    private lateinit var detailView: TextView
+    private lateinit var movieNameView: TextView
 
 
     var posterUrl: String = ""
@@ -37,42 +30,24 @@ class MovieView(context: Context) : FrameLayout(context)
 
             Loader.loadImage(posterUrl, this::onPosterLoaded)
         }
-
     private var posterDrawable: Drawable? = null
-    private var posterWidthPx = Utils.dp(113)
+    private var posterWidth: Int = Utils.dp(113)
+        set(value) {
+            if (value == field) return
+            field = value
+
+            posterHeight = ceil(posterWidth * 1.5F).toInt()
+        }
+    private var posterHeight: Int = Utils.dp(170)
+
+    var detailText: String = ""
         set(value) {
             field = value
 
-            posterHeightPx = ceil(posterWidthPx * 1.5F).toInt()
-
-            posterView.layoutParams = Layout.ezFrame(
-                Utils.px(posterWidthPx), Utils.px(posterHeightPx),
-                Gravity.START or Gravity.TOP
-            )
-
-            gradient = LinearGradient(
-                0F, posterHeightPx + 0F, 0F, posterHeightPx / 2F,
-                Theme.color(Theme.color_bg),
-                Theme.COLOR_TRANSPARENT,
-                Shader.TileMode.CLAMP
-            )
-            gradientPaint.shader = gradient
+            detailView.text = detailText
         }
-
-    private var posterHeightPx = Utils.dp(170)
-
-    fun setDetailText(text: String, type: Int = TYPE_MOVIE_TYPE)
-    {
-        when (type)
-        {
-            TYPE_MOVIE_TYPE -> detailView.text = text
-            TYPE_RATING -> detailView.text = text.amount()
-        }
-    }
-
 
     private var gradientPaint = Paint( Paint.ANTI_ALIAS_FLAG )
-    private var gradient: LinearGradient
 
     var movieName: String? = null
         set(value) {
@@ -87,7 +62,7 @@ class MovieView(context: Context) : FrameLayout(context)
 
         val rawBitmap = (poster as BitmapDrawable).bitmap
 
-        val resizedBitmap = Bitmap.createScaledBitmap(rawBitmap, posterWidthPx, posterHeightPx, false)
+        val resizedBitmap = Bitmap.createScaledBitmap(rawBitmap, posterWidth, posterHeight, false)
 
         posterDrawable = RoundedBitmapDrawableFactory.create(resources, resizedBitmap).apply {
             cornerRadius = Utils.dp(6F)
@@ -102,61 +77,9 @@ class MovieView(context: Context) : FrameLayout(context)
         isClickable = true
         setOnTouchListener( InstantPressListener(this) )
 
-        background = Theme.rect(Theme.color_bg)
+        background = Theme.rect( Theme.color_bg )
 
-        // children
-
-        posterView = ImageView(context).apply {
-            scaleType = ImageView.ScaleType.FIT_XY
-        }
-        addView(posterView, Layout.frame(
-            posterWidthPx, posterHeightPx,
-            Gravity.START or Gravity.TOP
-        ))
-
-        detailView = TextView(context).apply {
-            setPadding(Utils.dp(5), Utils.dp(2), Utils.dp(5), Utils.dp(2))
-
-            background = Theme.rect(
-                Theme.alphaColor(Theme.COLOR_LIGHT_CHERRY, 0.7F),
-                radii = floatArrayOf(
-                    0F, Utils.dp(6F), 0F, Utils.dp(7F)
-                )
-            )
-
-            setTextColor( Color.WHITE )
-            textSize = 13F
-            typeface = Theme.typeface(Theme.tf_bold)
-            setLines(1)
-            maxLines = 1
-            isSingleLine = true
-        }
-        addView(detailView, Layout.frame(
-            Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-            Gravity.END or Gravity.TOP
-        ))
-
-        gradient = LinearGradient(
-            0F, posterHeightPx + 0F, 0F, posterHeightPx / 2F,
-            Theme.color(Theme.color_bg),
-            Color.TRANSPARENT,
-            Shader.TileMode.CLAMP
-        )
-        gradientPaint.shader = gradient
-
-        movieNameView = RTextView(context).apply {
-            setTextColor( Theme.color_text )
-            textSize = 15.2F
-            typeface = Theme.typeface(Theme.tf_bold)
-            setLines(1)
-            maxLines = 1
-            isSingleLine = true
-            ellipsize = TextUtils.TruncateAt.END
-        }
-        addView(movieNameView, Layout.frame(
-            Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-            Gravity.START or Gravity.BOTTOM
-        ))
+        createUI()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
@@ -164,20 +87,22 @@ class MovieView(context: Context) : FrameLayout(context)
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
 
-        if ( widthMode == MeasureSpec.UNSPECIFIED )
-        {
-            posterWidthPx = Utils.dp(113)
-        }
-        else if ( widthMode == MeasureSpec.EXACTLY )
-        {
-            posterWidthPx = width
+        if ( widthMode == MeasureSpec.UNSPECIFIED ) {
+            posterWidth = Utils.dp(113)
+        } else if ( widthMode == MeasureSpec.EXACTLY ) {
+            posterWidth = width
         }
 
         val nameHeight = Utils.dp(30)
 
         super.onMeasure(
-            MeasureSpec.makeMeasureSpec( posterWidthPx, MeasureSpec.EXACTLY ),
-            MeasureSpec.makeMeasureSpec( posterHeightPx + nameHeight, MeasureSpec.EXACTLY )
+            MeasureSpec.makeMeasureSpec( posterWidth, MeasureSpec.EXACTLY ),
+            MeasureSpec.makeMeasureSpec( posterHeight + nameHeight, MeasureSpec.EXACTLY )
+        )
+
+        posterView.measure(
+            MeasureSpec.makeMeasureSpec( posterWidth, MeasureSpec.EXACTLY ),
+            MeasureSpec.makeMeasureSpec( posterHeight, MeasureSpec.EXACTLY )
         )
 
         val availableWidth = measuredWidth - Utils.dp(20)
@@ -196,12 +121,82 @@ class MovieView(context: Context) : FrameLayout(context)
     {
         super.dispatchDraw(canvas)
 
-        canvas.drawRect(
-            0F,
-            posterHeightPx / 2F,
-            posterWidthPx + 0F,
-            posterHeightPx + Utils.dp(1F),
-            gradientPaint)
+        val x1 = 0F
+        val y1 = posterHeight + 0F
+        val x2 = posterWidth + 0F
+        val y2 = y1 / 2
+
+        gradientPaint.shader = LinearGradient(
+            x1, y1, x1, y2,
+            Theme.color( Theme.color_bg ),
+            Color.TRANSPARENT,
+            Shader.TileMode.CLAMP
+        )
+
+        canvas.drawRect( x1, y1, x2, y2 + Utils.dp(1F), gradientPaint )
+    }
+
+
+    private fun createUI()
+    {
+        createPosterView()
+        addView(posterView, Layout.frame(
+            posterWidth, posterHeight,
+            Gravity.START or Gravity.TOP
+        ))
+
+        createDetailView()
+        addView(detailView, Layout.ezFrame(
+            Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
+            Gravity.END or Gravity.TOP
+        ))
+
+        createNameView()
+        addView(movieNameView, Layout.frame(
+            Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
+            Gravity.START or Gravity.BOTTOM
+        ))
+    }
+
+    private fun createPosterView()
+    {
+        posterView = ImageView(context).apply {
+            scaleType = ImageView.ScaleType.FIT_XY
+        }
+    }
+
+    private fun createDetailView()
+    {
+        detailView = TextView(context).apply {
+            setPadding( Utils.dp(5), Utils.dp(2), Utils.dp(5), Utils.dp(2) )
+
+            background = Theme.rect(
+                Theme.alphaColor(Theme.COLOR_LIGHT_CHERRY, 0.7F),
+                radii = floatArrayOf(
+                    0F, Utils.dp(6F), 0F, Utils.dp(7F)
+                )
+            )
+
+            setTextColor( Color.WHITE )
+            textSize = 13F
+            typeface = Theme.typeface(Theme.tf_bold)
+            setLines(1)
+            maxLines = 1
+            isSingleLine = true
+        }
+    }
+
+    private fun createNameView()
+    {
+        movieNameView = RTextView(context).apply {
+            setTextColor( Theme.color_text )
+            textSize = 15.3F
+            typeface = Theme.typeface(Theme.tf_bold)
+            setLines(1)
+            maxLines = 1
+            isSingleLine = true
+            ellipsize = TextUtils.TruncateAt.END
+        }
     }
 
 }

@@ -53,16 +53,7 @@ class Theme
 
         private fun createColors()
         {
-//            var colorBg = 0xFF1A1640.toInt()
-//            var colorText = 0xFFFFFFFF.toInt()
-//            var colorText2 = mixColors(colorBg, colorText, 0.7F)
-//            var colorBottomNavIconInactive = mixColors(colorBg, 0xFFFFFFFF.toInt(), 0.5F)
-//            var colorSearchResultBest = 0xFF00FF00.toInt()
-//            var colorSearchResultMiddle = mixColors(colorBg, colorText, 0.5F)
-//            var colorSearchResultWorst = 0xFFFF0000.toInt()
-//            var colorActionBarBack = mixColors(colorBg, 0xFFFFFFFF.toInt(), 0.7F)
-
-            var colorBg = 0xFF000000.toInt()
+            var colorBg = 0xFF1A1640.toInt()
             var colorText = 0xFFFFFFFF.toInt()
             var colorText2 = mixColors(colorBg, colorText, 0.7F)
             var colorBottomNavIconInactive = mixColors(colorBg, 0xFFFFFFFF.toInt(), 0.5F)

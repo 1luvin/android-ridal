@@ -20,9 +20,7 @@ open class BottomPopup(context: Context) : BottomSheetDialog(context, R.style.Bo
 
     init
     {
-        window?.apply {
-            setDimAmount(dim)
-        }
+        window?.setDimAmount(dim)
     }
 
     var isDraggable: Boolean
