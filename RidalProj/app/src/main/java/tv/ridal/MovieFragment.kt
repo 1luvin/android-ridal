@@ -1,13 +1,11 @@
 package tv.ridal
 
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.TypedValue
 import android.view.*
 import android.widget.*
 import androidx.core.view.contains
@@ -21,7 +19,6 @@ import coil.transition.TransitionTarget
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import tv.ridal.util.Locale
 import tv.ridal.util.Theme
@@ -31,8 +28,8 @@ import tv.ridal.hdrezka.Movie
 import tv.ridal.hdrezka.Parser
 import tv.ridal.ui.actionbar.ActionBar
 import tv.ridal.adapter.PeopleAdapter
+import tv.ridal.ui.actionbar.IosBack
 import tv.ridal.ui.cell.PointerCell
-import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.VLinearLayout
 import tv.ridal.ui.recyclerview.SpacingItemDecoration
 import tv.ridal.ui.popup.ImagePopup
@@ -65,9 +62,6 @@ class MovieFragment : BaseAppFragment()
     private lateinit var headerView: HeaderView
     private var actorsView: RecyclerView? = null
     private var producersView: RecyclerView? = null
-
-    private lateinit var watchButton: Button
-    private lateinit var watchFab: FloatingActionButton
 
     private lateinit var movie: Movie
     private lateinit var movieInfo: Movie.Info
@@ -133,10 +127,13 @@ class MovieFragment : BaseAppFragment()
             background = Theme.rect( Theme.color_bg )
             enableOnlyBackButton(enable = true, animated = false)
 
-            addIosBack(type = ActionBar.IosBack.Type.ICON)
-            staticIosBackType = true
-            onBack {
-                finish()
+            iosBack = IosBack(context).apply {
+                type = IosBack.Type.ICON
+                canChangeType = false
+
+                onBack {
+                    this@MovieFragment.finish()
+                }
             }
 
             title = movie.name

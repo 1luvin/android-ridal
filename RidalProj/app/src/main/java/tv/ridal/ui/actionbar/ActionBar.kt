@@ -35,8 +35,23 @@ class ActionBar(context: Context) : FrameLayout(context)
         const val actionBarHeightDp: Int = 50
     }
 
-    private var iosBack: IosBack? = null
-    var staticIosBackType: Boolean = false
+
+    var iosBack: IosBack? = null
+        set(value)
+        {
+            iosBack?.let {
+                if ( contains(it) ) removeView(it)
+            }
+
+            field = value
+
+            iosBack?.let {
+                addView(it, Layout.ezFrame(
+                    Layout.WRAP_CONTENT, Layout.MATCH_PARENT,
+                    Gravity.START
+                ))
+            }
+        }
 
     private lateinit var titleView: RTextView
     private var subtitleView: RTextView? = null
@@ -89,34 +104,9 @@ class ActionBar(context: Context) : FrameLayout(context)
 
             if (subtitleView == null) createSubtitleView()
             subtitleView!!.text = subtitle
+
+            measureTitles()
         }
-
-
-    fun addIosBack(text: String? = null, type: IosBack.Type = IosBack.Type.ICON_TEXT)
-    {
-        iosBack?.let {
-            if ( contains(it) ) removeView(it)
-        }
-
-        iosBack = IosBack(context, text).apply {
-            this.type = type
-
-            setOnClickListener {
-                onBack?.invoke()
-            }
-        }
-
-        addView(iosBack, Layout.ezFrame(
-            Layout.WRAP_CONTENT, Layout.MATCH_PARENT,
-            Gravity.START
-        ))
-    }
-
-    private var onBack: (() -> Unit)? = null
-    fun onBack(l: () -> Unit)
-    {
-        onBack = l
-    }
 
     private fun createTitleView()
     {
@@ -230,43 +220,23 @@ class ActionBar(context: Context) : FrameLayout(context)
     {
         super.onMeasure(
             MeasureSpec.makeMeasureSpec( MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY ),
-            MeasureSpec.makeMeasureSpec( paddingTop + actionBarHeight + paddingBottom, MeasureSpec.EXACTLY) )
+            MeasureSpec.makeMeasureSpec( paddingTop + actionBarHeight + paddingBottom, MeasureSpec.EXACTLY )
+        )
 
-        var leftWidth = 0
+        var leftWidth = actionBarHeight
         iosBack?.let {
             it.measure()
             leftWidth = it.measuredWidth
         }
 
-        var rightWidth = 0
+        var rightWidth = actionBarHeight
         menu?.let {
             it.measure()
             rightWidth = it.measuredWidth
         }
 
         val busyWidth = max(leftWidth, rightWidth)
-
-        var availableWidth = measuredWidth - busyWidth * 2
-
-        if ( ! staticIosBackType )
-        {
-            val paint = Paint().apply {
-                typeface = Theme.typeface(Theme.tf_bold)
-                textSize = titleView.textSize
-            }
-            val titleWidth = paint.measureText(title)
-            paint.typeface = Theme.typeface(Theme.tf_normal)
-            val subtitleWidth = paint.measureText(subtitle)
-            val textWidth = max(titleWidth, subtitleWidth)
-
-            iosBack?.let {
-                it.type = if ( textWidth > availableWidth ) {
-                    IosBack.Type.ICON
-                } else {
-                    IosBack.Type.ICON_TEXT
-                }
-            }
-        }
+        val availableWidth = measuredWidth - busyWidth * 2
 
         titleView.measure(
             MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
@@ -277,6 +247,43 @@ class ActionBar(context: Context) : FrameLayout(context)
             MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
             0
         )
+    }
+
+    private fun measureTitles()
+    {
+        measure()
+
+        val availableWidth = max( titleView.measuredWidth, subtitleView?.measuredWidth ?: 0 )
+
+        msg("${availableWidth}")
+
+        if ( iosBack != null && iosBack!!.canChangeType )
+        {
+            val titleWidth = measureText(titleView)
+            val subtitleWidth = measureText(subtitleView)
+            val textWidth = max(titleWidth, subtitleWidth)
+
+            if ( textWidth > availableWidth ) {
+                iosBack!!.type = IosBack.Type.ICON
+            } else {
+                iosBack!!.type = IosBack.Type.ICON_TEXT
+            }
+        }
+    }
+
+    private val textPaint: Paint = Paint()
+    private fun measureText(textView: TextView?) : Float
+    {
+        if ( textView == null ) return 0F
+
+        textPaint.apply {
+            typeface = textView.typeface
+            textSize = Utils.dp( textView.textSize )
+        }
+
+        val text = textView.text
+
+        return textPaint.measureText(text, 0, text.length)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int)
@@ -318,94 +325,6 @@ class ActionBar(context: Context) : FrameLayout(context)
                 this.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
                 setMargins( widthMargin, this.topMargin, widthMargin, this.bottomMargin  )
             }
-        }
-    }
-
-
-    class IosBack(context: Context, private val Text: String? = null) : LinearLayout(context)
-    {
-        var type: IosBack.Type = IosBack.Type.ICON_TEXT
-            set(value)
-            {
-                if (field == value) return
-                field = value
-
-                if ( isTypeConstant ) return
-
-                when (type)
-                {
-                    Type.ICON -> applyIcon()
-                    Type.ICON_TEXT -> applyIconText()
-                }
-            }
-
-        var isTypeConstant: Boolean = false
-
-        init
-        {
-            isClickable = true
-            setOnTouchListener( InstantPressListener(this) )
-
-            applyIconText()
-        }
-
-        private fun applyIconText()
-        {
-            removeAllViews()
-
-            setPadding( 0, 0, Utils.dp(10), 0 )
-
-            val backIcon = Theme.drawable(R.drawable.ios_back, Theme.mainColor)
-            val imageView = ImageView(context).apply {
-                scaleType = ImageView.ScaleType.CENTER
-
-                setImageDrawable(backIcon)
-            }
-            addView(imageView, Layout.ezLinear(
-                Utils.dp(10), Layout.WRAP_CONTENT,
-                Gravity.CENTER_VERTICAL
-            ))
-
-            val textView = RTextView(context).apply {
-                setTextColor( Theme.mainColor )
-                textSize = 17.5F
-                typeface = Theme.typeface(Theme.tf_normal)
-
-                this.text = Text ?: Locale.string(R.string.back)
-            }
-            addView(textView, Layout.ezLinear(
-                Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-                Gravity.CENTER_VERTICAL
-            ))
-        }
-
-        private fun applyIcon()
-        {
-            removeAllViews()
-
-            setPaddings(0)
-
-            val imageView = ImageView(context).apply {
-                scaleType = ImageView.ScaleType.CENTER
-
-                setImageDrawable( Theme.drawable(R.drawable.back, Theme.mainColor) )
-            }
-            addView(imageView, Layout.ezLinear(
-                actionBarHeightDp, actionBarHeightDp
-            ))
-        }
-
-        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
-        {
-            super.onMeasure(
-                0,
-                MeasureSpec.makeMeasureSpec( Utils.dp(actionBarHeightDp), MeasureSpec.EXACTLY )
-            )
-        }
-
-        enum class Type
-        {
-            ICON_TEXT, ICON
         }
     }
 

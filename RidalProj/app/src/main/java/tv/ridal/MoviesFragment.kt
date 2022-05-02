@@ -32,6 +32,7 @@ import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.layout.SingleCheckGroup
 import tv.ridal.ui.popup.BottomPopup
 import tv.ridal.hdrezka.*
+import tv.ridal.ui.actionbar.IosBack
 import tv.ridal.ui.layout.VLinearLayout
 import tv.ridal.ui.measure
 import tv.ridal.util.Utils
@@ -43,12 +44,14 @@ class MoviesFragment : BaseAppFragment()
     override val stableTag: String
         get() = "MoviesFragment${View.generateViewId()}"
 
+
     companion object
     {
         fun newInstance(args: Arguments) = MoviesFragment().apply {
             arguments = args
         }
     }
+
 
     private lateinit var arguments: Arguments
     class Arguments
@@ -188,9 +191,13 @@ class MoviesFragment : BaseAppFragment()
             setPadding(0, Utils.dp(30), 0, 0)
             setBackgroundColor( Theme.color(Theme.color_bg) )
 
-            addIosBack()
-            onBack {
-                finish()
+            iosBack = IosBack(context).apply {
+                type = IosBack.Type.ICON_TEXT
+                canChangeType = true
+
+                onBack {
+                    this@MoviesFragment.finish()
+                }
             }
 
             title = arguments.title
@@ -835,9 +842,14 @@ class MoviesFragment : BaseAppFragment()
                 actionBar = ActionBar(context).apply {
                     title = Locale.string(R.string.genre)
 
-                    addIosBack( Locale.string(R.string.filters) )
-                    onBack {
-                        navigate(genreView!!, filtersView!!)
+                    iosBack = IosBack(context).apply {
+                        type = IosBack.Type.ICON_TEXT
+                        canChangeType = true
+                        backText = Locale.string(R.string.filters)
+
+                        onBack {
+                            navigate(genreView!!, filtersView!!)
+                        }
                     }
                 }
 
@@ -917,9 +929,14 @@ class MoviesFragment : BaseAppFragment()
                     title = Locale.string(R.string.sorting)
 
                     filtersView?.let {
-                        addIosBack( Locale.string(R.string.filters) )
-                        onBack {
-                            navigate(sortingView, it)
+                        iosBack = IosBack(context).apply {
+                            type = IosBack.Type.ICON_TEXT
+                            canChangeType = true
+                            backText = Locale.string(R.string.filters)
+
+                            onBack {
+                                navigate(sortingView, it)
+                            }
                         }
                     }
                 }
@@ -1018,9 +1035,14 @@ class MoviesFragment : BaseAppFragment()
                     title = Locale.string(R.string.section)
 
                     filtersView?.let {
-                        addIosBack( Locale.string(R.string.filters) )
-                        onBack {
-                            navigate(sectionView!!, it)
+                        iosBack = IosBack(context).apply {
+                            type = IosBack.Type.ICON_TEXT
+                            canChangeType = true
+                            backText = Locale.string(R.string.filters)
+
+                            onBack {
+                                navigate(sectionView!!, it)
+                            }
                         }
                     }
                 }
