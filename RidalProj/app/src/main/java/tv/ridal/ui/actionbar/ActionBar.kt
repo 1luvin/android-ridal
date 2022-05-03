@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
@@ -53,7 +54,9 @@ class ActionBar(context: Context) : FrameLayout(context)
             }
         }
 
-    private lateinit var titleView: RTextView
+    lateinit var titleView: RTextView
+        private set
+
     private var subtitleView: RTextView? = null
     var menu: ActionBar.Menu? = null
         set(value) {
@@ -157,7 +160,7 @@ class ActionBar(context: Context) : FrameLayout(context)
                     background,
                     Theme.rect(
                         Theme.Fill(
-                            intArrayOf( Theme.alphaColor(Theme.COLOR_BLACK, 0.5F), Theme.COLOR_TRANSPARENT ),
+                            intArrayOf( Theme.alphaColor( Color.BLACK, 0.5F ), Color.TRANSPARENT ),
                             GradientDrawable.Orientation.TOP_BOTTOM
                         )
                     )

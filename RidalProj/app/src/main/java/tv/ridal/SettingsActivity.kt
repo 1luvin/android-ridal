@@ -10,7 +10,6 @@ import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentContainerView
 import tv.ridal.util.Theme
 import tv.ridal.ui.layout.Layout
-import tv.ridal.util.Utils
 
 class SettingsActivity : BaseActivity()
 {
@@ -62,7 +61,7 @@ class SettingsActivity : BaseActivity()
         }
 
         supportFragmentManager.beginTransaction().add(
-            fragmentContainer.id, SettingsFragment.instance()
+            fragmentContainer.id, SettingsFragment.newInstance()
         ).commit()
     }
 

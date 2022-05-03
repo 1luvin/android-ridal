@@ -4,7 +4,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
-import tv.ridal.hdrezka.Streams.Stream
 import tv.ridal.ui.amount
 import tv.ridal.ui.msg
 
@@ -13,7 +12,7 @@ class Parser
     companion object
     {
         /*
-            Фильмы, сериалы, мультфильмы, аниме
+            Films, series, cartoons, anime
          */
 
         fun parseMovies(doc: Document, size: Int = HDRezka.PAGE_CAPACITY): ArrayList<Movie>?
@@ -72,7 +71,7 @@ class Parser
 
 
         /*
-            Информация о фильме
+            Movie information
          */
 
         fun parseMovieInfo(doc: Document): Movie.Info
@@ -233,7 +232,7 @@ class Parser
 
 
         /*
-            Результаты поиска
+            Search results
          */
 
         fun parseSearchResults(doc: Document): Pair<ArrayList<SearchResult>, Boolean>?
@@ -309,7 +308,7 @@ class Parser
 
 
         /*
-            Количество единиц кино
+            Movies size
          */
 
         fun parseSectionMoviesSize(doc: Document) : String
@@ -330,6 +329,9 @@ class Parser
             return parseSectionMoviesSize( Jsoup.parse(html) )
         }
 
+        /*
+            Person photo
+         */
 
         fun parsePersonPhotoUrl(html: String) : String
         {

@@ -26,5 +26,6 @@ class Sorting
 
             return url
         }
+
     }
 }

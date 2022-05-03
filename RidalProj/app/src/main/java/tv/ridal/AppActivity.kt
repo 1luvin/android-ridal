@@ -140,39 +140,6 @@ class AppActivity : BaseActivity()
         onBackPressedDispatcher.addCallback(this) { if ( ! multiStackNavigator.pop() ) finish() }
     }
 
-    override fun onResume()
-    {
-        super.onResume()
-
-        updateColors()
-        updateStatusBar()
-    }
-
-    private fun updateColors()
-    {
-        bottomNavigationView.apply {
-            setBackgroundColor( Theme.color_bg )
-
-            itemIconTintList = ColorStateList(
-                arrayOf(
-                    intArrayOf(-android.R.attr.state_checked),
-                    intArrayOf(android.R.attr.state_checked)
-                ),
-                intArrayOf(
-                    Theme.color(Theme.color_bottomNavIcon_inactive),
-                    Theme.color(Theme.color_bottomNavIcon_active),
-                )
-            )
-
-            itemRippleColor = ColorStateList.valueOf(
-                Theme.alphaColor(
-                    Theme.mainColor,
-                    0.05F
-                )
-            )
-        }
-    }
-
     private fun updateStatusBar()
     {
         Theme.enableDarkStatusBar(window, ! Theme.isDark())

@@ -61,7 +61,7 @@ class IosBack(context: Context) : LinearLayout(context)
 
         setPadding( 0, 0, Utils.dp(10), 0 )
 
-        val backIcon = Theme.drawable(R.drawable.ios_back, Theme.mainColor)
+        val backIcon = Theme.drawable( R.drawable.ios_back, Theme.mainColor )
         val imageView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.CENTER
 

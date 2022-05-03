@@ -29,30 +29,6 @@ open class BottomPopup(context: Context) : BottomSheetDialog(context, R.style.Bo
             this.behavior.isDraggable = value
         }
 
-    inner class HolderView : FrameLayout(context)
-    {
-        init
-        {
-            val holder = Theme.rect(Theme.color_popup_holder, radii = FloatArray(4).apply {
-                fill(Utils.dp(4F))
-            })
-            val holderView = ImageView(context).apply {
-                setImageDrawable(holder)
-            }
-            addView(holderView, Layout.ezFrame(
-                32, 4
-            ))
-        }
-
-        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
-        {
-            super.onMeasure(
-                MeasureSpec.makeMeasureSpec( MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY ),
-                MeasureSpec.makeMeasureSpec( Utils.dp(22), MeasureSpec.EXACTLY )
-            )
-        }
-    }
-
 }
 
 

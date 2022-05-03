@@ -22,7 +22,8 @@ class BigActionBar(context: Context) : FrameLayout(context)
     private val bottomPadding: Int = Utils.dp(10)
     private val menuIndent: Int = Utils.dp(15)
 
-    private var titleView: TextView
+    var titleView: TextView
+        private set
 
     var title: String = ""
         set(value) {

@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.graphics.*
 import android.graphics.drawable.*
 import android.view.Window
+import androidx.annotation.FloatRange
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsControllerCompat
@@ -14,24 +15,16 @@ class Theme
     companion object
     {
         /*
-            Константы
-         */
-
-        const val COLOR_TRANSPARENT = 0x00000000
-        const val COLOR_WHITE = 0xFFFFFFFF.toInt()
-        const val COLOR_BLACK = 0xFF000000.toInt()
-
-        /*
             Основные цвета (те, которые пользователь может выбрать)
          */
 
-        const val COLOR_TWITCH = 0xFF7C24FF.toInt()
+        private const val COLOR_TWITCH = 0xFF7C24FF.toInt()
         const val COLOR_LIGHT_CHERRY = 0xFFFF005F.toInt()
-        const val COLOR_TELEGRAM = 0xFF00B2FF.toInt()
-        const val COLOR_SOFT_BLUE = 0xFF4D00FF.toInt()
-        const val COLOR_SOFT_GREEN = 0xFF54EA54.toInt()
-        const val COLOR_ORANGE = 0xFFFA8700.toInt()
-        const val COLOR_PINK = 0xFFFF00F5.toInt()
+        private const val COLOR_TELEGRAM = 0xFF00B2FF.toInt()
+        private const val COLOR_SOFT_BLUE = 0xFF4D00FF.toInt()
+        private const val COLOR_SOFT_GREEN = 0xFF54EA54.toInt()
+        private const val COLOR_ORANGE = 0xFFFA8700.toInt()
+        private const val COLOR_PINK = 0xFFFF00F5.toInt()
 
         fun mainColors() : IntArray
         {
@@ -54,13 +47,13 @@ class Theme
         private fun createColors()
         {
             var colorBg = 0xFF1A1640.toInt()
-            var colorText = 0xFFFFFFFF.toInt()
+            var colorText = Color.WHITE
             var colorText2 = mixColors(colorBg, colorText, 0.7F)
-            var colorBottomNavIconInactive = mixColors(colorBg, 0xFFFFFFFF.toInt(), 0.5F)
-            var colorSearchResultBest = 0xFF00FF00.toInt()
+            var colorBottomNavIconInactive = mixColors(colorBg, Color.WHITE, 0.5F)
+            val colorSearchResultBest = 0xFF00FF00.toInt()
             var colorSearchResultMiddle = mixColors(colorBg, colorText, 0.5F)
-            var colorSearchResultWorst = 0xFFFF0000.toInt()
-            var colorActionBarBack = mixColors(colorBg, 0xFFFFFFFF.toInt(), 0.7F)
+            val colorSearchResultWorst = 0xFFFF0000.toInt()
+            var colorActionBarBack = mixColors(colorBg, Color.WHITE, 0.7F)
 
             darkColors = HashMap<String, Int>().apply {
                 put(color_bg, colorBg)
@@ -79,18 +72,14 @@ class Theme
                 put(color_actionBar_bg, lightenColor(colorBg, 0.03F))
                 put(color_actionBar_back, colorActionBarBack)
                 put(color_actionBar_menuItem, 0xFFFFFFFF.toInt())
-
-                put(color_negative, 0xFFFF6565.toInt())
-                put(color_popup_holder, 0xFFAAAAAA.toInt())
-                put(color_radio, 0xFFBBBBBB.toInt())
             }
 
-            colorBg = COLOR_WHITE
+            colorBg = Color.WHITE
             colorText = 0xFF000000.toInt()
             colorText2 = mixColors(colorBg, colorText, 0.7F)
-            colorBottomNavIconInactive = mixColors(colorBg, 0xFF000000.toInt(), 0.5F)
+            colorBottomNavIconInactive = mixColors(colorBg, Color.BLACK, 0.5F)
             colorSearchResultMiddle = mixColors(colorBg, colorText, 0.5F)
-            colorActionBarBack = mixColors(colorBg, 0xFF000000.toInt(), 0.7F)
+            colorActionBarBack = mixColors(colorBg, Color.BLACK, 0.7F)
 
             lightColors = HashMap<String, Int>().apply {
                 put(color_bg, colorBg)
@@ -100,7 +89,7 @@ class Theme
 
                 put(color_bottomNavBg, colorBg)
                 put(color_bottomNavIcon_inactive, colorBottomNavIconInactive)
-                put(color_bottomNavIcon_active, 0xFF000000.toInt())
+                put(color_bottomNavIcon_active, Color.BLACK)
 
                 put(color_searchResult_best, colorSearchResultBest)
                 put(color_searchResult_middle, colorSearchResultMiddle)
@@ -109,10 +98,6 @@ class Theme
                 put(color_actionBar_bg, colorBg)
                 put(color_actionBar_back, colorActionBarBack)
                 put(color_actionBar_menuItem, 0xFF000000.toInt())
-
-                put(color_negative, 0xFFFF6565.toInt())
-                put(color_popup_holder, 0xFF666666.toInt())
-                put(color_radio, 0xFF333333.toInt())
             }
         }
 
@@ -129,60 +114,60 @@ class Theme
         {
             // Инициализация темы
             val pref = App.instance().settingsPref
-            if ( ! pref.contains(theme) )
+            if ( ! pref.contains(key_colors) )
             {
                 pref.edit()
-                    .putInt(theme, FOLLOW_SYSTEM)
+                    .putInt(key_colors, FOLLOW_SYSTEM)
                     .apply()
             }
-            val t = pref.getInt(theme, FOLLOW_SYSTEM)
-            setTheme(t)
+            colors = pref.getInt(key_colors, FOLLOW_SYSTEM)
             // Инициализация основного цвета
-            if ( ! pref.contains(color_main) )
+            if ( ! pref.contains(key_mainColor) )
             {
                 pref.edit()
-                    .putInt(color_main, COLOR_TWITCH)
+                    .putInt(key_mainColor, COLOR_TWITCH)
                     .apply()
             }
             mainColor = pref.getInt(color_main, COLOR_TWITCH)
         }
 
-        fun setTheme(themeId: Int)
-        {
-            currentId = themeId
+        var colors: Int = FOLLOW_SYSTEM // !
+            set(value) {
+                field = value
 
-            if (themeId == FOLLOW_SYSTEM)
-            {
-                val conf = App.instance().configuration
-                val nightMode = conf.uiMode and Configuration.UI_MODE_NIGHT_YES
-                if (nightMode == Configuration.UI_MODE_NIGHT_YES)
-                    activeColors = colorsList[DARK]
+                if (colors == FOLLOW_SYSTEM)
+                {
+                    val conf = App.instance().configuration
+                    val nightMode = conf.uiMode and Configuration.UI_MODE_NIGHT_YES
+                    if (nightMode == Configuration.UI_MODE_NIGHT_YES)
+                        activeColors = colorsList[DARK]
+                    else
+                        activeColors = colorsList[LIGHT]
+                }
                 else
-                    activeColors = colorsList[LIGHT]
+                {
+                    activeColors = colorsList[colors]
+                }
             }
-            else
-            {
-                activeColors = colorsList[themeId]
-            }
-        }
 
-        fun update()
-        {
-            val editor = App.instance().settingsPref.edit()
-            editor.apply {
-                putInt(theme, currentId)
-                putInt(color_main, mainColor)
-            }
-            editor.apply()
-        }
+        var mainColor = 0 // !
+            set(value) {
+                field = value
 
-        var currentId: Int = 0 // !
+                val editor = App.instance().settingsPref.edit()
+                editor.apply {
+                    putInt(key_mainColor, mainColor)
+                    apply()
+                }
+            }
+
 
         /*
             Ключи для тем
          */
 
-        const val theme = "theme"
+        const val key_colors = "key_colors"
+        const val key_mainColor = "key_mainColor"
 
         /*
             Ключи для цветов
@@ -207,29 +192,21 @@ class Theme
         const val color_actionBar_back = "color_actionBar_back"
         const val color_actionBar_menuItem = "color_actionBar_menuItem"
 
-        const val color_negative = "color_negative"
-
-        const val color_popup_holder = "color_popup_holder"
-
-        const val color_radio = "color_radio"
-
         /*
-            Цвета
+            Colors
          */
 
-        var mainColor = 0 // !
-
-        // Светлые цвета
+        // Light colors
         lateinit var lightColors: HashMap<String, Int>
             private set
-        // Темные цвета
+        // Dark colors
         lateinit var darkColors: HashMap<String, Int>
             private set
-        // Активные цвета
-        var activeColors = HashMap<String, Int>()
+        // Active colors
+        lateinit var activeColors: HashMap<String, Int>
             private set
-        // Список всех цветов
-        val colorsList = listOf(
+        // All colors array
+        val colorsList = arrayOf(
             lightColors,
             darkColors,
         )
@@ -257,13 +234,11 @@ class Theme
         }
 
         /*
-            Шрифты
+            Fonts
          */
 
         const val tf_normal = "fonts/ps_normal.ttf"
-        const val tf_italic = "fonts/ps_italic.ttf"
         const val tf_bold = "fonts/ps_bold.ttf"
-        const val tf_boldItalic = "fonts/ps_boldItalic.ttf"
 
         fun typeface(tfKey: String) : Typeface
         {
@@ -271,10 +246,9 @@ class Theme
         }
 
         /*
-            Функции для цветов
+            Color functions
          */
 
-        // Осветлить цвет
         fun lightenColor(color: Int, value: Float = 0.02F) : Int
         {
             val hsv = FloatArray(3)
@@ -294,7 +268,7 @@ class Theme
         {
             return lightenColor( color(colorKey), value )
         }
-        // Затемнить цвет
+
         fun darkenColor(color: Int, value: Float = 0.02F) : Int
         {
             val hsv = FloatArray(3)
@@ -314,7 +288,8 @@ class Theme
         {
             return darkenColor( color(colorKey), value )
         }
-        // Осветляет или затемняет цвет
+
+        // Darken or lighten the color (depends on the input color)
         fun overlayColor(color: Int, value: Float = 0.02F) : Int
         {
             val hsv = FloatArray(3)
@@ -334,17 +309,17 @@ class Theme
         {
             return overlayColor( color(colorKey), value )
         }
-        // Сделать прозрачнее
-        fun alphaColor(color: Int, alpha: Float) : Int
+
+        fun alphaColor(color: Int, @FloatRange(from=0.0, to=1.0) alpha: Float) : Int
         {
             return ColorUtils.setAlphaComponent(color, (255 * alpha).toInt())
         }
-        fun alphaColor(colorKey: String, alpha: Float) : Int
+        fun alphaColor(colorKey: String, @FloatRange(from=0.0, to=1.0) alpha: Float) : Int
         {
             return alphaColor(color(colorKey), alpha)
         }
-        // Смешать цвета
-        fun mixColors(color1: Int, color2: Int, ratio: Float) : Int
+
+        fun mixColors(color1: Int, color2: Int, @FloatRange(from=0.0, to=1.0) ratio: Float) : Int
         {
             return ColorUtils.blendARGB(color1, color2, ratio)
         }
@@ -355,7 +330,7 @@ class Theme
 
         fun drawable(drawableId: Int): Drawable
         {
-            return ContextCompat.getDrawable(App.instance().applicationContext, drawableId)!!
+            return ContextCompat.getDrawable( App.instance().applicationContext, drawableId )!!
         }
         fun drawable(drawableId: Int, color: Int): Drawable
         {
@@ -365,7 +340,7 @@ class Theme
         }
         fun drawable(drawableId: Int, colorKey: String): Drawable
         {
-            return drawable(drawableId, color(colorKey))
+            return drawable( drawableId, color(colorKey) )
         }
 
         /*
@@ -382,7 +357,11 @@ class Theme
         }
         fun rect(colorKey: String, outline: Outline? = null, radii: FloatArray? = null) : GradientDrawable
         {
-            return rect( color(colorKey), outline, radii )
+            return rect(
+                color(colorKey),
+                outline,
+                radii
+            )
         }
         fun rect(fill: Fill? = null, outline: Outline? = null, radii: FloatArray? = null) : GradientDrawable
         {
@@ -401,7 +380,7 @@ class Theme
                     orientation = fill.orientation
                 }
                 if (outline != null) {
-                    setStroke(outline.width, outline.color)
+                    setStroke( outline.width, outline.color )
                 }
                 if (radii != null) {
                     cornerRadii = radiiArray
@@ -420,8 +399,8 @@ class Theme
 
     }
 
-    data class Outline(val color: Int, val width: Int = Utils.dp(1))
-    data class Fill(val colors: IntArray, val orientation: GradientDrawable.Orientation = GradientDrawable.Orientation.LEFT_RIGHT)
+    data class Outline( val color: Int, val width: Int = Utils.dp(1) )
+    data class Fill( val colors: IntArray, val orientation: GradientDrawable.Orientation = GradientDrawable.Orientation.LEFT_RIGHT )
 }
 
 

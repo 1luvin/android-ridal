@@ -19,12 +19,7 @@ class Pager
         }
         fun isNextPageExist(html: String) : Boolean
         {
-            return isNextPageExist(Jsoup.parse(html))
-        }
-
-        fun isTranslatorsExist(doc: Document) : Boolean
-        {
-            return doc.getElementById("translators-list") != null
+            return isNextPageExist( Jsoup.parse(html) )
         }
 
         fun nextPageUrl(document: Document) : String
