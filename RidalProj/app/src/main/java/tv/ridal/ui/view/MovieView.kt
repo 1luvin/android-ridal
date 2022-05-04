@@ -14,6 +14,7 @@ import tv.ridal.util.Theme
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.hdrezka.Loader
+import tv.ridal.ui.setTextColor
 import tv.ridal.util.Utils
 import kotlin.math.ceil
 

@@ -32,17 +32,18 @@ import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.layout.SingleCheckGroup
 import tv.ridal.ui.popup.BottomPopup
 import tv.ridal.hdrezka.*
-import tv.ridal.ui.actionbar.IosBack
 import tv.ridal.ui.layout.VLinearLayout
 import tv.ridal.ui.measure
+import tv.ridal.ui.msg
 import tv.ridal.util.Utils
 import tv.ridal.ui.setBackgroundColor
 import kotlin.math.abs
+import kotlin.random.Random
 
 class MoviesFragment : BaseAppFragment()
 {
     override val stableTag: String
-        get() = "MoviesFragment${View.generateViewId()}"
+        get() = "Movies${Random.nextInt()}"
 
 
     companion object
@@ -65,15 +66,6 @@ class MoviesFragment : BaseAppFragment()
         var applySection: String? = null
     }
 
-    private var subtitle: String? = null
-        set(value)
-        {
-            field = value
-
-            subtitle?.let {
-                actionBar.subtitle = it
-            }
-        }
     private fun updateSubtitle()
     {
         var str = ""
@@ -82,9 +74,9 @@ class MoviesFragment : BaseAppFragment()
 
         if (str != "") str += ", "
 
-        if (activeSorting != "") str += activeSorting
+        if (activeSorting != null) str += activeSorting
 
-        subtitle = str
+        actionBar.subtitle = str
     }
 
     /*
@@ -191,13 +183,8 @@ class MoviesFragment : BaseAppFragment()
             setPadding(0, Utils.dp(30), 0, 0)
             setBackgroundColor( Theme.color(Theme.color_bg) )
 
-            iosBack = IosBack(context).apply {
-                type = IosBack.Type.ICON_TEXT
-                canChangeType = true
-
-                onBack {
-                    this@MoviesFragment.finish()
-                }
+            onBack {
+                this@MoviesFragment.finish()
             }
 
             title = arguments.title
@@ -207,7 +194,7 @@ class MoviesFragment : BaseAppFragment()
     private fun createMoviesView()
     {
         moviesView = RecyclerView(context).apply {
-            setPadding( Utils.dp(10), 0, Utils.dp(10), 0 )
+            setPadding( Utils.dp(9), 0, Utils.dp(9), 0 )
             clipToPadding = false
 
             edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
@@ -217,7 +204,7 @@ class MoviesFragment : BaseAppFragment()
             }
 
             layoutManager = GridLayoutManager( context, 3 )
-            addItemDecoration( GridSpacingItemDecoration(3, Utils.dp(10)) )
+            addItemDecoration( GridSpacingItemDecoration(3, Utils.dp(11)) )
 
             adapter = MoviesAdapter(movies).apply {
                 onMovieClick {
@@ -277,7 +264,7 @@ class MoviesFragment : BaseAppFragment()
             backgroundTintList = ColorStateList.valueOf( Theme.color(Theme.color_main) )
 
             setImageDrawable( Theme.drawable(R.drawable.sett) )
-            imageTintList = ColorStateList.valueOf( Theme.COLOR_WHITE )
+            imageTintList = ColorStateList.valueOf( Color.WHITE )
 
             setOnClickListener {
                 filtersPopup.show()
@@ -842,14 +829,8 @@ class MoviesFragment : BaseAppFragment()
                 actionBar = ActionBar(context).apply {
                     title = Locale.string(R.string.genre)
 
-                    iosBack = IosBack(context).apply {
-                        type = IosBack.Type.ICON_TEXT
-                        canChangeType = true
-                        backText = Locale.string(R.string.filters)
-
-                        onBack {
-                            navigate(genreView!!, filtersView!!)
-                        }
+                    onBack {
+                        navigate(genreView!!, filtersView!!)
                     }
                 }
 
@@ -929,14 +910,8 @@ class MoviesFragment : BaseAppFragment()
                     title = Locale.string(R.string.sorting)
 
                     filtersView?.let {
-                        iosBack = IosBack(context).apply {
-                            type = IosBack.Type.ICON_TEXT
-                            canChangeType = true
-                            backText = Locale.string(R.string.filters)
-
-                            onBack {
-                                navigate(sortingView, it)
-                            }
+                        onBack {
+                            navigate(sortingView, it)
                         }
                     }
                 }
@@ -1035,14 +1010,8 @@ class MoviesFragment : BaseAppFragment()
                     title = Locale.string(R.string.section)
 
                     filtersView?.let {
-                        iosBack = IosBack(context).apply {
-                            type = IosBack.Type.ICON_TEXT
-                            canChangeType = true
-                            backText = Locale.string(R.string.filters)
-
-                            onBack {
-                                navigate(sectionView!!, it)
-                            }
+                        onBack {
+                            navigate(sectionView!!, it)
                         }
                     }
                 }

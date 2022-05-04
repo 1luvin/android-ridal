@@ -23,7 +23,7 @@ import tv.ridal.ui.cell.SearchResultCell
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.layout.VLinearLayout
 import tv.ridal.ui.setBackgroundColor
-import tv.ridal.ui.view.InputBar
+import tv.ridal.ui.view.SearchBar
 import tv.ridal.util.Locale
 import tv.ridal.util.Theme
 import tv.ridal.util.Utils
@@ -35,7 +35,7 @@ class SearchInputFragment : BaseAppFragment()
 
 
     private lateinit var rootFrame: FrameLayout
-    private lateinit var inputBar: InputBar
+    private lateinit var searchBar: SearchBar
     private lateinit var frame: FrameLayout
     private lateinit var scroll: NestedScrollView
 
@@ -75,14 +75,14 @@ class SearchInputFragment : BaseAppFragment()
     {
         super.onResume()
 
-        inputBar.showKeyboard()
+        searchBar.showKeyboard()
     }
 
     override fun onPause()
     {
         super.onPause()
 
-        inputBar.hideKeyboard()
+        searchBar.hideKeyboard()
     }
 
 
@@ -105,21 +105,21 @@ class SearchInputFragment : BaseAppFragment()
         rootFrame = FrameLayout(context).apply {
             setBackgroundColor( Theme.color_bg )
 
-            addView(inputBar, Layout.ezFrame(
+            addView(searchBar, Layout.ezFrame(
                 Layout.MATCH_PARENT, Layout.WRAP_CONTENT
             ))
 
             addView(frame, Layout.frame(
                 Layout.MATCH_PARENT, Layout.MATCH_PARENT,
                 Gravity.TOP,
-                0, inputBar.measuredHeight, 0, 0
+                0, searchBar.measuredHeight, 0, 0
             ))
         }
     }
 
     private fun createInputBar()
     {
-        inputBar = InputBar(context).apply {
+        searchBar = SearchBar(context).apply {
             setPadding(0, Utils.dp(30), 0, 0)
 
             setBackgroundColor(
@@ -129,7 +129,7 @@ class SearchInputFragment : BaseAppFragment()
             measure(0, 0)
         }
 
-        inputBar.apply {
+        searchBar.apply {
             onBack {
                 finish()
             }

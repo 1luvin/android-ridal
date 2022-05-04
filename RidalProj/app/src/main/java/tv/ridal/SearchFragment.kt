@@ -2,12 +2,12 @@ package tv.ridal
 
 import android.animation.ValueAnimator
 import android.os.Bundle
+import android.text.TextUtils
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EdgeEffect
-import android.widget.FrameLayout
-import android.widget.LinearLayout
+import android.widget.*
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +23,7 @@ import tv.ridal.ui.actionbar.BigActionBar
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.layout.VLinearLayout
 import tv.ridal.ui.recyclerview.GridSpacingItemDecoration
-import tv.ridal.ui.view.SearchView
+import tv.ridal.ui.view.RTextView
 import tv.ridal.util.Locale
 import tv.ridal.util.Theme
 import tv.ridal.util.Utils
@@ -147,7 +147,7 @@ class SearchFragment : BaseAppFragment()
 
     private fun createSearchView()
     {
-        searchView = SearchView(context).apply {
+        searchView = SearchView().apply {
             background = Theme.rect(
                 Theme.overlayColor(Theme.color_bg, 0.04F),
                 radii = FloatArray(4).apply {
@@ -205,6 +205,60 @@ class SearchFragment : BaseAppFragment()
         moviesView.adapter?.notifyItemRangeInserted(
             0, movies.size
         )
+    }
+
+
+    inner class SearchView : FrameLayout(context)
+    {
+        private var searchIconView: ImageView
+        private var textView: TextView
+
+        var text: String = ""
+            set(value) {
+                field = value
+
+                textView.text = text
+            }
+
+        init
+        {
+            searchIconView = ImageView(context).apply {
+                scaleType = ImageView.ScaleType.CENTER
+
+                setImageDrawable(Theme.drawable(R.drawable.search, Theme.color_text))
+            }
+            addView(searchIconView, Layout.ezFrame(
+                50, 50
+            ))
+
+            textView = RTextView(context).apply {
+                gravity = Gravity.CENTER_VERTICAL
+
+                setTextColor(Theme.color(Theme.color_text))
+                textSize = 18F
+                typeface = Theme.typeface(Theme.tf_normal)
+                setLines(1)
+                maxLines = 1
+                isSingleLine = true
+                ellipsize = TextUtils.TruncateAt.END
+
+                hint = Locale.string(R.string.search_hint)
+                setHintTextColor( Theme.color(Theme.color_text2) )
+            }
+            addView(textView, Layout.ezFrame(
+                Layout.MATCH_PARENT, Layout.MATCH_PARENT,
+                Gravity.START or Gravity.CENTER_VERTICAL,
+                50, 0, 0, 0
+            ))
+        }
+
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
+        {
+            super.onMeasure(
+                MeasureSpec.makeMeasureSpec( MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY ),
+                MeasureSpec.makeMeasureSpec( Utils.dp(50), MeasureSpec.EXACTLY )
+            )
+        }
     }
 }
 

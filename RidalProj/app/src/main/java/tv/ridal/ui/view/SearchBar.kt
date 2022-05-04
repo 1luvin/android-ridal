@@ -20,7 +20,7 @@ import tv.ridal.util.Locale
 import tv.ridal.util.Theme
 import tv.ridal.util.Utils
 
-class InputBar(context: Context) : FrameLayout(context)
+class SearchBar(context: Context) : FrameLayout(context)
 {
     private var backButton: ImageView
     private var editText: EditText
@@ -75,7 +75,7 @@ class InputBar(context: Context) : FrameLayout(context)
             setOnTouchListener( InstantPressListener(this) )
             scaleType = ImageView.ScaleType.CENTER
 
-            setImageDrawable( Theme.drawable(R.drawable.back, Theme.color_actionBar_back) )
+            setImageDrawable( Theme.drawable( R.drawable.back, Theme.color_actionBar_back ) )
 
             setOnClickListener {
                 onBack?.invoke()

@@ -18,14 +18,12 @@ class DropdownTextLayout(context: Context) : FrameLayout(context)
 {
     lateinit var textView: TextView
     var collapseLines: Int = 0 // !
-    var expandText: CharSequence
-        get() = expandTextView.text
-        set(value)
-        {
-            expandTextView.text = value.toString().lowercase()
+    var expandText: CharSequence = ""
+        set(value) {
+            field = value.toString().lowercase()
         }
 
-    private var expandTextView: RTextView
+    private var expandTextView: RTextView? = null
 
     private var startHeight: Int = 0 // !
     private var endHeight: Int = 0 // !
@@ -35,19 +33,7 @@ class DropdownTextLayout(context: Context) : FrameLayout(context)
 
     init
     {
-        expandTextView = RTextView(context).apply {
-            isClickable = true
 
-            setTextColor( Theme.mainColor )
-
-            setOnClickListener {
-                drop()
-            }
-        }
-        addView(expandTextView, Layout.frame(
-            Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-            Gravity.BOTTOM or Gravity.END
-        ))
     }
 
 
@@ -60,18 +46,11 @@ class DropdownTextLayout(context: Context) : FrameLayout(context)
                 Layout.MATCH_PARENT, Layout.WRAP_CONTENT
             ))
 
-            expandTextView.apply {
-                setPadding( Utils.dp(20), 0, it.paddingRight, it.paddingBottom )
-
-                background = Theme.rect( Theme.color_bg )
-
-                textSize = it.textSize
-                typeface = it.typeface
-
-                bringToFront()
-            }
-
             it.doOnPreDraw { view ->
+                if ( it.lineCount <= collapseLines) return@doOnPreDraw
+
+                createExpandTextView()
+
                 startHeight = it.paddingTop + (it.lineHeight * collapseLines) + it.paddingBottom
                 endHeight = (it.paddingTop + (it.lineHeight * it.lineCount) + (it.lineSpacingExtra * (it.lineCount - 1)) + it.paddingBottom).toInt()
 
@@ -87,6 +66,34 @@ class DropdownTextLayout(context: Context) : FrameLayout(context)
         super.onDetachedFromWindow()
 
         removeView(textView)
+        removeView(expandTextView)
+        expandTextView = null
+    }
+
+
+    private fun createExpandTextView()
+    {
+        expandTextView = RTextView(context).apply {
+            isClickable = true
+            setPadding( Utils.dp(20), 0, textView.paddingRight, textView.paddingBottom )
+
+            background = Theme.rect( Theme.color_bg )
+            setTextColor( Theme.mainColor )
+
+            textSize = textView.textSize
+            typeface = textView.typeface
+
+            text = expandText
+
+            setOnClickListener {
+                drop()
+            }
+        }
+
+        addView(expandTextView, Layout.frame(
+            Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
+            Gravity.BOTTOM or Gravity.END
+        ))
     }
 
     private fun drop()
@@ -101,7 +108,7 @@ class DropdownTextLayout(context: Context) : FrameLayout(context)
                 updateLayoutParams {
                     height = animHeight + paddingTop + paddingBottom
                 }
-                expandTextView.alpha = 1F - process
+                expandTextView?.alpha = 1F - process
             }
 
             addListener(object : AnimatorListenerAdapter()
@@ -110,7 +117,7 @@ class DropdownTextLayout(context: Context) : FrameLayout(context)
                 {
                     super.onAnimationEnd(animation)
 
-                    expandTextView.visibility = View.GONE
+                    expandTextView?.visibility = View.GONE
                 }
             })
 
@@ -118,6 +125,7 @@ class DropdownTextLayout(context: Context) : FrameLayout(context)
         }
 
     }
+
 }
 
 

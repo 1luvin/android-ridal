@@ -12,6 +12,7 @@ import tv.ridal.util.Theme
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.msg
+import tv.ridal.ui.setTextColor
 import tv.ridal.util.Utils
 import tv.ridal.ui.view.RTextView
 

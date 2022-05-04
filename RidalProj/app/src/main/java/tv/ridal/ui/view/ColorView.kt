@@ -2,6 +2,7 @@ package tv.ridal.ui.view
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.Color
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -46,7 +47,7 @@ class ColorView(context: Context) : FrameLayout(context)
         imageView = ImageView(context).apply {
             scaleType = ImageView.ScaleType.FIT_CENTER
 
-            setImageDrawable( Theme.drawable(R.drawable.done_bold, Theme.COLOR_WHITE) )
+            setImageDrawable( Theme.drawable( R.drawable.done_bold, Color.WHITE ) )
 
             alpha = 0F
             scaleX = 0F

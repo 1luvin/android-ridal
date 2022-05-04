@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
@@ -13,7 +12,6 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
 import android.widget.*
-import androidx.core.view.contains
 import androidx.core.view.updateLayoutParams
 import tv.ridal.R
 import tv.ridal.util.Theme
@@ -22,10 +20,8 @@ import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.measure
 import tv.ridal.ui.asInt
-import tv.ridal.ui.msg
-import tv.ridal.ui.setPaddings
+import tv.ridal.ui.setTextColor
 import tv.ridal.ui.view.RTextView
-import tv.ridal.util.Locale
 import tv.ridal.util.Utils
 import kotlin.math.max
 
@@ -36,28 +32,32 @@ class ActionBar(context: Context) : FrameLayout(context)
         const val actionBarHeightDp: Int = 50
     }
 
+    val actionBarHeight: Int = Utils.dp( actionBarHeightDp )
 
-    var iosBack: IosBack? = null
-        set(value)
-        {
-            iosBack?.let {
-                if ( contains(it) ) removeView(it)
-            }
 
-            field = value
-
-            iosBack?.let {
-                addView(it, Layout.ezFrame(
-                    Layout.WRAP_CONTENT, Layout.MATCH_PARENT,
-                    Gravity.START
-                ))
-            }
-        }
-
-    lateinit var titleView: RTextView
-        private set
+    private lateinit var titleView: RTextView
 
     private var subtitleView: RTextView? = null
+
+    private var backButton: ImageView? = null
+    private var onBackListener: (() -> Unit)? = null
+    fun onBack(l: (() -> Unit)?)
+    {
+        if ( l == null )
+        {
+            backButton?.let {
+                removeView(it)
+            }
+            backButton = null
+        }
+        else
+        {
+            if ( backButton == null ) createBackButtonView()
+        }
+
+        onBackListener = l
+    }
+
     var menu: ActionBar.Menu? = null
         set(value) {
             menu?.let {
@@ -73,43 +73,117 @@ class ActionBar(context: Context) : FrameLayout(context)
             ))
         }
 
-
-    val actionBarHeight: Int = Utils.dp(actionBarHeightDp)
-
     var title: String = ""
         set(value) {
             field = value
 
             titleView.text = title
         }
-    var titleColor: Int = Theme.color(Theme.color_text)
-        set(value) {
-            field = value
-
-            titleView.setTextColor(titleColor)
-        }
-    var titleTypeface: Typeface = Theme.typeface(Theme.tf_bold)
-        set(value) {
-            field = value
-
-            titleView.typeface = titleTypeface
-        }
-    var titleTextSize: Float = 19F
-        set(value) {
-            field = value
-
-            titleView.textSize = titleTextSize
-        }
+    private val titleTypeface: Typeface = Theme.typeface(Theme.tf_bold)
+    private val titleTextSize: Float = 19F
 
     var subtitle: String = ""
         set(value) {
             field = value
 
-            if (subtitleView == null) createSubtitleView()
-            subtitleView!!.text = subtitle
-
-            measureTitles()
+            if ( subtitle == "" )
+            {
+                subtitleView?.let {
+                    removeView(it)
+                }
+                subtitleView = null
+            }
+            else
+            {
+                if (subtitleView == null) createSubtitleView()
+                subtitleView!!.text = subtitle
+            }
         }
+
+
+    init
+    {
+        createTitleView()
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
+    {
+        super.onMeasure(
+            MeasureSpec.makeMeasureSpec( MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY ),
+            MeasureSpec.makeMeasureSpec( paddingTop + actionBarHeight + paddingBottom, MeasureSpec.EXACTLY )
+        )
+
+        var leftWidth = actionBarHeight
+        backButton?.let {
+            it.measure(
+                MeasureSpec.makeMeasureSpec( actionBarHeight, MeasureSpec.EXACTLY ),
+                MeasureSpec.makeMeasureSpec( actionBarHeight, MeasureSpec.EXACTLY )
+            )
+            leftWidth = it.measuredWidth
+        }
+
+        var rightWidth = actionBarHeight
+        menu?.let {
+            it.measure()
+            rightWidth = it.measuredWidth
+        }
+
+        val busyWidth = max(leftWidth, rightWidth)
+        val availableWidth = measuredWidth - busyWidth * 2
+
+        titleView.measure(
+            MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
+            0
+        )
+
+        subtitleView?.measure(
+            MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
+            0
+        )
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int)
+    {
+        super.onLayout(changed, left, top, right, bottom)
+
+        var leftMargin = 0
+        backButton?.let {
+            leftMargin = it.measuredWidth
+        }
+
+        var topMargin = 0
+        subtitleView?.let {
+            topMargin = Utils.dp(3)
+        }
+
+        var rightMargin = 0
+        menu?.let {
+            rightMargin = it.measuredWidth
+        }
+
+        var gravity = Gravity.CENTER
+        subtitleView?.let {
+            gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+        }
+
+        val widthMargin = max(leftMargin, rightMargin)
+
+        titleView.apply {
+            updateLayoutParams<FrameLayout.LayoutParams> {
+                this.gravity = gravity
+                setMargins( widthMargin, topMargin, widthMargin, this.bottomMargin )
+            }
+        }
+
+        subtitleView?.apply {
+            topMargin += ( Utils.dp( titleView.textSize.toInt() ) + Utils.dp(3) )
+
+            updateLayoutParams<FrameLayout.LayoutParams> {
+                setMargins( widthMargin, topMargin, widthMargin, this.bottomMargin  )
+            }
+        }
+    }
+
 
     private fun createTitleView()
     {
@@ -134,7 +208,7 @@ class ActionBar(context: Context) : FrameLayout(context)
     private fun createSubtitleView()
     {
         subtitleView = RTextView(context).apply {
-            setTextColor(Theme.color(Theme.color_text2))
+            setTextColor( Theme.color_text2 )
             textSize = 15F
             typeface = Theme.typeface(Theme.tf_normal)
             setLines(1)
@@ -142,10 +216,31 @@ class ActionBar(context: Context) : FrameLayout(context)
             isSingleLine = true
             ellipsize = TextUtils.TruncateAt.END
         }
+
         addView(subtitleView, Layout.ezFrame(
             Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
-            Gravity.TOP or Gravity.CENTER_HORIZONTAL,
-            0, 4 + titleTextSize.toInt() + 2, 0, 0
+            Gravity.TOP or Gravity.CENTER_HORIZONTAL
+        ))
+    }
+
+    private fun createBackButtonView()
+    {
+        backButton = ImageView(context).apply {
+            isClickable = true
+            setOnTouchListener( InstantPressListener(this) )
+
+            scaleType = ImageView.ScaleType.CENTER
+
+            setImageDrawable( Theme.drawable( R.drawable.back, Theme.mainColor ) )
+
+            setOnClickListener {
+                onBackListener?.invoke()
+            }
+        }
+
+        addView(backButton, Layout.frame(
+            Layout.WRAP_CONTENT, Layout.WRAP_CONTENT,
+            Gravity.START
         ))
     }
 
@@ -183,7 +278,10 @@ class ActionBar(context: Context) : FrameLayout(context)
                 duration = ANIM_DURATION
 
                 addUpdateListener {
-                    titleView.alpha = it.animatedValue as Float
+                    val value = it.animatedValue as Float
+
+                    elevation = Utils.dp(5F) * value
+                    titleView.alpha = value
                 }
 
                 addListener(object : AnimatorListenerAdapter() {
@@ -206,6 +304,7 @@ class ActionBar(context: Context) : FrameLayout(context)
         }
         else
         {
+            elevation = if (enable) 0F else Utils.dp(5F)
             titleView.apply {
                 alpha = toAlpha
                 visibility = if (enable) View.GONE else View.VISIBLE
@@ -214,129 +313,34 @@ class ActionBar(context: Context) : FrameLayout(context)
     }
 
 
-    init
-    {
-        createTitleView()
-    }
-
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
-    {
-        super.onMeasure(
-            MeasureSpec.makeMeasureSpec( MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY ),
-            MeasureSpec.makeMeasureSpec( paddingTop + actionBarHeight + paddingBottom, MeasureSpec.EXACTLY )
-        )
-
-        var leftWidth = actionBarHeight
-        iosBack?.let {
-            it.measure()
-            leftWidth = it.measuredWidth
-        }
-
-        var rightWidth = actionBarHeight
-        menu?.let {
-            it.measure()
-            rightWidth = it.measuredWidth
-        }
-
-        val busyWidth = max(leftWidth, rightWidth)
-        val availableWidth = measuredWidth - busyWidth * 2
-
-        titleView.measure(
-            MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
-            0
-        )
-
-        subtitleView?.measure(
-            MeasureSpec.makeMeasureSpec( availableWidth, MeasureSpec.AT_MOST ),
-            0
-        )
-    }
-
-    private fun measureTitles()
-    {
-        measure()
-
-        val availableWidth = max( titleView.measuredWidth, subtitleView?.measuredWidth ?: 0 )
-
-        msg("${availableWidth}")
-
-        if ( iosBack != null && iosBack!!.canChangeType )
-        {
-            val titleWidth = measureText(titleView)
-            val subtitleWidth = measureText(subtitleView)
-            val textWidth = max(titleWidth, subtitleWidth)
-
-            if ( textWidth > availableWidth ) {
-                iosBack!!.type = IosBack.Type.ICON
-            } else {
-                iosBack!!.type = IosBack.Type.ICON_TEXT
-            }
-        }
-    }
-
-    private val textPaint: Paint = Paint()
-    private fun measureText(textView: TextView?) : Float
-    {
-        if ( textView == null ) return 0F
-
-        textPaint.apply {
-            typeface = textView.typeface
-            textSize = Utils.dp( textView.textSize )
-        }
-
-        val text = textView.text
-
-        return textPaint.measureText(text, 0, text.length)
-    }
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int)
-    {
-        super.onLayout(changed, left, top, right, bottom)
-
-        var leftMargin = 0
-        iosBack?.let {
-            leftMargin = it.measuredWidth
-            println(leftMargin)
-        }
-
-        var topMargin = 0
-        subtitleView?.let {
-            topMargin = Utils.dp(4)
-        }
-
-        var rightMargin = 0
-        menu?.let {
-            rightMargin = it.measuredWidth
-        }
-
-        var widthMargin = max(leftMargin, rightMargin)
-
-        var gravity = Gravity.CENTER
-        subtitleView?.let {
-            gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-        }
-
-        titleView.apply {
-            updateLayoutParams<FrameLayout.LayoutParams> {
-                this.gravity = gravity
-                setMargins( widthMargin, topMargin, widthMargin, this.bottomMargin )
-            }
-        }
-
-        subtitleView?.apply {
-            updateLayoutParams<FrameLayout.LayoutParams> {
-                this.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-                setMargins( widthMargin, this.topMargin, widthMargin, this.bottomMargin  )
-            }
-        }
-    }
-
     open class Menu(context: Context) : LinearLayout(context)
     {
         init
         {
             setPadding( Utils.dp(15), 0, Utils.dp(6), 0 )
         }
+
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
+        {
+            var width = paddingLeft + Utils.dp(40) * itemsCount()
+            if (itemsCount() > 1) {
+                width += Utils.dp(12) * (itemsCount() - 1)
+            }
+            width += paddingRight
+
+            super.onMeasure(
+                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec), MeasureSpec.UNSPECIFIED)
+            )
+        }
+
+        private fun createItemView() : ImageView
+        {
+            return ImageView(context).apply {
+                scaleType = ImageView.ScaleType.CENTER
+            }
+        }
+
 
         fun addItem(drawable: Drawable, onClick: (() -> Unit)? = null)
         {
@@ -358,30 +362,9 @@ class ActionBar(context: Context) : FrameLayout(context)
             ))
         }
 
-        private fun createItemView() : ImageView
-        {
-            return ImageView(context).apply {
-                scaleType = ImageView.ScaleType.CENTER
-            }
-        }
-
         private fun itemsCount(): Int
         {
             return this.childCount
-        }
-
-        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)
-        {
-            var width = paddingLeft + Utils.dp(40) * itemsCount()
-            if (itemsCount() > 1) {
-                width += Utils.dp(12) * (itemsCount() - 1)
-            }
-            width += paddingRight
-
-            super.onMeasure(
-                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec), MeasureSpec.UNSPECIFIED)
-            )
         }
     }
 

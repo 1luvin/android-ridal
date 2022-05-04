@@ -1,13 +1,16 @@
 package tv.ridal
 
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Animatable
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.*
 import android.widget.*
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.view.contains
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
@@ -19,7 +22,6 @@ import coil.transition.TransitionTarget
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import tv.ridal.util.Locale
 import tv.ridal.util.Theme
 import tv.ridal.hdrezka.HDRezka
@@ -28,15 +30,17 @@ import tv.ridal.hdrezka.Movie
 import tv.ridal.hdrezka.Parser
 import tv.ridal.ui.actionbar.ActionBar
 import tv.ridal.adapter.PeopleAdapter
-import tv.ridal.ui.actionbar.IosBack
+import tv.ridal.hdrezka.Loader
 import tv.ridal.ui.cell.PointerCell
 import tv.ridal.ui.layout.VLinearLayout
+import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.recyclerview.SpacingItemDecoration
 import tv.ridal.ui.popup.ImagePopup
 import tv.ridal.ui.recyclerview.EdgeColorEffect
 import tv.ridal.ui.view.RTextView
 import tv.ridal.util.Utils
 import tv.ridal.ui.setBackgroundColor
+import tv.ridal.ui.setTextColor
 import tv.ridal.ui.view.DropdownTextLayout
 import kotlin.random.Random
 
@@ -127,13 +131,8 @@ class MovieFragment : BaseAppFragment()
             background = Theme.rect( Theme.color_bg )
             enableOnlyBackButton(enable = true, animated = false)
 
-            iosBack = IosBack(context).apply {
-                type = IosBack.Type.ICON
-                canChangeType = false
-
-                onBack {
-                    this@MovieFragment.finish()
-                }
+            onBack {
+                this@MovieFragment.finish()
             }
 
             title = movie.name
@@ -256,11 +255,9 @@ class MovieFragment : BaseAppFragment()
             }
 
             val dropdownLayout = DropdownTextLayout(context).apply {
-                setPadding(0, Utils.dp(5), 0, Utils.dp(5))
-
                 textView = tv
                 expandText = Locale.string(R.string.more)
-                collapseLines = 3
+                collapseLines = 4
             }
 
             layout.addView(dropdownLayout, Layout.frame(
@@ -446,7 +443,7 @@ class MovieFragment : BaseAppFragment()
         private var actorsText: TextView? = null
         private var durationView: LinearLayout? = null
 
-        private val secondaryTextColor: Int = Theme.alphaColor(Theme.COLOR_WHITE, 0.8F)
+        private val secondaryTextColor: Int = Theme.alphaColor( Color.WHITE, 0.8F )
 
         var movieNameHeightIndicator: Int = 0 // !
 
@@ -594,7 +591,7 @@ class MovieFragment : BaseAppFragment()
             ))
 
             nameView = RTextView(context).apply {
-                setTextColor( Theme.COLOR_WHITE )
+                setTextColor( Color.WHITE )
                 textSize = 32F
                 typeface = Theme.typeface(Theme.tf_bold)
                 setLines(1)
@@ -613,15 +610,15 @@ class MovieFragment : BaseAppFragment()
         private fun createBottomToGradient()
         {
             val color = if ( Theme.isDark() ) {
-                Theme.color(Theme.color_bg)
+                Theme.color( Theme.color_bg )
             } else {
-                Theme.alphaColor(Theme.COLOR_BLACK, 0.5F)
+                Theme.alphaColor( Color.BLACK, 0.5F )
             }
 
             gradientView = View(context).apply {
                 background = Theme.rect(
                     Theme.Fill(
-                        intArrayOf( color, Theme.COLOR_TRANSPARENT ),
+                        intArrayOf( color, Color.TRANSPARENT ),
                         GradientDrawable.Orientation.BOTTOM_TOP
                     )
                 )
@@ -742,7 +739,7 @@ class MovieFragment : BaseAppFragment()
                 ))
 
                 val tv = TextView(context).apply {
-                    setTextColor( Theme.COLOR_WHITE )
+                    setTextColor( Color.WHITE )
                     textSize = 17F
                     typeface = Theme.typeface(Theme.tf_bold)
 
@@ -779,7 +776,7 @@ class MovieFragment : BaseAppFragment()
                 ))
 
                 val tv = TextView(context).apply {
-                    setTextColor( Theme.COLOR_WHITE )
+                    setTextColor( Color.WHITE )
                     textSize = 17F
                     typeface = Theme.typeface(Theme.tf_bold)
 
@@ -832,6 +829,7 @@ class MovieFragment : BaseAppFragment()
         }
 
     }
+
 }
 
 

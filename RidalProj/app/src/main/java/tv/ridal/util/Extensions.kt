@@ -1,32 +1,34 @@
 package tv.ridal.ui
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.util.Log
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import tv.ridal.util.Theme
 import tv.ridal.R
 import tv.ridal.ui.view.EditText
 
-// Log
+
+/*
+    Custom Logs
+ */
 
 fun msg(msg: String)
 {
     Log.d("msg", msg)
 }
 
-// String
+/*
+    String
+ */
 
 // Extracts first float number found in string
+
 fun String.amount(): String = substring(indexOfFirst { it.isDigit() }, indexOfLast { it.isDigit() } + 1)
     .filter { it.isDigit() || it == '.' }
 
@@ -42,7 +44,7 @@ fun Boolean.asInt() = if (this) 1 else 0
 
 fun View.setPaddings(padding: Int)
 {
-    setPadding(padding, padding, padding, padding)
+    setPadding( padding, padding, padding, padding )
 }
 
 fun View.setBackgroundColor(colorKey: String)
@@ -55,7 +57,9 @@ fun View.measure()
     measure(0, 0)
 }
 
-// TextView
+/*
+    TextView
+ */
 
 fun TextView.setTextColor(colorKey: String)
 {
@@ -67,7 +71,9 @@ fun TextView.setTypeface(tfKey: String)
     typeface = Theme.typeface(tfKey)
 }
 
-// EditText
+/*
+    EditText
+ */
 
 fun EditText.showKeyboard()
 {
@@ -83,7 +89,9 @@ fun EditText.hideKeyboard()
     }
 }
 
-// Drawable
+/*
+    Drawable
+ */
 
 fun Drawable.asBitmap() : Bitmap
 {
@@ -98,7 +106,9 @@ fun Drawable.asBitmap() : Bitmap
     return bitmap
 }
 
-// FragmentTransaction
+/*
+    FragmentTransaction
+ */
 
 fun FragmentTransaction.zoom()
 {

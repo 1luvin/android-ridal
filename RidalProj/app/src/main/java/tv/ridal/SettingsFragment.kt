@@ -27,6 +27,7 @@ import tv.ridal.ui.setBackgroundColor
 import tv.ridal.ui.view.ColorView
 import tv.ridal.ui.view.RTextView
 import tv.ridal.ui.setPaddings
+import tv.ridal.ui.setTextColor
 import tv.ridal.util.Utils
 
 class SettingsFragment : BaseSettingsFragment()
@@ -302,7 +303,6 @@ class SettingsFragment : BaseSettingsFragment()
     }
 
 
-
     inner class SectionView(sectionName: String, view: View) : VLinearLayout(context)
     {
         init
@@ -472,14 +472,14 @@ class SettingsFragment : BaseSettingsFragment()
 
         private fun createGradientView(orientation: GradientDrawable.Orientation) : View
         {
-            val cFrom: Int = Theme.overlayColor(Theme.color_bg, 0.04F)
-            val cTo: Int = Theme.COLOR_TRANSPARENT
+            val cFrom: Int = Theme.overlayColor( Theme.color_bg, 0.04F )
+            val cTo: Int = Color.TRANSPARENT
 
             return View(context).apply {
                 background = Theme.rect(
                     Theme.Fill( intArrayOf(cFrom, cTo), orientation ),
                     radii = FloatArray(4).apply {
-                        fill(Utils.dp(15F))
+                        fill( Utils.dp(15F) )
                     }
                 )
             }
