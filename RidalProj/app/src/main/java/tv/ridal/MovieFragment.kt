@@ -1,16 +1,13 @@
 package tv.ridal
 
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Animatable
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.*
 import android.widget.*
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.view.contains
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
@@ -30,10 +27,8 @@ import tv.ridal.hdrezka.Movie
 import tv.ridal.hdrezka.Parser
 import tv.ridal.ui.actionbar.ActionBar
 import tv.ridal.adapter.PeopleAdapter
-import tv.ridal.hdrezka.Loader
 import tv.ridal.ui.cell.PointerCell
 import tv.ridal.ui.layout.VLinearLayout
-import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.recyclerview.SpacingItemDecoration
 import tv.ridal.ui.popup.ImagePopup
 import tv.ridal.ui.recyclerview.EdgeColorEffect
@@ -172,7 +167,7 @@ class MovieFragment : BaseAppFragment()
 
             edgeEffectFactory = EdgeColorEffect( Theme.mainColor )
 
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = LinearLayoutManager( context, LinearLayoutManager.HORIZONTAL, false )
             addItemDecoration( SpacingItemDecoration( Utils.dp(11) ) )
 
             adapter = PeopleAdapter(people).apply {
@@ -268,7 +263,7 @@ class MovieFragment : BaseAppFragment()
         // Актеры
         if ( movieInfo.hasActors() )
         {
-            actorsView = createPeopleView(movieInfo.actors!!)
+            actorsView = createPeopleView( movieInfo.actors!! )
 
             val actorsSection = SectionView( Locale.string(R.string.actors) ).apply {
                 setView(
@@ -282,7 +277,7 @@ class MovieFragment : BaseAppFragment()
         // Режиссеры
         if ( movieInfo.hasProducers() )
         {
-            producersView = createPeopleView(movieInfo.producers!!)
+            producersView = createPeopleView( movieInfo.producers!! )
 
             val producersSection = SectionView( Locale.string(R.string.producers) ).apply {
                 setView(

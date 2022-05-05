@@ -2,6 +2,7 @@ package tv.ridal.ui.layout
 
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.recyclerview.widget.RecyclerView
 import tv.ridal.util.Utils
 
 class Layout
@@ -147,6 +148,21 @@ class Layout
         fun linear(width: Int, height: Int) : LinearLayout.LayoutParams
         {
             return LinearLayout.LayoutParams( width, height )
+        }
+
+
+        /*
+            RecyclerView.LayoutParams
+         */
+
+        fun ezRecycler(width: Int, height: Int) : RecyclerView.LayoutParams
+        {
+            return RecyclerView.LayoutParams( size(width), size(height) )
+        }
+
+        fun recycler(width: Int, height: Int) : RecyclerView.LayoutParams
+        {
+            return RecyclerView.LayoutParams( width, height )
         }
 
     }

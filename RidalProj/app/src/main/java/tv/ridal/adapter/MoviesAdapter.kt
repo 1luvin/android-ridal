@@ -2,20 +2,17 @@ package tv.ridal.adapter
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import tv.ridal.AppActivity
 import tv.ridal.CatalogFragment
-import tv.ridal.MoviesFragment
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.view.MovieView
 import tv.ridal.hdrezka.Movie
-import tv.ridal.ui.msg
 
 class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter<MoviesAdapter.ViewHolder>()
 {
     private var onMovieClick: ((Movie) -> Unit)? = null
-    fun onMovieClick(l: ((Movie) -> Unit))
+    fun onMovieClick(l: ((Movie) -> Unit)?)
     {
         onMovieClick = l
     }
@@ -37,8 +34,9 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
             val movieView = itemView as MovieView
             movieView.apply {
                 current.posterUrl?.let {
-                    posterUrl = it
+                    this.posterUrl = it
                 }
+
                 movieName = current.name
 
                 detailText = if (current.rating != null) {
@@ -50,13 +48,13 @@ class MoviesAdapter(private val movies: ArrayList<Movie>) : RecyclerView.Adapter
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : ViewHolder
     {
         val movieView = MovieView(parent.context)
 
-        if (AppActivity.currentFragment() is CatalogFragment)
+        if ( AppActivity.currentFragment() is CatalogFragment )
         {
-            movieView.layoutParams = RecyclerView.LayoutParams(
+            movieView.layoutParams = Layout.ezRecycler(
                 Layout.WRAP_CONTENT, Layout.WRAP_CONTENT
             )
         }

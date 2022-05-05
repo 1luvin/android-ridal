@@ -19,9 +19,8 @@ class SpacingItemDecoration(
         super.getItemOffsets(outRect, view, parent, state)
 
         val position = parent.getChildAdapterPosition(view)
-        val itemCount = parent.adapter!!.itemCount
 
-        if (position != 0) outRect.left = spacing
+        if ( position != 0 ) outRect.left = spacing
 
         outRect.top = topSpacing
         outRect.bottom = bottomSpacing

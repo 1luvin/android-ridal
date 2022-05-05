@@ -5,7 +5,7 @@ import tv.ridal.ui.cell.CheckCell
 
 class SingleCheckGroup(context: Context) : VLinearLayout(context)
 {
-    var checkCells: ArrayList<CheckCell> = ArrayList()
+    private var checkCells: ArrayList<CheckCell> = ArrayList()
 
     init
     {
@@ -58,11 +58,6 @@ class SingleCheckGroup(context: Context) : VLinearLayout(context)
         }
     }
 
-    fun getCheckColor() : Int
-    {
-        return checkCells[0].checkColor
-    }
-
     fun setTextColor(color: Int)
     {
         checkCells.forEach {
@@ -84,15 +79,20 @@ class SingleCheckGroup(context: Context) : VLinearLayout(context)
 
         val prevChecked = getChildAt(0) as CheckCell
         removeView(prevChecked)
-        addView(prevChecked, checkCells.indexOf(prevChecked))
+        addView( prevChecked, checkCells.indexOf(prevChecked) )
 
         removeView(checkedCell)
-        addView(checkedCell, 0)
+        addView( checkedCell, 0 )
     }
 
-    fun currentChecked(): String = checkCells.find {
-        it.isChecked
-    }!!.text
+    fun currentChecked(): String
+    {
+        val found = checkCells.find {
+            it.isChecked
+        }
+
+        return found?.text ?: "null"
+    }
 
     fun size(): Int = checkCells.size
 }

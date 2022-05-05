@@ -7,6 +7,6 @@ open class VLinearLayout(context: Context) : LinearLayout(context)
 {
     init
     {
-        orientation = LinearLayout.VERTICAL
+        orientation = VERTICAL
     }
 }

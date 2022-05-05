@@ -8,6 +8,7 @@ import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.view.Gravity
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import tv.ridal.R

@@ -6,54 +6,38 @@ import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
 
-class InstantPressListener(private val ofView: View) : View.OnTouchListener
+class InstantPressListener(private val view: View) : View.OnTouchListener
 {
+    private val ANIM_DURATION: Long = 100
     private val ALPHA_PRESSED: Float = 0.6F
     private val SCALE_PRESSED: Float = 0.99F
 
+    private var wasPressed: Boolean = false
+
     private val alphaAnimator: ValueAnimator = ValueAnimator().apply {
-        duration = 100
+        duration = ANIM_DURATION
         setEvaluator( ArgbEvaluator() )
 
         addUpdateListener {
-            val animatedAlpha = it.animatedValue as Float
-            ofView.alpha = animatedAlpha
+            view.alpha = it.animatedValue as Float
         }
     }
-
     private val scaleAnimator: ValueAnimator = ValueAnimator().apply {
-        duration = 100
+        duration = ANIM_DURATION
 
         addUpdateListener {
-            val animatedScale = it.animatedValue as Float
-            ofView.scaleX = animatedScale
-            ofView.scaleY = animatedScale
+            val value = it.animatedValue as Float
+            view.apply {
+                scaleX = value
+                scaleY = value
+            }
         }
     }
 
-    private fun cancelPress()
+
+    override fun onTouch(v: View, event: MotionEvent) : Boolean
     {
-        if ( ! wasPressed ) return
-        wasPressed = false
-
-        alphaAnimator.apply {
-            cancel()
-            setFloatValues(ofView.alpha, ALPHA_PRESSED, 1F)
-            start()
-        }
-
-        scaleAnimator.apply {
-            cancel()
-            setFloatValues(ofView.scaleX, SCALE_PRESSED, 1F)
-            start()
-        }
-    }
-
-    private var wasPressed: Boolean = false
-
-    override fun onTouch(v: View, event: MotionEvent): Boolean
-    {
-        when (event.action)
+        when ( event.action )
         {
             MotionEvent.ACTION_DOWN ->
             {
@@ -61,23 +45,23 @@ class InstantPressListener(private val ofView: View) : View.OnTouchListener
 
                 alphaAnimator.apply {
                     cancel()
-                    setFloatValues(ofView.alpha, ALPHA_PRESSED)
+                    setFloatValues( view.alpha, ALPHA_PRESSED )
+                    start()
+                }
+                scaleAnimator.apply {
+                    cancel()
+                    setFloatValues( view.scaleX, SCALE_PRESSED )
                     start()
                 }
 
-                scaleAnimator.apply {
-                    cancel()
-                    setFloatValues(1F, SCALE_PRESSED)
-                    start()
-                }
                 return true
             }
             MotionEvent.ACTION_UP ->
             {
                 cancelPress()
 
-                if (isUpInside(event)) {
-                    ofView.performClick()
+                if ( isUpInside(event) ) {
+                    view.performClick()
                 }
 
                 return true
@@ -89,7 +73,7 @@ class InstantPressListener(private val ofView: View) : View.OnTouchListener
             }
             MotionEvent.ACTION_MOVE ->
             {
-                if ( ! isUpInside(event)) {
+                if ( ! isUpInside(event) ) {
                     cancelPress()
                 }
                 return true
@@ -98,20 +82,38 @@ class InstantPressListener(private val ofView: View) : View.OnTouchListener
         return false
     }
 
+    private fun cancelPress()
+    {
+        if ( ! wasPressed ) return
+        wasPressed = false
+
+        alphaAnimator.apply {
+            cancel()
+            setFloatValues( view.alpha, ALPHA_PRESSED, 1F )
+            start()
+        }
+        scaleAnimator.apply {
+            cancel()
+            setFloatValues( view.scaleX, SCALE_PRESSED, 1F )
+            start()
+        }
+    }
+
     private fun isUpInside(e: MotionEvent) : Boolean
     {
         val rect = Rect(
-            ofView.left,
-            ofView.top,
-            ofView.right,
-            ofView.bottom
+            view.left,
+            view.top,
+            view.right,
+            view.bottom
         )
 
         return rect.contains(
-            ofView.left + e.x.toInt(),
-            ofView.top + e.y.toInt()
+            view.left + e.x.toInt(),
+            view.top + e.y.toInt()
         )
     }
+
 }
 
 

@@ -12,9 +12,6 @@ class App : Application()
 {
     companion object
     {
-        const val APP_NAME = "Ridal"
-        const val WEBSITE = "https://ridal.tv"
-
         const val SETTINGS_PREF = "tv.ridal.settings"
 
         @Volatile

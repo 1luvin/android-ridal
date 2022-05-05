@@ -13,6 +13,8 @@ import tv.ridal.util.Utils
 
 class ColorView(context: Context) : FrameLayout(context)
 {
+    private val ANIM_DURATION: Long = 190
+
     private var imageView: ImageView
 
     var color: Int = 0xFF666666.toInt()
@@ -27,13 +29,6 @@ class ColorView(context: Context) : FrameLayout(context)
             )
         }
 
-    override fun setSelected(selected: Boolean)
-    {
-        if (selected == isSelected) return
-        super.setSelected(selected)
-
-        animateTo(selected)
-    }
 
     init
     {
@@ -69,13 +64,23 @@ class ColorView(context: Context) : FrameLayout(context)
         )
     }
 
+
+    override fun setSelected(selected: Boolean)
+    {
+        if (selected == isSelected) return
+
+        super.setSelected(selected)
+
+        animateTo(selected)
+    }
+
     private fun animateTo(select: Boolean)
     {
         val from = imageView.alpha
         val to = if (select) 1F else 0F
 
-        ValueAnimator.ofFloat(from, to).apply {
-            duration = 190
+        ValueAnimator.ofFloat( from, to ).apply {
+            duration = ANIM_DURATION
 
             addUpdateListener {
                 val value = it.animatedValue as Float

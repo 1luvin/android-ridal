@@ -11,7 +11,7 @@ import tv.ridal.ui.view.PersonView
 class PeopleAdapter(private val people: ArrayList<Movie.NameUrl>) : RecyclerView.Adapter<PeopleAdapter.ViewHolder>()
 {
     private var onPersonClick: ((Drawable) -> Unit)? = null
-    fun onPersonClick(l: (Drawable) -> Unit)
+    fun onPersonClick(l: ((Drawable) -> Unit)?)
     {
         onPersonClick = l
     }

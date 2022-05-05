@@ -6,6 +6,6 @@ import androidx.recyclerview.widget.RecyclerView
 class EdgeColorEffect(private val Color: Int) : RecyclerView.EdgeEffectFactory()
 {
     override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
-        return EdgeEffect(view.context).apply { color = Color }
+        return EdgeEffect( view.context ).apply { color = Color }
     }
 }

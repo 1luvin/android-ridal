@@ -5,13 +5,13 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentTransaction
 import tv.ridal.util.Theme
 import tv.ridal.R
-import tv.ridal.ui.view.EditText
 
 
 /*
@@ -29,7 +29,7 @@ fun msg(msg: String)
 
 // Extracts first float number found in string
 
-fun String.amount(): String = substring(indexOfFirst { it.isDigit() }, indexOfLast { it.isDigit() } + 1)
+fun String.amount(): String = substring( indexOfFirst { it.isDigit() }, indexOfLast { it.isDigit() } + 1 )
     .filter { it.isDigit() || it == '.' }
 
 /*

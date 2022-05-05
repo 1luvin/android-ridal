@@ -16,6 +16,8 @@ import tv.ridal.util.Utils
 
 class DropdownTextLayout(context: Context) : FrameLayout(context)
 {
+    private val DROP_DURATION: Long = 300
+
     lateinit var textView: TextView
     var collapseLines: Int = 0 // !
     var expandText: CharSequence = ""
@@ -27,8 +29,6 @@ class DropdownTextLayout(context: Context) : FrameLayout(context)
 
     private var startHeight: Int = 0 // !
     private var endHeight: Int = 0 // !
-
-    private val DROP_DURATION: Long = 300
 
 
     init
@@ -47,7 +47,7 @@ class DropdownTextLayout(context: Context) : FrameLayout(context)
             ))
 
             it.doOnPreDraw { view ->
-                if ( it.lineCount <= collapseLines) return@doOnPreDraw
+                if ( it.lineCount <= collapseLines ) return@doOnPreDraw
 
                 createExpandTextView()
 
