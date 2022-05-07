@@ -9,24 +9,24 @@ class Section
     {
         const val url_base = "&genre="
 
-        private var sectionUrls = HashMap<String, String>().apply {
+        private var sections = HashMap<String, String>().apply {
+            this[Locale.string(R.string.allSections)] = ""
             this[Locale.string(R.string.films)] = "1"
             this[Locale.string(R.string.series)] = "2"
             this[Locale.string(R.string.cartoons)] = "3"
             this[Locale.string(R.string.anime)] = "82"
         }
 
-        fun url(sorting: String) : String
+        fun url(section: String?) : String
         {
-            if (sorting == Locale.string(R.string.allSections)) return ""
+            if ( section == null ) return ""
 
-            var url = ""
-            if ( sectionUrls.containsKey(sorting) )
+            if ( sections.containsKey(section) )
             {
-                url += "${url_base}${sectionUrls[sorting]}"
+                return "${url_base}${sections[section]}"
             }
 
-            return url
+            return ""
         }
     }
 }

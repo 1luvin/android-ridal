@@ -60,7 +60,7 @@ class MoviesFragment : BaseAppFragment()
         lateinit var title: String
         var url: String? = null
 
-        lateinit var filters: HDRezka.Filters
+        lateinit var filters: Filters
 
         var applyGenre: String? = null
         var applySection: String? = null
@@ -90,7 +90,7 @@ class MoviesFragment : BaseAppFragment()
     private var activeGenre: String? = null
     private var sortings: Array<String>? = null
     private var activeSorting: String? = null
-    private var sections: Array<String>? = null
+    private var sections: List<String>? = null
     private var activeSection: String? = null
 
     private fun hasGenres(): Boolean = genres != null
@@ -164,7 +164,7 @@ class MoviesFragment : BaseAppFragment()
             ))
         }
 
-        if (arguments.filters != HDRezka.Filters.NO_FILTERS)
+        if (arguments.filters != Filters.NO_FILTERS)
         {
             createFiltersButton()
             rootFrame.addView(
@@ -223,7 +223,7 @@ class MoviesFragment : BaseAppFragment()
                         heightIndicator = range / 2
                     }
 
-                    if ( arguments.filters != HDRezka.Filters.NO_FILTERS )
+                    if ( arguments.filters != Filters.NO_FILTERS )
                     {
                         if ( abs(dy) > Utils.dp(2) )
                         {
@@ -285,7 +285,7 @@ class MoviesFragment : BaseAppFragment()
 
     private fun checkFilters()
     {
-        if (arguments.filters == HDRezka.Filters.NO_FILTERS) return
+        if (arguments.filters == Filters.NO_FILTERS) return
 
         val title = arguments.title
         if (title in HDRezka.sectionNames)
@@ -302,7 +302,7 @@ class MoviesFragment : BaseAppFragment()
         )
         activeSorting = sortings!![0]
 
-        if (arguments.filters == HDRezka.Filters.SECTION_SORTING)
+        if (arguments.filters == Filters.SECTION_SORTING)
         {
             sections = HDRezka.sectionNames
             activeSection = arguments.applySection ?: sections!![0]
@@ -315,30 +315,7 @@ class MoviesFragment : BaseAppFragment()
     {
         loading = true
 
-        var url = ""
-        if (document == null)
-        {
-            updateSubtitle()
-
-            url = arguments.url!!
-            if ( hasGenres() ) {
-                url += genres!![activeGenre!!]
-            }
-            if ( hasSortings() ) {
-                url += Sorting.url(activeSorting!!)
-            }
-            if ( hasSections() ) {
-                url += Section.url(activeSection!!)
-            }
-        }
-        else {
-            if (Pager.isNextPageExist(document!!)) {
-                url = Pager.nextPageUrl(document!!)
-            } else {
-                loading = false
-                return
-            }
-        }
+        val url: String = nextUrl() ?: return
 
         val request = StringRequest(
             Request.Method.GET, url,
@@ -361,6 +338,32 @@ class MoviesFragment : BaseAppFragment()
         }
 
         requestQueue.add(request)
+    }
+
+    private fun nextUrl() : String?
+    {
+        if (document == null)
+        {
+            updateSubtitle()
+
+            val url = HDRezka.createUrl(
+                baseUrl = arguments.url!!,
+                genreUrl = Genre.url(genres, activeGenre),
+                sortingUrl = Sorting.url(activeSorting),
+                sectionUrl = Section.url(activeSection)
+            )
+
+            msg(url)
+
+            return url
+        }
+
+        return if ( Pager.isNextPageExist( document!! ) ) {
+            Pager.nextPageUrl( document!! )
+        } else {
+            loading = false
+            null
+        }
     }
 
     private fun clearMovies()
@@ -405,7 +408,7 @@ class MoviesFragment : BaseAppFragment()
                     })
             }
 
-            if (arguments.filters != HDRezka.Filters.SORTING)
+            if (arguments.filters != Filters.SORTING)
             {
                 createBottomLayout()
                 popupView.addView(bottomLayout, Layout.ezFrame(

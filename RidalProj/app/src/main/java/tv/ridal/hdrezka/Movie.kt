@@ -9,49 +9,50 @@ data class Movie(val name: String, val url: String)
 
     class Info
     {
-        // Постер
+        // Poster
         var hdPosterUrl: String? = null
-        // Рейтинги
+
+        // Ratings
         var ratings: ArrayList<Rating>? = null
         fun hasRatings() = ratings != null
-        // Входит в списки
+
+        // In lists
         var inLists: ArrayList<NameUrl>? = null
         fun hasInLists() = inLists != null
-        // Дата выхода
+
+        // Release year
         var releaseYear: String? = null
-        fun hasReleaseYear() = releaseYear != null
-        // Страны
+
+        // Country
         var countries: ArrayList<NameUrl>? = null
         fun hasCountries() = countries != null
-        // Режиссеры
+
+        // Producers
         var producers: ArrayList<NameUrl>? = null
         fun hasProducers() = producers != null
-        // Жанры
+
+        // Genre
         var genres: ArrayList<NameUrl>? = null
         fun hasGenres() = genres != null
-        // В переводе
-        var inTranslations: String? = null
-        fun hasInTranslations() = inTranslations != null
-        // Длительность
+
+        // Duration
         var duration: String? = null
-        fun hasDuration() = duration != null
-        // Из коллекций
+
+        // In collections
         var inCollections: ArrayList<NameUrl>? = null
         fun hasInCollections() = inCollections != null
-        // В ролях актеры
+
+        // Actors
         var actors: ArrayList<NameUrl>? = null
         fun hasActors() = actors != null
-        // Описание
-        var description: Description? = null
-        fun hasDescription() = description != null
 
+        // Description
+        lateinit var description: String
     }
 
     data class NameUrl(val name: String, val url: String)
 
     data class Rating(val whose: String, val value: String)
-
-    data class Description(val title: String, val text: String)
 
 }
 

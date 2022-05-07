@@ -14,13 +14,6 @@ class HDRezka
         const val CARTOON = "Мультфильм"
         const val ANIME = "Аниме"
 
-        val sectionNames: Array<String> = arrayOf(
-            Locale.string(R.string.films),
-            Locale.string(R.string.series),
-            Locale.string(R.string.cartoons),
-            Locale.string(R.string.anime)
-        )
-
         const val RATINGS = "Рейтинги"
         const val IMDB = "IMDb"
         const val KP = "Кинопоиск"
@@ -29,50 +22,46 @@ class HDRezka
         const val COUNTRY = "Страна"
         const val PRODUCER = "Режиссер"
         const val GENRE = "Жанр"
-        const val IN_TRANSLATION = "В переводе"
         const val TIME = "Время"
         const val FROM_SERIES = "Из серии"
         const val ACTORS = "В ролях актеры"
 
-        var url_base = "https://rezka.ag/"
+        const val URL_BASE = "https://hdrezkaert.com/"
 
         val URL_FILMS
-            get() = url_base + "films/"
+            get() = URL_BASE + "films/"
         val URL_SERIES
-            get() = url_base + "series/"
+            get() = URL_BASE + "series/"
         val URL_CARTOONS
-            get() = url_base + "cartoons/"
+            get() = URL_BASE + "cartoons/"
         val URL_ANIME
-            get() = url_base + "animation/"
+            get() = URL_BASE + "animation/"
 
-        val sectionUrls: Array<String> = arrayOf(
-            URL_FILMS,
-            URL_SERIES,
-            URL_CARTOONS,
-            URL_ANIME
+
+        val movieSections: List<MovieSection> = listOf(
+            MovieSection( Locale.string(R.string.films), URL_FILMS ),
+            MovieSection( Locale.string(R.string.series), URL_SERIES ),
+            MovieSection( Locale.string(R.string.cartoons), URL_CARTOONS ),
+            MovieSection( Locale.string(R.string.anime), URL_ANIME ),
         )
+        val sectionNames: List<String> = movieSections.map { it.name }
+        val sectionUrls: List<String> = movieSections.map { it.url }
 
-        // Секции
-        const val url_films = "films/"
-        const val url_series = "series/"
-        const val url_cartoons = "cartoons/"
-        const val url_anime = "animation/"
 
-        // Фильтры
-        const val sorting_base = "?filter="
-        const val sorting_last = "last"
-        const val sorting_popular = "popular"
-        const val sorting_watching = "watching"
-
-        fun createUrl(section: String = "", genre: String = "", sorting: String = "") : String
+        fun createUrl(
+            baseUrl: String = URL_BASE,
+            sectionUrl: String? = null,
+            genreUrl: String? = null,
+            sortingUrl: String? = null
+        ) : String
         {
-            var url = url_base + section + genre
-            if (sorting != "")
-                url += sorting_base + sorting
+            var url = baseUrl
+            url += genreUrl ?: ""
+            url += sortingUrl ?: ""
+            url += sectionUrl ?: ""
 
             return url
         }
-
 
         fun getSectionNameByMovieType(type: String) : String
         {
@@ -86,12 +75,22 @@ class HDRezka
                 else -> "error_type"
             }
         }
+
+        fun getSectionUrlByMovieType(type: String) : String
+        {
+            return when (type)
+            {
+                FILM -> URL_FILMS
+                SERIAL -> URL_SERIES
+                CARTOON -> URL_CARTOONS
+                ANIME -> URL_ANIME
+
+                else -> "error_type"
+            }
+        }
     }
 
-    enum class Filters
-    {
-        NO_FILTERS, SECTION_SORTING, GENRE_SORTING, SORTING
-    }
+    data class MovieSection(val name: String, val url: String)
 }
 
 

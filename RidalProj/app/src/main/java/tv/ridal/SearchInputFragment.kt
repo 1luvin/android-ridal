@@ -14,10 +14,7 @@ import androidx.core.widget.NestedScrollView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
-import tv.ridal.hdrezka.HDRezka
-import tv.ridal.hdrezka.Movie
-import tv.ridal.hdrezka.Parser
-import tv.ridal.hdrezka.SearchResult
+import tv.ridal.hdrezka.*
 import tv.ridal.ui.cell.PointerCell
 import tv.ridal.ui.cell.SearchResultCell
 import tv.ridal.ui.layout.Layout
@@ -298,7 +295,7 @@ class SearchInputFragment : BaseAppFragment()
         val args = MoviesFragment.Arguments().apply {
             url = "https://rezka.ag/search/?do=search&subaction=search&q=${searchText}"
             title = searchText
-            filters = HDRezka.Filters.NO_FILTERS
+            filters = Filters.NO_FILTERS
         }
         startFragment(
             MoviesFragment.newInstance(args)

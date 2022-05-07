@@ -27,8 +27,10 @@ import tv.ridal.hdrezka.Movie
 import tv.ridal.hdrezka.Parser
 import tv.ridal.ui.actionbar.ActionBar
 import tv.ridal.adapter.PeopleAdapter
+import tv.ridal.hdrezka.Filters
 import tv.ridal.ui.cell.PointerCell
 import tv.ridal.ui.layout.VLinearLayout
+import tv.ridal.ui.msg
 import tv.ridal.ui.recyclerview.SpacingItemDecoration
 import tv.ridal.ui.popup.ImagePopup
 import tv.ridal.ui.recyclerview.EdgeColorEffect
@@ -225,9 +227,9 @@ class MovieFragment : BaseAppFragment()
         }
 
         headerView.apply {
-            setData(movieInfo.releaseYear, movieInfo.countries, movieInfo.genres)
-            setActors(movieInfo.actors)
-            setDuration(movieInfo.duration)
+            setData( movieInfo.releaseYear, movieInfo.countries, movieInfo.genres )
+            setActors( movieInfo.actors )
+            setDuration( movieInfo.duration )
         }
 
         // Рейтинги
@@ -237,28 +239,25 @@ class MovieFragment : BaseAppFragment()
         }
 
         // Описание
-        if ( movieInfo.hasDescription() )
-        {
-            val tv = RTextView(context).apply {
-                setPadding( Utils.dp(20), Utils.dp(10), Utils.dp(20), 0 )
+        val tv = RTextView(context).apply {
+            setPadding( Utils.dp(20), Utils.dp(10), Utils.dp(20), 0 )
 
-                setTextColor( Theme.color_text )
-                typeface = Theme.typeface(Theme.tf_normal)
-                textSize = 16.5F
+            setTextColor( Theme.color_text )
+            typeface = Theme.typeface(Theme.tf_normal)
+            textSize = 16.5F
 
-                text = movieInfo.description!!.text
-            }
-
-            val dropdownLayout = DropdownTextLayout(context).apply {
-                textView = tv
-                expandText = Locale.string(R.string.more)
-                collapseLines = 4
-            }
-
-            layout.addView(dropdownLayout, Layout.frame(
-                Layout.MATCH_PARENT, Layout.WRAP_CONTENT
-            ))
+            text = movieInfo.description
         }
+
+        val dropdownLayout = DropdownTextLayout(context).apply {
+            textView = tv
+            expandText = Locale.string(R.string.more)
+            collapseLines = 4
+        }
+
+        layout.addView(dropdownLayout, Layout.frame(
+            Layout.MATCH_PARENT, Layout.WRAP_CONTENT
+        ))
 
         // Актеры
         if ( movieInfo.hasActors() )
@@ -303,7 +302,7 @@ class MovieFragment : BaseAppFragment()
                             title = list.name
                             url = list.url
 
-                            filters = HDRezka.Filters.NO_FILTERS
+                            filters = Filters.NO_FILTERS
                         }
                         startFragment(MoviesFragment.newInstance(args))
                     }
@@ -335,7 +334,7 @@ class MovieFragment : BaseAppFragment()
                             title = collection.name
                             url = collection.url
 
-                            filters = HDRezka.Filters.SORTING
+                            filters = Filters.SORTING
                         }
                         startFragment(MoviesFragment.newInstance(args))
                     }
@@ -367,7 +366,7 @@ class MovieFragment : BaseAppFragment()
                             title = country.name
                             url = country.url
 
-                            filters = HDRezka.Filters.SECTION_SORTING
+                            filters = Filters.SECTION_SORTING
                         }
                         startFragment(MoviesFragment.newInstance(args))
                     }
@@ -399,9 +398,9 @@ class MovieFragment : BaseAppFragment()
                     setOnClickListener {
                         val args = MoviesFragment.Arguments().apply {
                             title = HDRezka.getSectionNameByMovieType(movie.type!!)
-                            url = genre.url
+                            url = HDRezka.getSectionUrlByMovieType(movie.type!!)
 
-                            filters = HDRezka.Filters.GENRE_SORTING
+                            filters = Filters.GENRE_SORTING
 
                             applyGenre = genre.name
                         }
@@ -441,6 +440,7 @@ class MovieFragment : BaseAppFragment()
         private val secondaryTextColor: Int = Theme.alphaColor( Color.WHITE, 0.8F )
 
         var movieNameHeightIndicator: Int = 0 // !
+
 
         fun setPoster(drawable: Drawable)
         {
@@ -567,6 +567,7 @@ class MovieFragment : BaseAppFragment()
                 Gravity.START or Gravity.BOTTOM
             ))
         }
+
 
         init
         {

@@ -8,23 +8,24 @@ class Sorting
 {
     companion object
     {
-        const val url_base = "?filter="
+        private const val url_base = "?filter="
 
-        private var sortingUrls = HashMap<String, String>().apply {
+        private var sortings = HashMap<String, String>().apply {
             this[Locale.string(R.string.sorting_last)] = "last"
             this[Locale.string(R.string.sorting_popular)] = "popular"
             this[Locale.string(R.string.sorting_watching)] = "watching"
         }
 
-        fun url(sorting: String) : String
+        fun url(sorting: String?) : String
         {
-            var url = ""
-            if ( sortingUrls.containsKey(sorting) )
+            if ( sorting == null ) return ""
+
+            if ( sortings.containsKey(sorting) )
             {
-                url += "${url_base}${sortingUrls[sorting]}"
+                return "${url_base}${sortings[sorting]}"
             }
 
-            return url
+            return ""
         }
 
     }

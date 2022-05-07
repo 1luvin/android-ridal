@@ -84,7 +84,8 @@ class Parser
                 doc.getElementsByClass("b-post__info")[0].getElementsByTag("tbody")[0]
             val trs: Elements = table.getElementsByTag("tr")
 
-            for (i in 0 until trs.size) {
+            for (i in 0 until trs.size)
+            {
                 val tds: Elements = trs[i].getElementsByTag("td")
                 val tdTitle: String = if (tds.size > 1) {
                     tds[0].text().substring(0, tds[0].text().length - 2)
@@ -141,7 +142,7 @@ class Parser
 
                         for (a in _as) {
                             val name = a.text()
-                            val url = a.attr("href")
+                            val url = "${HDRezka.URL_BASE}country/${name}/"
 
                             val country = Movie.NameUrl(name, url)
                             mi.countries!!.add(country)
@@ -176,9 +177,6 @@ class Parser
                             val genre = Movie.NameUrl(name, url)
                             mi.genres!!.add(genre)
                         }
-                    }
-                    HDRezka.IN_TRANSLATION -> {
-                        mi.inTranslations = tdData.text()
                     }
                     HDRezka.TIME -> {
                         mi.duration = tdData.text()
@@ -218,9 +216,8 @@ class Parser
                 }
             }
 
-            val title = doc.getElementsByClass("b-post__description_title")[0].text()
             val text = doc.getElementsByClass("b-post__description_text")[0].text()
-            mi.description = Movie.Description(title, text)
+            mi.description = text
 
             return mi
         }

@@ -16,6 +16,7 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import tv.ridal.adapter.MoviesAdapter
+import tv.ridal.hdrezka.Filters
 import tv.ridal.util.Locale
 import tv.ridal.util.Theme
 import tv.ridal.ui.actionbar.BigActionBar
@@ -43,11 +44,9 @@ class CatalogFragment : BaseAppFragment()
     private lateinit var actionBar: BigActionBar
     private val sectionViews: ArrayList<SectionView> = ArrayList()
 
-    private val requestQueue: RequestQueue = App.instance().requestQueue
+    private val sections: List<HDRezka.MovieSection> = HDRezka.movieSections
 
-    private val sectionUrls: Array<String> by lazy {
-        HDRezka.sectionUrls
-    }
+    private val requestQueue: RequestQueue = App.instance().requestQueue
 
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -71,15 +70,13 @@ class CatalogFragment : BaseAppFragment()
 
         layout = VLinearLayout( requireContext() ).apply {
             addView(actionBar)
+        }
 
-            post {
-                for (i in sectionUrls.indices)
-                {
-                    val view = SectionView( requireContext() )
-                    sectionViews.add(view)
-                    layout.addView(view)
-                }
-            }
+        for (i in sections.indices)
+        {
+            val view = SectionView( requireContext() )
+            sectionViews.add(view)
+            layout.addView(view)
         }
 
         scroll = NestedScrollView( requireContext() ).apply {
@@ -130,29 +127,21 @@ class CatalogFragment : BaseAppFragment()
 
     private fun loadSections()
     {
-        val urls = HDRezka.sectionUrls
-
-        val sectionNames = arrayOf(
-            Locale.string(R.string.films),
-            Locale.string(R.string.series),
-            Locale.string(R.string.cartoons),
-            Locale.string(R.string.anime),
-        )
-
-        for (i in urls.indices)
+        for (i in sections.indices)
         {
-            val request = StringRequest(Request.Method.GET, urls[i],
+            val section = sections[i]
+            val request = StringRequest(Request.Method.GET, section.url,
                 { response ->
                     val sectionView = sectionViews[i]
 
                     sectionView.apply {
-                        sectionName = sectionNames[i]
+                        sectionName = section.name
                         sectionSubtext = Parser.parseSectionMoviesSize(response)
 
                         setMovies( Parser.parseMovies(response, 10)!! )
 
                         onOpen {
-                            startMoviesFragment(sectionName, urls[i])
+                            startMoviesFragment( sections[i] )
                         }
 
                         onMovieClick {
@@ -169,12 +158,12 @@ class CatalogFragment : BaseAppFragment()
         }
     }
 
-    private fun startMoviesFragment(title: String, url: String)
+    private fun startMoviesFragment(section: HDRezka.MovieSection)
     {
         val args = MoviesFragment.Arguments().apply {
-            this.title = title
-            this.url = url
-            filters = HDRezka.Filters.GENRE_SORTING
+            this.title = section.name
+            this.url = section.url
+            filters = Filters.GENRE_SORTING
         }
 
         startFragment( MoviesFragment.newInstance(args) )
