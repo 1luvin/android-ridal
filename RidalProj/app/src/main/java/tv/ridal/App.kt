@@ -23,17 +23,17 @@ class App : Application()
                 }
             }
 
-        val appContext get() = instance().applicationContext
+        val appContext: Context get() = instance().applicationContext
     }
 
     // Volley's RequestQueue
     val requestQueue: RequestQueue by lazy {
-        Volley.newRequestQueue(applicationContext)
+        Volley.newRequestQueue( appContext )
     }
 
     // Shared Preferences
     val settingsPref: SharedPreferences by lazy {
-        getSharedPreferences(SETTINGS_PREF, Context.MODE_PRIVATE)
+        getSharedPreferences( SETTINGS_PREF, Context.MODE_PRIVATE )
     }
 
     val configuration: Configuration by lazy {

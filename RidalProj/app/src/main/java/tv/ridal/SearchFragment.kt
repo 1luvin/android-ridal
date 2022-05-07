@@ -9,12 +9,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import com.github.nitrico.stickyscrollview.StickyScrollView
+import com.tunjid.androidx.navigation.Navigator
 import tv.ridal.adapter.MoviesAdapter
 import tv.ridal.hdrezka.HDRezka
 import tv.ridal.hdrezka.Movie

@@ -13,6 +13,7 @@ import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.multiStackNavigationController
 import tv.ridal.util.Theme
 import tv.ridal.ui.fade
+import tv.ridal.ui.msg
 import tv.ridal.ui.setBackgroundColor
 import tv.ridal.ui.zoom
 import tv.ridal.util.Utils
@@ -83,10 +84,13 @@ class AppActivity : BaseActivity()
                 { menu.findItem(tabs[it])?.isChecked = true }
             multiStackNavigator.transactionModifier = { incomingFragment ->
                 val current = multiStackNavigator.current
-                if (current is Navigator.TransactionModifier) current.augmentTransaction(
-                    this,
-                    incomingFragment
-                )
+                if (current is Navigator.TransactionModifier)
+                {
+                    current.augmentTransaction(
+                        this,
+                        incomingFragment
+                    )
+                }
                 else {
                     zoom()
                 }
@@ -94,11 +98,12 @@ class AppActivity : BaseActivity()
             multiStackNavigator.stackTransactionModifier = { fade() }
 
             setOnApplyWindowInsetsListener { v, insets -> insets }
-            setOnNavigationItemSelectedListener {
+
+            setOnItemSelectedListener {
                 multiStackNavigator.show(tabs.indexOf(it.itemId)).let { true }
             }
-            setOnNavigationItemReselectedListener {
-                multiStackNavigator.activeNavigator.clear() // возврат к начальному экрану активной вкладки
+            setOnItemReselectedListener {
+                multiStackNavigator.activeNavigator.clear()
             }
         }
 
@@ -124,17 +129,6 @@ class AppActivity : BaseActivity()
                     Theme.color(Theme.color_bottomNavIcon_active),
                 )
             )
-
-            itemTextColor = ColorStateList(
-                arrayOf(
-                    intArrayOf(-android.R.attr.state_checked),
-                    intArrayOf(android.R.attr.state_checked)
-                ),
-                intArrayOf(
-                    Theme.color(Theme.color_bottomNavIcon_inactive),
-                    Theme.color(Theme.color_bottomNavIcon_active),
-                )
-            )
         }
 
         onBackPressedDispatcher.addCallback(this) { if ( ! multiStackNavigator.pop() ) finish() }
@@ -142,7 +136,7 @@ class AppActivity : BaseActivity()
 
     private fun updateStatusBar()
     {
-        Theme.enableDarkStatusBar(window, ! Theme.isDark())
+        Theme.enableDarkStatusBar( window, ! Theme.isDark() )
     }
 }
 
