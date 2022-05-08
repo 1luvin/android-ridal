@@ -11,7 +11,7 @@
 
 ### Find your favourite movies
 
-<image src="./readme/movie.gif" width="250" />
+<image src="./assets/movie.gif" width="250" />
 
 ### Change color theme and main color
 
