@@ -180,7 +180,11 @@ class SearchFragment : BaseAppFragment()
             layoutManager = GridLayoutManager(context, 3)
             addItemDecoration( GridSpacingItemDecoration(3, Utils.dp(13)) )
 
-            adapter = MoviesAdapter(movies)
+            adapter = MoviesAdapter(movies).apply {
+                onMovieClick {
+                    startFragment( MovieFragment.newInstance(it) )
+                }
+            }
         }
     }
 

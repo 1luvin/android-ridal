@@ -16,13 +16,10 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import tv.ridal.adapter.MoviesAdapter
-import tv.ridal.hdrezka.Filters
+import tv.ridal.hdrezka.*
 import tv.ridal.util.Locale
 import tv.ridal.util.Theme
 import tv.ridal.ui.actionbar.BigActionBar
-import tv.ridal.hdrezka.HDRezka
-import tv.ridal.hdrezka.Movie
-import tv.ridal.hdrezka.Parser
 import tv.ridal.ui.layout.VLinearLayout
 import tv.ridal.util.Utils
 import tv.ridal.ui.*
@@ -130,7 +127,8 @@ class CatalogFragment : BaseAppFragment()
         for (i in sections.indices)
         {
             val section = sections[i]
-            val request = StringRequest(Request.Method.GET, section.url,
+            val url = section.url + Sorting.url( Locale.string(R.string.sorting_watching) )
+            val request = StringRequest(Request.Method.GET, url,
                 { response ->
                     val sectionView = sectionViews[i]
 
@@ -141,7 +139,7 @@ class CatalogFragment : BaseAppFragment()
                         setMovies( Parser.parseMovies(response, 10)!! )
 
                         onOpen {
-                            startMoviesFragment( sections[i] )
+                            startMoviesFragment( section )
                         }
 
                         onMovieClick {
@@ -161,8 +159,8 @@ class CatalogFragment : BaseAppFragment()
     private fun startMoviesFragment(section: HDRezka.MovieSection)
     {
         val args = MoviesFragment.Arguments().apply {
-            this.title = section.name
-            this.url = section.url
+            title = section.name
+            url = section.url
             filters = Filters.GENRE_SORTING
         }
 

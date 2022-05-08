@@ -284,7 +284,7 @@ class MoviesFragment : BaseAppFragment()
 
 
     private fun checkFilters()
-    {
+     {
         if (arguments.filters == Filters.NO_FILTERS) return
 
         val title = arguments.title
