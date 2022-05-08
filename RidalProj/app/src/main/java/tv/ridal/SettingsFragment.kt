@@ -19,7 +19,6 @@ import androidx.core.widget.NestedScrollView
 import tv.ridal.util.Locale
 import tv.ridal.util.Theme
 import tv.ridal.ui.actionbar.BigActionBar
-import tv.ridal.ui.listener.InstantPressListener
 import tv.ridal.ui.layout.Layout
 import tv.ridal.ui.layout.SingleCheckGroup
 import tv.ridal.ui.layout.VLinearLayout
@@ -58,7 +57,7 @@ class SettingsFragment : BaseSettingsFragment()
     private var bg_views: ArrayList<View> = ArrayList()
     private var sectionBgs_views: ArrayList<View> = ArrayList()
 
-    private val colors: IntArray = Theme.mainColors()
+    private val mainColors: IntArray = Theme.mainColors()
 
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -173,11 +172,11 @@ class SettingsFragment : BaseSettingsFragment()
         val fromColors = Theme.activeColors
 
         val toTheme: Int
-        if (colors == Theme.FOLLOW_SYSTEM)
+        if ( colors == Theme.FOLLOW_SYSTEM )
         {
             val conf = App.instance().configuration
             val nightMode = conf.uiMode and Configuration.UI_MODE_NIGHT_YES
-            if (nightMode == Configuration.UI_MODE_NIGHT_YES)
+            if ( nightMode == Configuration.UI_MODE_NIGHT_YES )
                 toTheme = Theme.DARK
             else
                 toTheme = Theme.LIGHT
@@ -190,12 +189,12 @@ class SettingsFragment : BaseSettingsFragment()
         val toColors = Theme.colorsList[toTheme]
 
         val f_bg = fromColors[Theme.color_bg]!!
-        val f_bg_l = Theme.overlayColor(f_bg, 0.04F)
+        val f_bg_l = Theme.overlayColor( f_bg, 0.04F )
         val f_text = fromColors[Theme.color_text]!!
         val f_text2 = fromColors[Theme.color_text2]!!
 
         val t_bg = toColors[Theme.color_bg]!!
-        val t_bg_l = Theme.overlayColor(t_bg, 0.04F)
+        val t_bg_l = Theme.overlayColor( t_bg, 0.04F )
         val t_text = toColors[Theme.color_text]!!
         val t_text2 = toColors[Theme.color_text2]!!
 
@@ -250,8 +249,8 @@ class SettingsFragment : BaseSettingsFragment()
 
                     themeCheckGroup.apply {
                         isEnabled = false
-                        setTextColor(t_text2)
-                        setTextColorChecked(t_text)
+                        setTextColor( t_text2 )
+                        setTextColorChecked( t_text )
                     }
 
                     val enable = toTheme == 0
@@ -394,10 +393,10 @@ class SettingsFragment : BaseSettingsFragment()
         {
             layout = LinearLayout(context)
 
-            for (i in colors.indices)
+            for (i in mainColors.indices)
             {
                 val colorView = ColorView(context).apply {
-                    color = colors[i]
+                    color = mainColors[i]
 
                     setOnClickListener {
                         if ( ! it.isSelected) selectColor(color)
@@ -451,7 +450,7 @@ class SettingsFragment : BaseSettingsFragment()
                 overScrollMode = View.OVER_SCROLL_NEVER
 
                 setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-                    val maxScrollX = (Utils.dp(15) * 2) + (Utils.dp(80) * colors.size) + (Utils.dp(10) * (colors.size - 1)) - width
+                    val maxScrollX = (Utils.dp(15) * 2) + (Utils.dp(80) * mainColors.size) + (Utils.dp(10) * (mainColors.size - 1)) - width
 
                     if (scrollX < gradientWidth)
                     {

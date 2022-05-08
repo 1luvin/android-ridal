@@ -36,6 +36,7 @@ class App : Application()
         getSharedPreferences( SETTINGS_PREF, Context.MODE_PRIVATE )
     }
 
+    // Configuration
     val configuration: Configuration by lazy {
         resources.configuration
     }

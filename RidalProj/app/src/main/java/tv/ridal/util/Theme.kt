@@ -15,7 +15,15 @@ class Theme
     companion object
     {
         /*
-            Основные цвета (те, которые пользователь может выбрать)
+            Color themes
+         */
+
+        const val FOLLOW_SYSTEM = -1
+        const val LIGHT: Int = 0
+        const val DARK: Int = 1
+
+        /*
+            Main colors
          */
 
         private const val COLOR_TWITCH = 0xFF7C24FF.toInt()
@@ -101,10 +109,6 @@ class Theme
             }
         }
 
-        const val FOLLOW_SYSTEM = -1
-        const val LIGHT: Int = 0
-        const val DARK: Int = 1
-
         fun isDark() : Boolean
         {
             return activeColors == darkColors
@@ -112,30 +116,18 @@ class Theme
 
         fun initTheme()
         {
-            // Инициализация темы
             val pref = App.instance().settingsPref
-            if ( ! pref.contains(key_colors) )
-            {
-                pref.edit()
-                    .putInt(key_colors, FOLLOW_SYSTEM)
-                    .apply()
-            }
-            colors = pref.getInt(key_colors, FOLLOW_SYSTEM)
-            // Инициализация основного цвета
-            if ( ! pref.contains(key_mainColor) )
-            {
-                pref.edit()
-                    .putInt(key_mainColor, COLOR_TWITCH)
-                    .apply()
-            }
-            mainColor = pref.getInt(color_main, COLOR_TWITCH)
+            // Colors init
+            colors = pref.getInt( key_colors, FOLLOW_SYSTEM )
+            // Main color init
+            mainColor = pref.getInt( key_mainColor, COLOR_TWITCH )
         }
 
         var colors: Int = FOLLOW_SYSTEM // !
             set(value) {
                 field = value
 
-                if (colors == FOLLOW_SYSTEM)
+                if ( colors == FOLLOW_SYSTEM )
                 {
                     val conf = App.instance().configuration
                     val nightMode = conf.uiMode and Configuration.UI_MODE_NIGHT_YES
@@ -148,29 +140,35 @@ class Theme
                 {
                     activeColors = colorsList[colors]
                 }
+
+                val editor = App.instance().settingsPref.edit()
+                editor.apply {
+                    putInt( key_colors, colors )
+                    apply()
+                }
             }
 
-        var mainColor = 0 // !
+        var mainColor = COLOR_TWITCH // !
             set(value) {
                 field = value
 
                 val editor = App.instance().settingsPref.edit()
                 editor.apply {
-                    putInt(key_mainColor, mainColor)
+                    putInt( key_mainColor, mainColor )
                     apply()
                 }
             }
 
 
         /*
-            Ключи для тем
+            Theme keys for shared preferences
          */
 
-        const val key_colors = "key_colors"
-        const val key_mainColor = "key_mainColor"
+        private const val key_colors = "key_colors"
+        private const val key_mainColor = "key_mainColor"
 
         /*
-            Ключи для цветов
+            Color keys
          */
 
         const val color_main = "color_main"
@@ -310,16 +308,16 @@ class Theme
             return overlayColor( color(colorKey), value )
         }
 
-        fun alphaColor(color: Int, @FloatRange(from=0.0, to=1.0) alpha: Float) : Int
+        fun alphaColor(color: Int, @FloatRange( from=0.0, to=1.0 ) alpha: Float) : Int
         {
             return ColorUtils.setAlphaComponent(color, (255 * alpha).toInt())
         }
-        fun alphaColor(colorKey: String, @FloatRange(from=0.0, to=1.0) alpha: Float) : Int
+        fun alphaColor(colorKey: String, @FloatRange( from=0.0, to=1.0 ) alpha: Float) : Int
         {
             return alphaColor(color(colorKey), alpha)
         }
 
-        fun mixColors(color1: Int, color2: Int, @FloatRange(from=0.0, to=1.0) ratio: Float) : Int
+        fun mixColors(color1: Int, color2: Int, @FloatRange( from=0.0, to=1.0 ) ratio: Float) : Int
         {
             return ColorUtils.blendARGB(color1, color2, ratio)
         }
