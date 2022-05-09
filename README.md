@@ -1,6 +1,6 @@
 # Ridal – Movie Finder
 
-### Explore catalog
+### Explore the catalog
   
 <image src="https://user-images.githubusercontent.com/85808397/167303080-b04bb4c5-15d3-4b89-a800-ae53e147216c.jpg" width="250" /> <image src="https://user-images.githubusercontent.com/85808397/167303103-444cccdb-ff75-4386-8815-830e376888df.jpg" width="250" />
 
