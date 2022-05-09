@@ -1,9 +1,8 @@
 # Ridal – Movie Finder
 
-### Explore catalog and movie sections
+### Explore catalog
   
 <image src="https://user-images.githubusercontent.com/85808397/167303080-b04bb4c5-15d3-4b89-a800-ae53e147216c.jpg" width="250" /> <image src="https://user-images.githubusercontent.com/85808397/167303103-444cccdb-ff75-4386-8815-830e376888df.jpg" width="250" />
-
 
 ### Filter movies by desired genre and sorting
 
@@ -12,6 +11,10 @@
 ### Find your favourite movies
 
 <image src="./assets/movie.gif" width="250" />
+
+### Search for desired movie
+
+<image src="https://user-images.githubusercontent.com/85808397/167432086-ef5da84c-1dc7-4e7a-b61b-ffbe7e627aa1.jpg" width="250" /> <image src="https://user-images.githubusercontent.com/85808397/167432271-13bd8885-714a-40d5-b352-efb00afb409d.jpg" width="250" /> 
 
 ### Change color theme and main color
 
