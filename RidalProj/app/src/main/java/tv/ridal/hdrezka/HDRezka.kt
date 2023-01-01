@@ -26,7 +26,7 @@ class HDRezka
         const val FROM_SERIES = "Из серии"
         const val ACTORS = "В ролях актеры"
 
-        const val URL_BASE = "https://hdrezkaert.com/"
+        const val URL_BASE = "http://hdrezkagghnf6.net/"
 
         val URL_FILMS
             get() = URL_BASE + "films/"
