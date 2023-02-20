@@ -358,10 +358,8 @@ class MoviesFragment : BaseAppFragment()
             return url
         }
 
-        return if ( Pager.isNextPageExist( document!! ) ) {
-            Pager.nextPageUrl( document!! )
-        } else {
-            loading = false
+        return Pager.nextPageUrl(document!!) ?: run {
+            loading = false;
             null
         }
     }

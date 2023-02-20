@@ -6,62 +6,21 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import tv.ridal.App
 
-class Loader
-{
-    companion object
-    {
-        private val context: Context
-            get() = App.instance().applicationContext
+class Loader {
 
-        fun loadImage(imageUrl: CharSequence, onLoaded: (d: Drawable?) -> Unit)
-        {
+    companion object {
+
+        private val context: Context get() = App.instance().applicationContext
+
+        fun loadImage(imageUrl: CharSequence, onLoaded: (d: Drawable?) -> Unit) {
             val request = ImageRequest.Builder(context)
                 .data(imageUrl)
-                .target {result ->
+                .target { result ->
                     onLoaded.invoke(result)
                 }
                 .build()
 
             context.imageLoader.enqueue(request)
         }
-
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//

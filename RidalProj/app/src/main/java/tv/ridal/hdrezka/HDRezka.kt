@@ -3,10 +3,10 @@ package tv.ridal.hdrezka
 import tv.ridal.R
 import tv.ridal.util.Locale
 
-class HDRezka
-{
-    companion object
-    {
+class HDRezka {
+
+    companion object {
+
         const val PAGE_CAPACITY = 36
 
         const val FILM = "Фильм"
@@ -26,7 +26,7 @@ class HDRezka
         const val FROM_SERIES = "Из серии"
         const val ACTORS = "В ролях актеры"
 
-        const val URL_BASE = "http://hdrezkagghnf6.net/"
+        const val URL_BASE = "http://hdrezka2p2erm.net/"
 
         val URL_FILMS
             get() = URL_BASE + "films/"
@@ -39,10 +39,10 @@ class HDRezka
 
 
         val movieSections: List<MovieSection> = listOf(
-            MovieSection( Locale.string(R.string.films), URL_FILMS ),
-            MovieSection( Locale.string(R.string.series), URL_SERIES ),
-            MovieSection( Locale.string(R.string.cartoons), URL_CARTOONS ),
-            MovieSection( Locale.string(R.string.anime), URL_ANIME ),
+            MovieSection(Locale.string(R.string.films), URL_FILMS),
+            MovieSection(Locale.string(R.string.series), URL_SERIES),
+            MovieSection(Locale.string(R.string.cartoons), URL_CARTOONS),
+            MovieSection(Locale.string(R.string.anime), URL_ANIME),
         )
         val sectionNames: List<String> = movieSections.map { it.name }
         val sectionUrls: List<String> = movieSections.map { it.url }
@@ -53,8 +53,7 @@ class HDRezka
             sectionUrl: String? = null,
             genreUrl: String? = null,
             sortingUrl: String? = null
-        ) : String
-        {
+        ): String {
             var url = baseUrl
             url += genreUrl ?: ""
             url += sortingUrl ?: ""
@@ -63,10 +62,8 @@ class HDRezka
             return url
         }
 
-        fun getSectionNameByMovieType(type: String) : String
-        {
-            return when (type)
-            {
+        fun getSectionNameByMovieType(type: String): String {
+            return when (type) {
                 FILM -> Locale.string(R.string.films)
                 SERIAL -> Locale.string(R.string.series)
                 CARTOON -> Locale.string(R.string.cartoons)
@@ -76,10 +73,8 @@ class HDRezka
             }
         }
 
-        fun getSectionUrlByMovieType(type: String) : String
-        {
-            return when (type)
-            {
+        fun getSectionUrlByMovieType(type: String): String {
+            return when (type) {
                 FILM -> URL_FILMS
                 SERIAL -> URL_SERIES
                 CARTOON -> URL_CARTOONS
@@ -92,41 +87,3 @@ class HDRezka
 
     data class MovieSection(val name: String, val url: String)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//

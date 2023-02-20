@@ -6,17 +6,13 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import tv.ridal.ui.amount
 import tv.ridal.ui.msg
+import kotlin.math.min
 
-class Parser
-{
-    companion object
-    {
-        /*
-            Films, series, cartoons, anime
-         */
+class Parser {
 
-        fun parseMovies(doc: Document, size: Int = HDRezka.PAGE_CAPACITY): ArrayList<Movie>?
-        {
+    companion object {
+
+        fun parseMovies(doc: Document, size: Int = HDRezka.PAGE_CAPACITY): ArrayList<Movie>? {
             val movieCardsBox = doc.getElementsByClass("b-content__inline_items")
             if (movieCardsBox.size == 0) return null
             val movieCards = movieCardsBox[0].getElementsByClass("b-content__inline_item")
@@ -25,37 +21,29 @@ class Parser
             val movies = ArrayList<Movie>()
             movies.ensureCapacity(size)
 
-            for (i in 0 until Math.min(movieCards.size, size))
-            {
+            for (i in 0 until min(movieCards.size, size)) {
                 val movieCard = movieCards[i]
 
                 val cardCover = movieCard.getElementsByClass("b-content__inline_item-cover")[0]
                 val cardLink = movieCard.getElementsByClass("b-content__inline_item-link")[0]
-                // Название
+
                 val name = cardLink.getElementsByTag("a")[0].text()
-                // Ссылка
                 val url = cardLink.getElementsByTag("a")[0].attr("href")
-                // Постер
                 val posterUrl = cardCover.getElementsByTag("img")[0].attr("src")
-                // Тип, Тип (рейтинг)
                 val entity = cardCover.getElementsByClass("entity")[0]
                 val iText = entity.ownText().replace(" ", "")
-                val type = iText
-
                 var rating: String? = null
                 val innerI = entity.getElementsByClass("b-category-bestrating")
-                if ( innerI.size != 0 )
-                {
+                if (innerI.size != 0) {
                     val text = innerI[0].ownText()
-                    if ( text.contains('.') )
-                    {
+                    if (text.contains('.')) {
                         rating = text.amount()
                     }
                 }
 
                 val movie = Movie(name, url).apply {
                     this.posterUrl = posterUrl
-                    this.type = type
+                    this.type = iText
                     this.rating = rating
                 }
                 movies.add(movie)
@@ -64,18 +52,11 @@ class Parser
             return movies
         }
 
-        fun parseMovies(html: String, size: Int = HDRezka.PAGE_CAPACITY): ArrayList<Movie>?
-        {
-            return parseMovies( Jsoup.parse(html), size )
+        fun parseMovies(html: String, size: Int = HDRezka.PAGE_CAPACITY): ArrayList<Movie>? {
+            return parseMovies(Jsoup.parse(html), size)
         }
 
-
-        /*
-            Movie information
-         */
-
-        fun parseMovieInfo(doc: Document): Movie.Info
-        {
+        fun parseMovieInfo(doc: Document): Movie.Info {
             val mi = Movie.Info()
 
             mi.hdPosterUrl = doc.select(".b-sidecover > a > img").attr("src")
@@ -84,8 +65,7 @@ class Parser
                 doc.getElementsByClass("b-post__info")[0].getElementsByTag("tbody")[0]
             val trs: Elements = table.getElementsByTag("tr")
 
-            for (i in 0 until trs.size)
-            {
+            for (i in 0 until trs.size) {
                 val tds: Elements = trs[i].getElementsByTag("td")
                 val tdTitle: String = if (tds.size > 1) {
                     tds[0].text().substring(0, tds[0].text().length - 2)
@@ -119,11 +99,10 @@ class Parser
 
                         mi.inLists = ArrayList()
 
-                        for (aTag in aTags)
-                        {
+                        for (aTag in aTags) {
                             val name = aTag.text()
                             var url = aTag.attr("href")
-                            if ( ! url!!.contains("https")) {
+                            if (!url!!.contains("https")) {
                                 url = url.replace("http", "https")
                             }
 
@@ -222,18 +201,11 @@ class Parser
             return mi
         }
 
-        fun parseMovieInfo(html: String) : Movie.Info
-        {
-            return parseMovieInfo( Jsoup.parse(html) )
+        fun parseMovieInfo(html: String): Movie.Info {
+            return parseMovieInfo(Jsoup.parse(html))
         }
 
-
-        /*
-            Search results
-         */
-
-        fun parseSearchResults(doc: Document): Pair<ArrayList<SearchResult>, Boolean>?
-        {
+        fun parseSearchResults(doc: Document): Pair<ArrayList<SearchResult>, Boolean>? {
             val results = ArrayList<SearchResult>().apply {
                 ensureCapacity(5)
             }
@@ -241,8 +213,7 @@ class Parser
             val lis = doc.getElementsByTag("li")
             if (lis.size == 0) return null
 
-            for (li in lis)
-            {
+            for (li in lis) {
                 val a = li.select("a")
                 val movieName = a.select(".enty").text()
 
@@ -253,16 +224,13 @@ class Parser
                     HDRezka.CARTOON, HDRezka.FILM, HDRezka.SERIAL, HDRezka.ANIME
                 )
 
-                for (i in typesList.indices)
-                {
+                for (i in typesList.indices) {
                     if (d.contains(typesList[i], ignoreCase = true)) {
                         movieData += typesList[i]
                         movieData += ", "
                         break
-                    }
-                    else {
-                        if (i == typesList.size - 1)
-                        {
+                    } else {
+                        if (i == typesList.size - 1) {
                             movieData += HDRezka.FILM
                             movieData += ", "
                         }
@@ -273,12 +241,10 @@ class Parser
                     .map(MatchResult::value)
                     .toList()
 
-                for (i in years.indices)
-                {
+                for (i in years.indices) {
                     if (years[i].length < 4) continue
                     movieData += years[i]
-                    if (years.size > 1 && i != years.size - 1)
-                    {
+                    if (years.size > 1 && i != years.size - 1) {
                         movieData += "-"
                     }
                 }
@@ -293,26 +259,18 @@ class Parser
             }
 
             val hasMore = doc.getElementsByClass("b-search__live_all").size != 0
-            msg("${hasMore}")
+            msg("$hasMore")
 
             return Pair(results, hasMore)
         }
 
-        fun parseSearchResults(html: String) : Pair<ArrayList<SearchResult>, Boolean>?
-        {
-            return parseSearchResults( Jsoup.parse(html) )
+        fun parseSearchResults(html: String): Pair<ArrayList<SearchResult>, Boolean>? {
+            return parseSearchResults(Jsoup.parse(html))
         }
 
-
-        /*
-            Movies size
-         */
-
-        fun parseSectionMoviesSize(doc: Document) : String
-        {
+        fun parseSectionMoviesSize(doc: Document): String {
             val navigation = doc.getElementsByClass("b-navigation")
-            if (navigation.size > 0)
-            {
+            if (navigation.size > 0) {
                 val nav = navigation[0]
                 val aTags = nav.getElementsByTag("a")
                 val size = aTags[aTags.size - 2].text().toInt() - 1
@@ -321,17 +279,11 @@ class Parser
             return ""
         }
 
-        fun parseSectionMoviesSize(html: String) : String
-        {
-            return parseSectionMoviesSize( Jsoup.parse(html) )
+        fun parseSectionMoviesSize(html: String): String {
+            return parseSectionMoviesSize(Jsoup.parse(html))
         }
 
-        /*
-            Person photo
-         */
-
-        fun parsePersonPhotoUrl(html: String) : String
-        {
+        fun parsePersonPhotoUrl(html: String): String {
             val doc = Jsoup.parse(html)
             val sideCover = doc.getElementsByClass("b-sidecover")
             if (sideCover.isNotEmpty()) {
@@ -342,42 +294,5 @@ class Parser
             }
             return "https://static.hdrezka.ac/i/nopersonphoto.png"
         }
-
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//

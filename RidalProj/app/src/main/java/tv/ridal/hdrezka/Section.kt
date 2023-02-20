@@ -3,10 +3,10 @@ package tv.ridal.hdrezka
 import tv.ridal.R
 import tv.ridal.util.Locale
 
-class Section
-{
-    companion object
-    {
+class Section {
+
+    companion object {
+
         const val url_base = "&genre="
 
         private var sections = HashMap<String, String>().apply {
@@ -17,16 +17,6 @@ class Section
             this[Locale.string(R.string.anime)] = "82"
         }
 
-        fun url(section: String?) : String
-        {
-            if ( section == null ) return ""
-
-            if ( sections.containsKey(section) )
-            {
-                return "${url_base}${sections[section]}"
-            }
-
-            return ""
-        }
+        fun url(section: String?): String = sections[section]?.let { "$url_base$it" } ?: ""
     }
 }

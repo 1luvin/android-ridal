@@ -1,14 +1,14 @@
 package tv.ridal.hdrezka
 
 
-data class Movie(val name: String, val url: String)
-{
+data class Movie(val name: String, val url: String) {
+
     var posterUrl: String? = null
     var type: String? = null
     var rating: String? = null
 
-    class Info
-    {
+    class Info {
+
         // Poster
         var hdPosterUrl: String? = null
 
@@ -53,40 +53,4 @@ data class Movie(val name: String, val url: String)
     data class NameUrl(val name: String, val url: String)
 
     data class Rating(val whose: String, val value: String)
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//
