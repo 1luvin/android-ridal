@@ -1,4 +1,4 @@
-# Ridal – Movie Finder
+# Ridal – movie finder
 
 ### Explore the catalog
   
